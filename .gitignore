@@ -1,6 +1,5 @@
 .DS_Store
 .idea
-.env
 .vscode
 .babelrc
 .stylelintrc.json
@@ -15,3 +14,4 @@ dist
 node_modules/
 npm-debug.*
 Thumbs.db
+.env
