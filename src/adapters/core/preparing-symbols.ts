@@ -2,6 +2,8 @@ import {getAllTradableTickers} from "../utils/fetch";
 
 import {generateCombinations} from "./utils/utils";
 import {createTradeSequence} from "./create-trade-sequence";
+import {ActionTimer, actionTimer} from "../utils/timer";
+
 
 const getAllCoins=(tradableTickers:any[])=>{
 
@@ -19,7 +21,9 @@ const getAllCoins=(tradableTickers:any[])=>{
 }
 
 export const preparingSymbols =async ()=>{
-
+    //const startTime = +(new Date());
+    const timer =new ActionTimer("preparingSymbols")
+    timer.start()
     const tradableTickers =  await getAllTradableTickers();
     const tradableCoins = getAllCoins(tradableTickers);
     // console.log(tradableCoins)
@@ -33,10 +37,11 @@ export const preparingSymbols =async ()=>{
         return  acc
     }, {})
 
-    const allSequences = allCombinations.map((el:any)=>createTradeSequence(el,symbols));
-    console.log(allSequences.filter((el:any)=> el!==null));
-
-    return symbols;
+    const allSequences = allCombinations.map((el: any) => createTradeSequence(el, symbols)).filter((el: any) => el !== null);
+    // console.log(allSequences);
+    //console.log("done in -- " + (+(new Date()) - startTime) / 1000 + "sec")
+    timer.stop();
+    return {symbols, allSequences};
 
 }
 
