@@ -7,12 +7,13 @@ export async function getAllTradableTickers() {
     try {
         const response = await fetch1(url);
 
+
         const tickers = await response.json();
         const symbols = tickers.symbols.filter((el:any)=>el.status==='TRADING').map(symbolMapper)
         //
         // status: Этот ключ указывает на текущее состояние торговой пары. Если значение status равно "TRADING",
-        // это означает, что пара активна и торгуется. В вашем примере значение status равно "BREAK", что означает, что
-        // торговля по этой паре в данный момент приостановлена или не проводится.
+        // это означает, что пара активна и торгуется. "BREAK" означает, что торговля по этой паре в данный момент
+        // приостановлена или не проводится.
         //
         return symbols;
 

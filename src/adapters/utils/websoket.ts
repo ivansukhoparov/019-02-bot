@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import {symbols} from "../../index";
 import {getPair} from "../core/update-symbols";
+import {priceDifference} from "../core/price-difference";
 
 const streamNames = ['!ticker@arr'];
 const combinedStreamsUrl = `wss://stream.binance.com:9443/stream?streams=${streamNames.join('/')}`;
@@ -18,26 +19,7 @@ export const wsUpdate = (symbols: any) => {
             const data = JSON.parse(e.data.toString());
             updatePrices(symbols, data.data)
 
-            // console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
-            // console.log("AVAILABLE SYMBOLS")
-            // console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
-            const base = getPair(symbols);
-            const btcusdt = getPair(symbols,"ETH","USDT");
-            const btceur = getPair(symbols,"ETH","EUR");
-            console.log(base)
-            console.log(btcusdt);
-            console.log(btceur);
-
-            const fcp=+btcusdt!.info.ask;
-            console.log("Цена BTC/USD - " + fcp);
-
-            const cpsc=+btceur!.info.ask * +base!.exchangeRates
-            console.log("Конвертируемая цена BTC/USD по паре BTC/EUR - " + cpsc);
-
-            const rc = fcp-cpsc
-            console.log("Разница в ценах составит - " + rc);
-
-            console.log("Разница в % составит - " + (rc/fcp*100));
+            console.log( priceDifference(symbols, "USDT", "EUR", "BTC"));
 
 
         } catch (error) {

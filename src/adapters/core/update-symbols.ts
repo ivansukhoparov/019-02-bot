@@ -7,7 +7,6 @@ export const getPair = (tradeData:any, base:string = "EUR",quote:string = "USDT"
             pair:base+quote,
             exchangeRates:tradeData[base + quote].ask,
             info:tradeData[base + quote],
-
         };
     }else if (tradeData[quote+base]){
         return {

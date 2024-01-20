@@ -6,7 +6,8 @@ export let symbols:any ={};
 
 const startApp = async ()=>{
     symbols = await preparingSymbols();
-   wsUpdate(symbols);
+  // console.log(symbols)
+  // wsUpdate(symbols);
 }
 
 startApp();
