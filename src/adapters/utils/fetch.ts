@@ -1,7 +1,7 @@
 import fetch1 from 'node-fetch';
 import {symbolMapper} from "../types/fetch-binance/mapper";
 
-export async function getAllTradableTickersOnBinance() {
+export async function getAllTradableTickers() {
     const url = 'https://api.binance.com/api/v3/exchangeInfo';
 
     try {

@@ -11,8 +11,8 @@ export type tickerOutputDataType = {
     symbol: string //Символ торговой пары (CTSIBNB в данном случае).
     baseAsset: string
     quoteAsset: string
-    bid: string //Лучшая цена покупки (наивысшая цена спроса).
-    ask: string //Лучшая цена продажи (наименьшая цена предложения).
+    bid: number | null //Лучшая цена покупки (наивысшая цена спроса).
+    ask: number | null //Лучшая цена продажи (наименьшая цена предложения).
 
 }
 

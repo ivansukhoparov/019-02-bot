@@ -1,8 +1,12 @@
-import {getAllTradableTickersOnBinance} from "../utils/fetch";
+import {getAllTradableTickers} from "../utils/fetch";
 
 export const preparingSymbols =async ()=>{
-    const symbols =  await getAllTradableTickersOnBinance();
-
+    const tradableTickers =  await getAllTradableTickers();
+    const symbols:any = tradableTickers.reduce((acc, el)=>{
+        acc[el.symbol] = el
+        delete acc[el.symbol].symbol
+        return  acc
+    }, {})
     return symbols;
 }
 

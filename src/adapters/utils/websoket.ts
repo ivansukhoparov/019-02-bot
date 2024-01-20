@@ -1,18 +1,14 @@
-import  WebSocket from 'ws';
-import {tickerMapper} from "../types/web-soket-binance/mapper";
-import {TradingSymbolsType} from "../types/fetch-binance/input";
-import {getExchangePairs} from "../core/update-symbols";
+import WebSocket from 'ws';
+import {symbols} from "../../index";
+import {getPair} from "../core/update-symbols";
 
-const THRESHOLD = 0
 const streamNames = ['!ticker@arr'];
 const combinedStreamsUrl = `wss://stream.binance.com:9443/stream?streams=${streamNames.join('/')}`;
 
 const connection = new WebSocket(combinedStreamsUrl);
 
-export let log:any = [];  // Словарь для хранения последних цен по каждой паре
 
-
-export const wsUpdate =(symbols:TradingSymbolsType[])=> {
+export const wsUpdate = (symbols: any) => {
     connection.onopen = async () => {
         console.log('Connected to Binance combined WebSocket');
     };
@@ -20,26 +16,30 @@ export const wsUpdate =(symbols:TradingSymbolsType[])=> {
     connection.onmessage = async (e) => {
         try {
             const data = JSON.parse(e.data.toString());
+            updatePrices(symbols, data.data)
 
-           const prices = data.data.map(tickerMapper);
-            // Обновляем цены в словаре
-            console.log("pr - " + prices.length)
-            console.log("s - " +symbols.length)
-            log = symbols.map((el:any)=>{
-                const s = prices.find((e:any)=>e.symbol===el.symbol);
-                return {
-                    ...s,
-                    baseAsset: el.baseAsset,
-                    quoteAsset: el.quoteAsset
-                }
-            })
-          //  console.log("log - " +log)
-console.log(getExchangePairs(log).length)
-            // Поиск арбитражных возможностей
-            // const opportunities = findArbitrageOpportunities();
-            // if (opportunities.length >= 0) {
-            //     console.log('Arbitrage opportunities found:', opportunities);
-            // }
+            // console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
+            // console.log("AVAILABLE SYMBOLS")
+            // console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
+            const base = getPair(symbols);
+            const btcusdt = getPair(symbols,"ETH","USDT");
+            const btceur = getPair(symbols,"ETH","EUR");
+            console.log(base)
+            console.log(btcusdt);
+            console.log(btceur);
+
+            const fcp=+btcusdt!.info.ask;
+            console.log("Цена BTC/USD - " + fcp);
+
+            const cpsc=+btceur!.info.ask * +base!.exchangeRates
+            console.log("Конвертируемая цена BTC/USD по паре BTC/EUR - " + cpsc);
+
+            const rc = fcp-cpsc
+            console.log("Разница в ценах составит - " + rc);
+
+            console.log("Разница в % составит - " + (rc/fcp*100));
+
+
         } catch (error) {
             console.error('Ошибка при обработке сообщения:', error);
         }
@@ -54,7 +54,12 @@ console.log(getExchangePairs(log).length)
     };
 }
 
-//
-// function updatePrices(tickerData: any) {
-//     prices[tickerData.s] = parseFloat(tickerData.c);
-// }
+
+function updatePrices(target:any, tickerData: any) {
+tickerData.forEach((el:any)=>{
+    if (target[el.s]){
+        target[el.s].bid = el.b;
+        target[el.s].ask = el.a;
+    }
+})
+}
