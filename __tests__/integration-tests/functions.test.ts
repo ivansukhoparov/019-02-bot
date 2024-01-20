@@ -26,11 +26,27 @@ describe("createTradeSequence function test", () => {
         });
     })
 
-    it("function must return null if symbol don't have price", () => {
+    it("function must return correct sequence", () => {
 
         const sequence = createTradeSequence(['TCP', 'USDT', 'EUR'], testSymbols);
         console.log(sequence);
-        expect(sequence).toBeNull();
+        expect(sequence).toEqual({
+            firstSymbol: {
+                symbol: "TCPUSDT",
+                action: "buy",
+                price: "10"
+            },
+            secondSymbol:{
+                symbol: "TCPEUR",
+                action: "sell",
+                price: null
+            },
+            thirdSymbol:{
+                symbol: "EURUSDT",
+                action: "sell",
+                price: "1.1"
+            }
+        });
     })
 
 
@@ -40,6 +56,11 @@ describe("createTradeSequence function test", () => {
         console.log(sequence);
         expect(sequence).toBeNull();
     })
+    it("function must return null if symbol not in list", () => {
 
+        const sequence = createTradeSequence([ 'ETH', 'LTC', 'BNB' ], testSymbols);
+        console.log(sequence);
+        expect(sequence).toBeNull();
+    })
 
 })
