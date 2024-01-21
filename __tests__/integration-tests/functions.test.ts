@@ -1,6 +1,12 @@
 import {testSymbols} from "./data";
 import {createTradeSequence} from "../../src/adapters/core/create-trade-sequence";
-
+import {ActionTimer} from "../../src/adapters/utils/timer";
+import {calculateDifferences} from "../../src/adapters/utils/websoket";
+const a = {
+    firstSymbol: { symbol: 'BTCUSDT', action: 'buy', price: '10000' },
+    secondSymbol: { symbol: 'BTCEUR', action: 'sell', price: '9000' },
+    thirdSymbol: { symbol: 'EURUSDT', action: 'sell', price: '1.1' }
+}
 describe("createTradeSequence function test", () => {
 
     it("function must create correct sequence", () => {
@@ -62,5 +68,26 @@ describe("createTradeSequence function test", () => {
         console.log(sequence);
         expect(sequence).toBeNull();
     })
+
+    it("function must return null if symbol not in list", () => {
+
+
+
+    })
+
+
+
+})
+
+
+describe("createTradeSequence function test", () => {
+
+    it("test 1", () => {
+
+const result = calculateDifferences(a)
+        console.log(result)
+        expect(1).not.toBeNull()
+    })
+
 
 })
