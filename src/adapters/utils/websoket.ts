@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import {askOrBid} from "../core/utils/utils";
-import {ActionTimer} from "./timer";
+
 
 const streamNames = ['!ticker@arr'];
 const combinedStreamsUrl = `wss://stream.binance.com:9443/stream?streams=${streamNames.join('/')}`;
