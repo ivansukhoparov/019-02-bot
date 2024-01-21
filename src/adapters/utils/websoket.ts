@@ -27,7 +27,7 @@ export const wsUpdate = (symbols: any, allSequences: any) => {
 
 
             const opp = updateSeq.map(calculateDifferences)
-                .filter((el:any)=> el.priceDiff>0.3 && el.priceDiff<5 && el.priceDiff!==null);
+                .filter((el:any)=> el.priceDiff>=0.3 && el.priceDiff<5 && el.priceDiff!==null);
            if (opp.length>0) {
                 console.log(opp)
             }
