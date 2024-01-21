@@ -41,7 +41,7 @@ function sleep(milliseconds:number) {
     timer.stop()
 }
 
-testClass();
-asyncTestClass();
-sleep(5000);
+// testClass();
+// asyncTestClass();
+// sleep(5000);
 
