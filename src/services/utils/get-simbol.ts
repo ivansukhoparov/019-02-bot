@@ -1,5 +1,5 @@
 import {askOrBid, getReverseAction} from "./utils";
-import {TradeSequenceType} from "../../types/sequences";
+import {TradeSequenceType} from "../../adapters/types/sequences";
 
 export const getSymbol = (base: string, quot: string, action: "buy" | "sell", allSymbols: any): TradeSequenceType | null => {
 

@@ -1,5 +1,10 @@
 import WebSocket from 'ws';
-import {askOrBid} from "../core/utils/utils";
+import {askOrBid} from "../../services/utils/utils";
+import {ActionTimer} from "./timer";
+
+
+
+let counter = 0;
 
 
 const streamNames = ['!ticker@arr'];
@@ -16,8 +21,8 @@ export const wsUpdate = (symbols: any, allSequences: any) => {
 
     connection.onmessage = async (e) => {
         try {
-         //   const timer = new ActionTimer("upd")
-         //   timer.start()
+           // const timer = new ActionTimer("upd")
+           // timer.start()
             const data = JSON.parse(e.data.toString());
         const updSymbols = updatePrices(symbols, data.data)
 
@@ -27,9 +32,13 @@ export const wsUpdate = (symbols: any, allSequences: any) => {
 
 
             const opp = updateSeq.map(calculateDifferences)
-                .filter((el:any)=> el.priceDiff>=0.3 && el.priceDiff<5 && el.priceDiff!==null);
+                .filter((el:any)=> el.priceDiff>0.3 && el.priceDiff<5 && el.priceDiff!==null);
            if (opp.length>0) {
+               for (let i=0; i<opp.length;i++){
+                   counter += (opp[i].priceDiff-0.3)
+               }
                 console.log(opp)
+               console.log(counter)
             }
        //     console.log(opp.length)
        //     timer.stop()

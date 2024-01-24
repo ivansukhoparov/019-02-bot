@@ -1,8 +1,8 @@
-import {getAllTradableTickers} from "../utils/fetch";
+import {getAllTradableTickers} from "../adapters/utils/fetch";
 
 import {generateCombinations} from "./utils/utils";
 import {createTradeSequence} from "./create-trade-sequence";
-import {ActionTimer} from "../utils/timer";
+import {ActionTimer} from "../adapters/utils/timer";
 
 
 const getAllCoins=(tradableTickers:any[])=>{
@@ -30,8 +30,8 @@ export const preparingSymbols =async ()=>{
      // console.log(tradableCoins)
 
     let allCombinations = generateCombinations(tradableCoins, 3)
-     //  .filter((el: any) => el[1] === "USDT")
-
+       .filter((el: any) => el[1] === "USDT")
+console.log(allCombinations.length)
     const symbols:any = tradableTickers.reduce((acc:any, el:any)=>{
         acc[el.symbol] = el
         delete acc[el.symbol].symbol

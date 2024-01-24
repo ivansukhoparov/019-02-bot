@@ -1,4 +1,4 @@
-import {preparingSymbols} from "./adapters/core/preparing-symbols";
+import {preparingSymbols} from "./services/preparing-symbols";
 import {wsUpdate} from "./adapters/utils/websoket";
 
 

@@ -1,5 +1,5 @@
 import {testSymbols} from "./data";
-import {createTradeSequence} from "../../src/adapters/core/create-trade-sequence";
+import {createTradeSequence} from "../../src/services/create-trade-sequence";
 import {ActionTimer} from "../../src/adapters/utils/timer";
 import {calculateDifferences} from "../../src/adapters/utils/websoket";
 const a = {
