@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import {askOrBid} from "../../services/utils/utils";
-import {ActionTimer} from "./timer";
+import {ActionTimer} from "../../common/utils/timer";
 
 
 

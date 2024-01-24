@@ -1,7 +1,7 @@
 import {testSymbols} from "./data";
 import {createTradeSequence} from "../../src/services/create-trade-sequence";
-import {ActionTimer} from "../../src/adapters/utils/timer";
-import {calculateDifferences} from "../../src/adapters/utils/websoket";
+import {ActionTimer} from "../../src/common/utils/timer";
+import {calculateDifferences} from "../../src/adapters/websokets/websoket-adapter";
 const a = {
     firstSymbol: { symbol: 'BTCUSDT', action: 'buy', price: '10000' },
     secondSymbol: { symbol: 'BTCEUR', action: 'sell', price: '9000' },

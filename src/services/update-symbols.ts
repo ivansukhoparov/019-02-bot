@@ -1,4 +1,4 @@
-import {tickerOutputDataType} from "../adapters/types/web-soket-binance/input";
+import {tickerOutputDataType} from "../types/web-soket-binance/input";
 
 
 export const getPair = (tradeData:any, base:string = "EUR",quote:string = "USDT" ) =>{

@@ -1,8 +1,8 @@
-import {getAllTradableTickers} from "../adapters/utils/fetch";
+import {getAllTradableTickers} from "../adapters/http/fetch";
 
 import {generateCombinations} from "./utils/utils";
 import {createTradeSequence} from "./create-trade-sequence";
-import {ActionTimer} from "../adapters/utils/timer";
+import {ActionTimer} from "../common/utils/timer";
 
 
 const getAllCoins=(tradableTickers:any[])=>{

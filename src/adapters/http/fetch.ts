@@ -1,5 +1,5 @@
 import fetch1 from 'node-fetch';
-import {symbolMapper} from "../types/fetch-binance/mapper";
+import {symbolMapper} from "../../types/fetch-binance/mapper";
 
 export async function getAllTradableTickers() {
      let filter = "";

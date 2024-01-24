@@ -1,5 +1,5 @@
 import {preparingSymbols} from "./services/preparing-symbols";
-import {wsUpdate} from "./adapters/utils/websoket";
+import {wsUpdate} from "./adapters/websokets/websoket-adapter";
 
 
 

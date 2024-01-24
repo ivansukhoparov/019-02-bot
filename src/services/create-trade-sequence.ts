@@ -1,5 +1,5 @@
 import {getSymbol} from "./utils/get-simbol";
-import {TradeSequenceType} from "../adapters/types/sequences";
+import {TradeSequenceType} from "../types/sequences";
 
 
 // example of argument [ 'USDT', 'EUR', 'BTC' ]
