@@ -2,16 +2,13 @@ import fetch1 from 'node-fetch';
 import {symbolMapper} from "../../types/fetch-binance/mapper";
 
 export async function getAllTradableTickers() {
-     let filter = "";
-    filter = "?permissions=MARGIN";
-    const url = 'https://api.binance.com/api/v3/exchangeInfo'+filter;
 
+    const url = 'https://api.binance.com/api/v3/exchangeInfo';
 
     try {
         const response = await fetch1(url);
-
-
         const tickers = await response.json();
+
         const symbols = tickers.symbols.filter((el:any)=>el.status==='TRADING').map(symbolMapper)
         //
         // status: Этот ключ указывает на текущее состояние торговой пары. Если значение status равно "TRADING",
