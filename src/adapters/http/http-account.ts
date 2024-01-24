@@ -1,40 +1,27 @@
-import fetch from "node-fetch";
-import crypto from "crypto";
-import dotenv from "dotenv"
+import {appSettings} from "../../settings/settings";
+import {createSignature} from "./utils/create-signature";
+import {fetchAdapter} from "./fetch-adapter";
 
-const API_KEY = "vj32ugTRz4opP9C086t2iHiW6Hinn5nkx3BwMk7vdqGTVvhXphKcjBnJwyUvwJMM";
-const API_SECRET = "H9f2TLAyvYFwaFPF08YqJFmXuRkjPbn61QXnENJc1qVm6ozDgregLC0irCTtBMad";
-const BASE_URL = "https://testnet.binance.vision"
-    // "https://api.binance.com";
-
-function createSignature(queryString: string) {
-    return crypto.createHmac("sha256", API_SECRET).update(queryString).digest("hex");
-}
+const API_KEY = appSettings.binance.keys.api;
+const API_SECRET = appSettings.binance.keys.secret;
+const BASE_URL = appSettings.binance.urls.baseUrl;
 
 export async function getAccountInfo() {
-    const data:any = {
-        timestamp: Date.now()
-    };
 
+    const data: any = {timestamp: Date.now()};
     const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
-    const signature = createSignature(queryString);
+    const signature = createSignature(queryString, API_SECRET);
 
     const url = `${BASE_URL}/api/v3/account?${queryString}&signature=${signature}`;
-
-    try {
-        const response = await fetch(url, {
-            method: "GET",
+    const payload = {
+        method: "GET",
             headers: {
                 "X-MBX-APIKEY": API_KEY
             }
-        });
-
-        const responseData = await response.json();
-        console.log("Account Information:", responseData);
-    } catch (error) {
-        console.error("Error:", error);
     }
+
+    return await fetchAdapter.request(url, payload)
+
 }
 
-// Вызов функции
-getAccountInfo();
+
