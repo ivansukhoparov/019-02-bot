@@ -5,7 +5,6 @@ export type TradingSymbolsType = {
 
 }
 
-
 export type TradableTickerInputType = {
 
     symbol: string
@@ -73,7 +72,6 @@ export type OrderResponseFillType = {
     tradeId: number // The trade identifier for each part.
 }
 
-
 export type OrderResponseType = {
     symbol: string // The trading pair, e.g., 'BTCUSDT'.
     orderId: number // The unique identifier of the order on the exchange.
@@ -121,3 +119,26 @@ export type ResponseErrorType = {
     msg: string // 'Account has insufficient balance for requested action.'
 
 }
+
+export type OrderTypeType = "market" | "limit" | "stop_loss" | "stop_loss_limit" | "take_profit" | "take_profit_limit" | "limit_maker"
+//     ORDER TYPE
+//     MARKET:
+//           A Market order (MARKET) is executed immediately at the current market price. You specify
+//           the amount of cryptocurrency you want to buy or sell, and the order is executed at the best
+//           available price at that moment.
+//     LIMIT:
+//          A Limit order (LIMIT) allows you to set a specific price at which you want to buy or sell a
+//          cryptocurrency. The order will be executed only when the market price reaches your
+//          specified price.
+//     STOP_LOSS and STOP_LOSS_LIMIT:
+//          STOP_LOSS and STOP_LOSS_LIMIT orders are used for limiting losses. They are executed when the
+//          price of the cryptocurrency reaches a certain level. A STOP_LOSS order is executed as a market
+//          order when triggered, whereas a STOP_LOSS_LIMIT order is executed as a limit order.
+//     TAKE_PROFIT and TAKE_PROFIT_LIMIT:
+//         These orders are similar to STOP_LOSS but are used for securing profits. They are activated when
+//         the price reaches a certain level that yields profit.
+//     LIMIT_MAKER:
+//          This type of order is used to create limit orders that add liquidity to the market. The order
+//          will be rejected if it would immediately be executed and thus remove liquidity.
+
+export type OrderSide =  "buy" | "sell"
