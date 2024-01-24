@@ -78,6 +78,7 @@ export const preparingSymbols =async ()=>{
         .map((el: any) => createTradeSequence(el, symbolsDataSet))
         .filter((el: any) => el !== null)
 
+    console.log(sequencesDataSet)
 
     return {symbolsDataSet, sequencesDataSet};
 
