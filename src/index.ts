@@ -1,6 +1,6 @@
 import {preparingSymbols} from "./services/preparing-symbols";
 import {wsUpdate} from "./adapters/websokets/websoket-adapter";
-import {getAccountInfo} from "./adapters/http/http-account";
+import {getAccountInfo} from "./adapters/http/binance-adapter";
 require('dotenv').config();
 
 
