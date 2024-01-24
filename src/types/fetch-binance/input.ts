@@ -142,3 +142,8 @@ export type OrderTypeType = "market" | "limit" | "stop_loss" | "stop_loss_limit"
 //          will be rejected if it would immediately be executed and thus remove liquidity.
 
 export type OrderSide =  "buy" | "sell"
+
+export type FetchResponseType = {
+    type: "error" | "success"
+    content: ResponseErrorType | any
+}
