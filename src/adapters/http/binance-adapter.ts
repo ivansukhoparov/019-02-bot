@@ -3,10 +3,9 @@ import {createSignature} from "./utils/create-signature";
 import {FetchAdapter} from "./utils/fetch-adapter";
 import {
     AccountBalanceInfoInputType,
-    AccountInfoInputType,
-    OrderResponseType,
-    ResponseErrorType,
-    TradableTickerInputType
+    FetchResponseType,
+    OrderSide,
+    OrderTypeType
 } from "../../types/fetch-binance/input";
 
 const API_KEY = appSettings.binance.keys.api;
@@ -15,7 +14,7 @@ const BASE_URL = appSettings.binance.urls.baseUrl;
 
 export class BinanceAdapter {
 
-    static async getAccountInfo(): Promise<AccountInfoInputType | ResponseErrorType> {
+    static async getAccountInfo(): Promise<FetchResponseType> {
 
         const data: any = {timestamp: Date.now()};
         const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
@@ -28,43 +27,23 @@ export class BinanceAdapter {
                 "X-MBX-APIKEY": API_KEY
             }
         }
-
-        return await FetchAdapter.request(url, payload)
+        const response = await FetchAdapter.request(url, payload);
+        return response.content;
     }
 
     static async placeOrder(symbol: string,
-                            quantity: number,
-                            side: "buy" | "sell",
-                            type: "market" = "market"): Promise<OrderResponseType | ResponseErrorType> {
+                            quantityType: "quantity" | "quoteOrderQty",
+                            quantityAmount: number,
+                            side: OrderSide,
+                            type: OrderTypeType = "market"): Promise<FetchResponseType> {
+
         // Example:
         // placeOrder("BTCUSDT", 0.001, "BUY");
         const data: any = {
             symbol: symbol.toUpperCase(),
             side: side.toUpperCase(),
             type: type.toUpperCase(),
-            //     MARKET:
-            //           A Market order (MARKET) is executed immediately at the current market price. You specify
-            //           the amount of cryptocurrency you want to buy or sell, and the order is executed at the best
-            //           available price at that moment.
-            //     LIMIT:
-            //          A Limit order (LIMIT) allows you to set a specific price at which you want to buy or sell a
-            //          cryptocurrency. The order will be executed only when the market price reaches your
-            //          specified price.
-            //     STOP_LOSS and STOP_LOSS_LIMIT:
-            //          STOP_LOSS and STOP_LOSS_LIMIT orders are used for limiting losses. They are executed when the
-            //          price of the cryptocurrency reaches a certain level. A STOP_LOSS order is executed as a market
-            //          order when triggered, whereas a STOP_LOSS_LIMIT order is executed as a limit order.
-            //     TAKE_PROFIT and TAKE_PROFIT_LIMIT:
-            //         These orders are similar to STOP_LOSS but are used for securing profits. They are activated when
-            //         the price reaches a certain level that yields profit.
-            //     LIMIT_MAKER:
-            //          This type of order is used to create limit orders that add liquidity to the market. The order
-            //          will be rejected if it would immediately be executed and thus remove liquidity.
-            quantity: +quantity,
-            // quantity of base currency for sale or buy
-            // OR:
-            // quoteOrderQty: +quoteOrderQty
-            // quantity of quote currency for sale or buy base currency
+            [quantityType]: +quantityAmount,
             timestamp: Date.now()
         };
 
@@ -85,10 +64,62 @@ export class BinanceAdapter {
         return await FetchAdapter.request(url, payload)
     }
 
-    static async getAllTradableTickers(...filters: any): Promise<TradableTickerInputType[] | ResponseErrorType> {
-        const filter = this._createQueryFilter(arguments)
-        const url = 'https://api.binance.com/api/v3/exchangeInfo' + filter;
-        return FetchAdapter.request(url)
+    // static async orderBaseByQuote(base: string,
+    //                               quote: string,
+    //                               side: OrderSide,
+    //                               type: OrderTypeType = "market") {
+    //
+    //     const quoteAmount = await this.getCurrencyBalance(quote.toUpperCase());
+    //     if (!quoteAmount) {
+    //         console.log(`Can't get ${quote} balance, or haven't any ${quote} on balance`);
+    //         return;
+    //     } else {
+    //         console.log(`${quote} balance is ${quoteAmount}`);
+    //     }
+    //
+    //     const data: any = {
+    //         symbol: "BTCUSDT",// (base + quote).toUpperCase(),
+    //         side: side.toUpperCase(),
+    //         type: type.toUpperCase(),
+    //         //quantity: 0.01,
+    //         quoteOrderQty: +quoteAmount,
+    //         timestamp: Date.now()
+    //     };
+    //
+    //     console.log(data)
+    //
+    //     const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
+    //
+    //     const signature = createSignature(queryString, API_SECRET);
+    //
+    //     const url = `${BASE_URL}/api/v3/order`;
+    //     console.log(url)
+    //     const payload = {
+    //         method: 'POST',
+    //         headers: {
+    //             'X-MBX-APIKEY': API_KEY,
+    //             'Content-Type': 'application/x-www-form-urlencoded'
+    //         },
+    //         body: `${queryString}&signature=${signature}`
+    //     }
+    //     const res = await FetchAdapter.request(url, payload)
+    //     return res
+    // }
+
+    static async getAllSymbols(): Promise<FetchResponseType> {
+        const url = 'https://api.binance.com/api/v3/exchangeInfo';
+        const response = await FetchAdapter.request(url);
+        return response.content;
+    }
+
+    // This function return array with all available to trade coins (currencies) => ["BTC", "ETH", "USDT" ...etc]
+    static async getAllAvailableTickers() {
+        // Get account info
+        const accountInfo: FetchResponseType = await this.getAccountInfo();
+        // Take array balances with wallets, and from each wallet take coin (currency) name and return it
+        return accountInfo.content.balances.map((wallet: AccountBalanceInfoInputType) => {
+            return wallet.asset
+        });
     }
 
     static async getCurrencyBalance(currency: string) {
@@ -106,11 +137,9 @@ export class BinanceAdapter {
         };
 
         const responseData = await FetchAdapter.request(url, payload);
-        const balance = responseData.balances.find((b: AccountBalanceInfoInputType) => b.asset === currency);
+        const balance = responseData.content.balances.find((b: AccountBalanceInfoInputType) => b.asset === currency);
         return balance ? balance.free : null;
     }
-
-
 
     static _createQueryFilter(...filters: any) {
         let filter = ""
@@ -124,5 +153,3 @@ export class BinanceAdapter {
         return filter;
     }
 }
-
-
