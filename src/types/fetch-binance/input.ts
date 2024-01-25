@@ -147,3 +147,6 @@ export type FetchResponseType = {
     type: "error" | "success"
     content: ResponseErrorType | any
 }
+
+
+export type QuantityType = "quantity" | "quoteOrderQty"

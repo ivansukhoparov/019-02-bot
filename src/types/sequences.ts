@@ -1,6 +1,15 @@
-export type TradeSequenceType ={
+import {OrderSide} from "./fetch-binance/input";
+
+
+export type TradeInstructionType ={
     symbol: string
     currentCurrency:string
-    action: string
-    price: string
+    action: OrderSide
+    price: string|null
+}
+
+export type TradeSequenceType = {
+    firstSymbol:  TradeInstructionType
+    secondSymbol: TradeInstructionType
+    thirdSymbol: TradeInstructionType
 }

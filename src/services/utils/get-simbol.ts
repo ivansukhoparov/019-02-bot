@@ -1,11 +1,11 @@
 import {askOrBid, getReverseAction} from "./utils";
-import {TradeSequenceType} from "../../types/sequences";
+import {TradeInstructionType} from "../../types/sequences";
 
 export const getSymbol = (base: string,
                           quot: string,
                           currentCurrency:string,
                           action: "buy" | "sell",
-                          allSymbols: any): TradeSequenceType | null => {
+                          allSymbols: any): TradeInstructionType | null => {
 
     if (allSymbols[base + quot] !== undefined) {
         // At first check straight pair is exist and have property "ask" not equal null

@@ -9,6 +9,7 @@ const startApp = async ()=>{
 
 
         const {symbolsDataSet, allSequences}:any = await preparingSymbols()
+        console.log(allSequences)
         // symbols - is dataset with all tradable symbols(pairs) at now with information about base, quote, ask adn bid
         // for example:
         // ...

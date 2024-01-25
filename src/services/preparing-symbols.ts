@@ -68,9 +68,9 @@ export const preparingSymbols =async ()=>{
     //      Get array in view model like this:
     //      [...
     //          {
-    //             firstSymbol: { symbol: 'BNBUSDT', action: 'buy', price: null },
-    //             secondSymbol: { symbol: 'MATICBNB', action: 'buy', price: null },
-    //             thirdSymbol: { symbol: 'MATICUSDT', action: 'sell', price: null }
+    //             firstSymbol: {symbol: 'BNBUSDT', currentCurrency: 'USDT', action: 'buy', price: null},
+    //             secondSymbol: {symbol: 'MATICBNB', currentCurrency: 'BNB', action: 'buy', price: null},
+    //             thirdSymbol: {symbol: 'MATICUSDT', currentCurrency: 'MATIC', action: 'sell', price: null}
     //          },
     //      ...]
 
