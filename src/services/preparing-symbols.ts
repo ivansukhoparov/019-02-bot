@@ -64,13 +64,13 @@ export const preparingSymbols =async ()=>{
 
     //------------------------------------------------------------------------------
 
-    //      Get array with sequence trade instuctions and prices for each combination from allCombinations
+    //      Get array with sequence trade instructions and prices for each combination from allCombinations
     //      Get array in view model like this:
     //      [...
     //          {
-    //             firstSymbol: {symbol: 'BNBUSDT', currentCurrency: 'USDT', action: 'buy', price: null},
-    //             secondSymbol: {symbol: 'MATICBNB', currentCurrency: 'BNB', action: 'buy', price: null},
-    //             thirdSymbol: {symbol: 'MATICUSDT', currentCurrency: 'MATIC', action: 'sell', price: null}
+    //             firstSymbol: {symbol: 'BNB/USDT', currentCurrency: 'USDT', action: 'buy', price: null},
+    //             secondSymbol: {symbol: 'MATIC/BNB', currentCurrency: 'BNB', action: 'buy', price: null},
+    //             thirdSymbol: {symbol: 'MATIC/USDT', currentCurrency: 'MATIC', action: 'sell', price: null}
     //          },
     //      ...]
 
