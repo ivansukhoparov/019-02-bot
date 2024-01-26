@@ -11,12 +11,23 @@ const seq: TradeSequenceType = {
 const tradeInstruction: TradeInstructionType = seq.firstSymbol;
 
 export const tradeThis = async (instruction: TradeInstructionType) => {
-    const symbol = instruction.symbol
+    const symbol = instruction.symbol.replace("/", "")
     const side: OrderSide = instruction.action
     const {quantityCurrency, quantityType} = getQuantityType(instruction)
     const quantityAmount = await BinanceAdapter.getCurrencyBalance(quantityCurrency)
-
     return  BinanceAdapter.placeOrder(symbol, quantityType, quantityAmount, side)
+}
+type s= "firstSymbol"|"secondSymbol"|"thirdSymbol"
+export const  tradeAllSequence =async (sequence: TradeSequenceType) => {
+    const steps:s[]=  Object.keys(sequence).map((el)=> el as s )
+//["firstSymbol","secondSymbol","thirdSymbol"]
+    for (let i = 0; i < steps.length; i++) {
+        const step: TradeInstructionType = sequence[steps[i]]
+        //console.log(step)
+        const result=  await tradeThis(sequence[steps[i]]);
+console.log(step.symbol)
+        console.log(result.content)
+    }
 
 }
 
@@ -24,7 +35,6 @@ const getQuantityType = (instruction: TradeInstructionType): {
     quantityCurrency: string,
     quantityType: QuantityType
 } => {
-
     switch (instruction.action) {
         case "buy":
             return {
