@@ -17,7 +17,9 @@ export const tradeThis = async (instruction: TradeInstructionType) => {
     const quantityAmount = await BinanceAdapter.getCurrencyBalance(quantityCurrency)
     return  BinanceAdapter.placeOrder(symbol, quantityType, quantityAmount, side)
 }
+
 type s= "firstSymbol"|"secondSymbol"|"thirdSymbol"
+
 export const  tradeAllSequence =async (sequence: TradeSequenceType) => {
     const steps:s[]=  Object.keys(sequence).map((el)=> el as s )
 //["firstSymbol","secondSymbol","thirdSymbol"]
