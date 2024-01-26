@@ -47,6 +47,8 @@ export class BinanceAdapter {
             timestamp: Date.now()
         };
 
+        console.log(data)
+
         const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
         const signature = createSignature(queryString, API_SECRET);
 
@@ -107,9 +109,9 @@ export class BinanceAdapter {
     // }
 
     static async getAllSymbols(): Promise<FetchResponseType> {
-        const url = 'https://api.binance.com/api/v3/exchangeInfo';
+        const url = `${BASE_URL}/api/v3/exchangeInfo`;
         const response = await FetchAdapter.request(url);
-        return response.content;
+        return response;
     }
 
     // This function return array with all available to trade coins (currencies) => ["BTC", "ETH", "USDT" ...etc]

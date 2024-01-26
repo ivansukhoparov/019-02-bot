@@ -13,7 +13,11 @@ export type tickerOutputDataType = {
     quoteAsset: string
     bid: number | null //Лучшая цена покупки (наивысшая цена спроса).
     ask: number | null //Лучшая цена продажи (наименьшая цена предложения).
-
+    filters: {
+        minNotional:string
+        minQty: string
+        minQtyMarket: string
+    }
 }
 
 export type tickerReceivedDataType = {
