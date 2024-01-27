@@ -17,6 +17,8 @@ export type tickerOutputDataType = {
         minNotional:string
         minQty: string
         minQtyMarket: string
+        stepSize:string
+        stepSizeMarket:string
     }
 }
 
