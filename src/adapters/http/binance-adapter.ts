@@ -28,7 +28,7 @@ export class BinanceAdapter {
             }
         }
         const response = await FetchAdapter.request(url, payload);
-        return response.content;
+        return response;
     }
 
     static async placeOrder(symbol: string,
@@ -47,7 +47,8 @@ export class BinanceAdapter {
             timestamp: Date.now()
         };
 
-        console.log(data)
+        //console.log(data)
+
 
         const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
         const signature = createSignature(queryString, API_SECRET);
@@ -122,6 +123,36 @@ export class BinanceAdapter {
         return accountInfo.content.balances.map((wallet: AccountBalanceInfoInputType) => {
             return wallet.asset
         });
+    }
+
+    static async getAllWallets() {
+        // Get account info
+        const accountInfo: FetchResponseType = await this.getAccountInfo();
+        // Take array balances with wallets, and from each wallet take coin (currency) name and return it
+        return accountInfo.content.balances;
+    }
+    static async convertCurrency(quoteAsset:string, baseAsset:string, amount:number) {
+            const data:any = {
+                quoteAsset: quoteAsset,
+                baseAsset: baseAsset,
+                amount: amount,
+                timestamp: Date.now()
+            };
+
+        const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
+        const signature = createSignature(queryString, API_SECRET);
+
+        const url = `${BASE_URL}/sapi/v1/convert/trade?${queryString}&signature=${signature}`;
+
+        const payload = {
+
+            method: 'POST',
+            headers: {
+                'X-MBX-APIKEY': API_KEY
+            }
+        }
+
+        return await FetchAdapter.request(url, payload)
     }
 
     static async getCurrencyBalance(currency: string) {
