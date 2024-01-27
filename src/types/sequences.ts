@@ -6,6 +6,14 @@ export type TradeInstructionType ={
     currentCurrency:string
     action: OrderSide
     price: string|null
+    filters: {
+        minNotional:string
+        minQty: string
+        minQtyMarket: string
+        stepSize: string
+        stepSizeMarket: string
+
+    }
 }
 
 export type TradeSequenceType = {
