@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import {askOrBid} from "../../services/utils/utils";
 import {ActionTimer} from "../../common/utils/timer";
+import {tradeAllSequence} from "../../services/trade-sequence";
 
 
 
@@ -21,27 +22,25 @@ export const wsUpdate = (symbols: any, allSequences: any) => {
 
     connection.onmessage = async (e) => {
         try {
-           // const timer = new ActionTimer("upd")
-           // timer.start()
             const data = JSON.parse(e.data.toString());
-        const updSymbols = updatePrices(symbols, data.data)
+            const updSymbols = updatePrices(symbols, data.data);
+           // console.log(updSymbols)
 
-          //  console.log("allSequences")
             const updateSeq = updatePricesInSeq(allSequences, updSymbols)
-          //  console.log(updateSeq)
-
-
+            //console.log(updateSeq)
             const opp = updateSeq.map(calculateDifferences)
-                .filter((el:any)=> el.priceDiff>0.3 && el.priceDiff<5 && el.priceDiff!==null);
+                .filter((el:any)=> el.priceDiff>0.35 && el.priceDiff<5 && el.priceDiff!==null);
            if (opp.length>0) {
+               console.log("has found " + opp.length)
                for (let i=0; i<opp.length;i++){
+                   //console.log(opp[0])
+                   await tradeAllSequence(opp[0])
                    counter += (opp[i].priceDiff-0.3)
                }
-                console.log(opp)
-               console.log(counter)
+
+               //console.log(opp)
+               console.log("expeсted income "+counter)
             }
-       //     console.log(opp.length)
-       //     timer.stop()
         } catch (error) {
             console.error('Ошибка при обработке сообщения:', error);
         }
@@ -69,12 +68,36 @@ function updatePrices(target:any, tickerData: any) {
     return symbols
 }
 
+
+// {
+//     firstSymbol: {
+//         symbol: 'ETH/USDT',
+//             currentCurrency: 'USDT',
+//             action: 'buy',
+//             price: null,
+//             filters: [Object]
+//     },
+//     secondSymbol: {
+//         symbol: 'SNT/ETH',
+//             currentCurrency: 'ETH',
+//             action: 'buy',
+//             price: null,
+//             filters: [Object]
+//     },
+//     thirdSymbol: {
+//         symbol: 'SNT/USDT',
+//             currentCurrency: 'SNT',
+//             action: 'sell',
+//             price: null,
+//             filters: [Object]
+//     }
+// },
+
 function updatePricesInSeq(target: any, symbols: any) {
     target.forEach((el: any) => {
-        el.firstSymbol.price = symbols[el.firstSymbol.symbol][askOrBid(el.firstSymbol.action)]
-        el.secondSymbol.price = symbols[el.secondSymbol.symbol][askOrBid(el.secondSymbol.action)]
-        el.thirdSymbol.price = symbols[el.thirdSymbol.symbol][askOrBid(el.thirdSymbol.action)]
-
+        el.firstSymbol.price = symbols[el.firstSymbol.symbol.replace("/", "")][askOrBid(el.firstSymbol.action)]
+        el.secondSymbol.price = symbols[el.secondSymbol.symbol.replace("/", "")][askOrBid(el.secondSymbol.action)]
+        el.thirdSymbol.price = symbols[el.thirdSymbol.symbol.replace("/", "")][askOrBid(el.thirdSymbol.action)]
     })
     return target
 }
