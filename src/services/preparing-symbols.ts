@@ -20,8 +20,16 @@ export const createSymbolsDataSet =async (tradableSymbols:any)=>{
     //------------------------------------------------------------------------------
     //      Now it has view model like this:
     //      {...
-    //      MAVTUSD: { baseAsset: 'MAV', quoteAsset: 'TUSD', bid: null, ask: null },
-    //      CFXTUSD: { baseAsset: 'CFX', quoteAsset: 'TUSD', bid: null, ask: null },
+    //      MAVTUSD: { baseAsset: 'MAV',
+    //                 quoteAsset: 'TUSD',
+    //                 bid: null,
+    //                 ask: null,
+    //                 filters: {
+    //                            minNotional: '0.00100000',
+    //                            minQty: '0.01000000',
+    //                            minQtyMarket: '0.00000000'
+    //                            }
+    //                  },
     //      ...}
     return tradableSymbols.reduce((acc: any, el: any) => {
         acc[el.symbol] = el
@@ -44,7 +52,11 @@ export const createSequencesDataSet =async (tradableSymbols:any, symbolsDataSet:
     //      collect unique coins names from tradableTickers
     //      ['ETH',   'LTC',  'BNB',   'NEO', ...]
     const tradableCoins = getUniqueCoins(tradableSymbols)
-        .filter((el: any) => el !== "GAL" || el !== "GALA" || el !== "T");
+        .filter((el: any) => el !== "GAL"
+            || el !== "GALA"
+            || el !== "T"
+            || el !== "IOTA"
+            || el !== "RUB");
     //      Coins "GAL" "GALA" "T" was removed because it make anomalies
 
     //------------------------------------------------------------------------------
@@ -67,17 +79,15 @@ export const createSequencesDataSet =async (tradableSymbols:any, symbolsDataSet:
     //      Get array in view model like this:
     //      [...
     //          {
-    //             firstSymbol: {symbol: 'BNB/USDT', currentCurrency: 'USDT', action: 'buy', price: null},
-    //             secondSymbol: {symbol: 'MATIC/BNB', currentCurrency: 'BNB', action: 'buy', price: null},
-    //             thirdSymbol: {symbol: 'MATIC/USDT', currentCurrency: 'MATIC', action: 'sell', price: null}
+    //            firstSymbol: {symbol: 'BNB/USDT', currentCurrency: 'USDT', action: 'buy', price: null, filters{...}},
+    //            secondSymbol: {symbol: 'MATIC/BNB', currentCurrency: 'BNB', action: 'buy', price: null, filters{...}},
+    //            thirdSymbol: {symbol: 'MATIC/USDT', currentCurrency: 'USDT', action: 'sell', price: null, filters{...}}
     //          },
     //      ...]
 
     const sequencesDataSet = allCombinations
         .map((el: any) => createTradeSequence(el, symbolsDataSet))
         .filter((el: any) => el !== null)
-
-    console.log(sequencesDataSet)
 
     return sequencesDataSet;
 
