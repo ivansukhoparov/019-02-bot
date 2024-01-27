@@ -6,11 +6,11 @@ export class FetchAdapter {
 
         try {
             const response = await fetch(url, init);
-            const responseJson:any = await response.json();
-            return  this._responseMapper(responseJson)
+            const responseJson: any = await response.json();
+            return this._responseMapper(responseJson)
         } catch (error) {
-            throw new Error()
             console.log(error)
+            throw new Error()
         }
     }
 
