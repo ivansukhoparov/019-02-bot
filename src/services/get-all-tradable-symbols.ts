@@ -3,8 +3,8 @@ import {symbolMapper} from "../types/fetch-binance/mapper";
 
 export async function getAllTradableSymbols() {
 
-    const response = await BinanceAdapter.getAllSymbols()
-    const symbols = response.content.symbols.filter((el: any) => el.status === 'TRADING').map(symbolMapper)
+    const response = await BinanceAdapter.getAllSymbols();
+    const symbols = response.content.symbols.filter((el: any) => el.status === 'TRADING').map(symbolMapper);
     //
     // status: Этот ключ указывает на текущее состояние торговой пары. Если значение status равно "TRADING",
     // это означает, что пара активна и торгуется. "BREAK" означает, что торговля по этой паре в данный момент
