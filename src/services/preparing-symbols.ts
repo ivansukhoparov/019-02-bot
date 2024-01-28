@@ -13,7 +13,7 @@ const getUniqueCoins = (tradableTickers: any[]) => {
     }, []);
 }
 
-export const createSymbolsDataSet =async (tradableSymbols:any)=>{
+export const createSymbolsDataSet = async (tradableSymbols:any)=>{
     //      receive : getAllTradableSymbols()
     //      function receive an array of symbols available to trade created by function getAllTradableSymbols()
     //      and convert it to symbolsDataSet object to increase speed of processing data set
