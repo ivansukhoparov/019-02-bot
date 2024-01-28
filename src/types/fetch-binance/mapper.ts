@@ -2,9 +2,10 @@ import {tickerOutputDataType} from "../web-soket-binance/input";
 
 export const symbolMapper =(input:any):tickerOutputDataType=>{
     return {
-        symbol: input.symbol,
+        symbol: input.baseAsset + "/" + input.quoteAsset,
         baseAsset: input.baseAsset,
         quoteAsset: input.quoteAsset,
+
         bid:null,
         ask: null,
         filters: {
