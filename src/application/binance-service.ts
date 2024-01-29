@@ -30,15 +30,31 @@ export class BinanceService {
     public async createOrder(currentCurrency: string, targetCurrency: string, amount?: number) {
         const {symbolName, action, quantityType}: any = this._getSymbol(currentCurrency, targetCurrency)
         const symbol = this.symbolsDataSet[symbolName]
-        const symbol1 = symbolName.replace("/", "");
         const side: OrderSide = action;
 
-        if (!amount) {
-            amount = await BinanceAdapter.getCurrencyBalance(currentCurrency);
+        const balance = await BinanceAdapter.getCurrencyBalance(currentCurrency);
+
+        if (!amount || amount < +balance) {
+            amount = +balance;
         }
-        // if (currentCurrency === symbol.baseAsset)
-        const quantityAmount = roundDownNumber(amount!, symbol.filters.stepSize);
-        return BinanceAdapter.placeOrder(symbolName, quantityType, quantityAmount, side);
+
+        if (amount) {
+            if (quantityType === orderQuantity.base) {
+                amount = roundDownNumber(amount, symbol.filters.stepSize);
+                const amountInQuote = amount*+symbol.ask;
+                if (amountInQuote < symbol.filters.minNotional) {
+                    throw new Error("Do not have anought amount, or enter grater amount")
+                }
+            } else if (quantityType === orderQuantity.quote) {
+                if (amount < symbol.filters.minNotional) {
+                    throw new Error("Do not have anought amount, or enter grater amount")
+                }
+            }
+
+            return BinanceAdapter.placeOrder(symbolName, quantityType, amount, side);
+        } else {
+            throw new Error("currency does not exist, or can't get amount")
+        }
     }
 
     public _getSymbol(currentCurrency: string, targetCurrency: string) {
