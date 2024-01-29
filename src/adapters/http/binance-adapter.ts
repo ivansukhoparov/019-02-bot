@@ -40,7 +40,7 @@ export class BinanceAdapter {
         // Example:
         // placeOrder("BTCUSDT", 0.001, "BUY");
         const data: any = {
-            symbol: symbol.toUpperCase(),
+            symbol: symbol.replace("/", "").toUpperCase(),
             side: side.toUpperCase(),
             type: type.toUpperCase(),
             [quantityType]: +quantityAmount,
