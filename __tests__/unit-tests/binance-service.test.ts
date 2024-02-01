@@ -1,6 +1,7 @@
 import {BinanceService} from "../../src/application/binance-service";
 import {symbolsDataSet_test} from "../tests-data-sets/symbols-data-set";
 import {orderAction, orderQuantity} from "../../src/common/common";
+import {BinanceAdapter} from "../../src/adapters/http/binance-adapter";
 
 
 describe("binance-services methods tests", () => {
@@ -31,11 +32,10 @@ describe("binance-services methods tests", () => {
 
 
 
-    // it("function must return correct sequence", () => {
-    //
-    //
-    //
-    // })
+     // it("function must return correct sequence", () => {
+     //
+     //
+     // })
     //
     //
     // it("function must return null if symbol not in list", () => {

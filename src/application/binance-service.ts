@@ -43,11 +43,11 @@ export class BinanceService {
                 amount = roundDownNumber(amount, symbol.filters.stepSize);
                 const amountInQuote = amount*+symbol.ask;
                 if (amountInQuote < symbol.filters.minNotional) {
-                    throw new Error("Do not have anought amount, or enter grater amount")
+                    throw new Error("Do not have enough amount, or enter grater amount")
                 }
             } else if (quantityType === orderQuantity.quote) {
                 if (amount < symbol.filters.minNotional) {
-                    throw new Error("Do not have anought amount, or enter grater amount")
+                    throw new Error("Do not have enough amount, or enter grater amount")
                 }
             }
 
