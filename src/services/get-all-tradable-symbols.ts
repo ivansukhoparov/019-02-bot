@@ -10,7 +10,25 @@ export async function getAllTradableSymbols() {
     // это означает, что пара активна и торгуется. "BREAK" означает, что торговля по этой паре в данный момент
     // приостановлена или не проводится.
     //
-    return symbols;
+    const symbolsWithPrices = addPricesToSymbolsArray(symbols)
+    return symbolsWithPrices;
+}
+
+export const addPricesToSymbolsArray = async (symbols: any[]) => {
+    const pricesArray = await BinanceAdapter.getTickerPrices();
+    const prices = pricesArray.content.reduce((acc: any, el: any) => {
+        acc[el.symbol] = el.price;
+        return acc;
+    }, {})
+
+
+    return symbols.map((el: any) => {
+        const symbol = el.baseAsset + el.quoteAsset;
+        return {
+            ...el,
+            price: prices[symbol]
+        }
+    })
 }
 
 
