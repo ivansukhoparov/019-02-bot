@@ -30,7 +30,21 @@ export class BinanceAdapter {
         const response = await FetchAdapter.request(url, payload);
         return response;
     }
+    static async getTickerPrices(): Promise<FetchResponseType> {
 
+        const data: any = {timestamp: Date.now()};
+        const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
+        const signature = createSignature(queryString, API_SECRET);
+        const url = `${BASE_URL}/api/v3/ticker/price`;
+        const payload = {
+            method: "GET",
+            headers: {
+                "X-MBX-APIKEY": API_KEY
+            }
+        }
+        const response = await FetchAdapter.request(url, payload);
+        return response;
+    }
     static async placeOrder(symbol: string,
                             quantityType: "quantity" | "quoteOrderQty",
                             quantityAmount: number,
