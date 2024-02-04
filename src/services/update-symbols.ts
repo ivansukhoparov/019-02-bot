@@ -2,22 +2,22 @@ import {tickerOutputDataType} from "../types/web-soket-binance/input";
 
 
 export const getPair = (tradeData:any, base:string = "EUR",quote:string = "USDT" ) =>{
-    if (tradeData[base+quote]){
-        return {
-            pair:base+quote,
-            exchangeRates:tradeData[base + quote].ask,
-            info:tradeData[base + quote],
-        };
-    }else if (tradeData[quote+base]){
-        return {
-            pair:quote + base,
-            exchangeRates:tradeData[quote + base].ask,
-            info:tradeData[quote + base],
-        };
-    }else {
-        return null;
-    }
-}
+	if (tradeData[base+quote]){
+		return {
+			pair:base+quote,
+			exchangeRates:tradeData[base + quote].ask,
+			info:tradeData[base + quote],
+		};
+	}else if (tradeData[quote+base]){
+		return {
+			pair:quote + base,
+			exchangeRates:tradeData[quote + base].ask,
+			info:tradeData[quote + base],
+		};
+	}else {
+		return null;
+	}
+};
 
 // export const getExchangePairs = (symbols: tickerOutputDataType[]) => {
 //     return symbols.filter((el: tickerOutputDataType) => el.quoteAsset === 'USDT')

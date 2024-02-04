@@ -3,33 +3,33 @@ import {symbolMapper} from "../types/fetch-binance/mapper";
 
 export async function getAllTradableSymbols() {
 
-    const response = await BinanceAdapter.getAllSymbols();
-    const symbols = response.content.symbols.filter((el: any) => el.status === 'TRADING').map(symbolMapper);
-    //
-    // status: Этот ключ указывает на текущее состояние торговой пары. Если значение status равно "TRADING",
-    // это означает, что пара активна и торгуется. "BREAK" означает, что торговля по этой паре в данный момент
-    // приостановлена или не проводится.
-    //
-    const symbolsWithPrices = addPricesToSymbolsArray(symbols)
-    return symbolsWithPrices;
+	const response = await BinanceAdapter.getAllSymbols();
+	const symbols = response.content.symbols.filter((el: any) => el.status === "TRADING").map(symbolMapper);
+	//
+	// status: Этот ключ указывает на текущее состояние торговой пары. Если значение status равно "TRADING",
+	// это означает, что пара активна и торгуется. "BREAK" означает, что торговля по этой паре в данный момент
+	// приостановлена или не проводится.
+	//
+	const symbolsWithPrices = addPricesToSymbolsArray(symbols);
+	return symbolsWithPrices;
 }
 
 export const addPricesToSymbolsArray = async (symbols: any[]) => {
-    const pricesArray = await BinanceAdapter.getTickerPrices();
-    const prices = pricesArray.content.reduce((acc: any, el: any) => {
-        acc[el.symbol] = el.price;
-        return acc;
-    }, {})
+	const pricesArray = await BinanceAdapter.getTickerPrices();
+	const prices = pricesArray.content.reduce((acc: any, el: any) => {
+		acc[el.symbol] = el.price;
+		return acc;
+	}, {});
 
 
-    return symbols.map((el: any) => {
-        const symbol = el.baseAsset + el.quoteAsset;
-        return {
-            ...el,
-            price: prices[symbol]
-        }
-    })
-}
+	return symbols.map((el: any) => {
+		const symbol = el.baseAsset + el.quoteAsset;
+		return {
+			...el,
+			price: prices[symbol]
+		};
+	});
+};
 
 
 // response before map
