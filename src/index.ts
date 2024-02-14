@@ -1,37 +1,31 @@
-import {BinanceAdapter} from "./adapters/http/binance-adapter";
-
-
-import {addPricesToSymbolsArray, getAllTradableSymbols} from "./services/get-all-tradable-symbols";
-import {createSymbolsDataSet} from "./services/preparing-symbols";
-import {wsUpdate} from "./adapters/websokets/websoket-adapter";
-import {BinanceService} from "./application/binance-service";
-import {copyFileSync} from "fs";
-import {createSequencesDataSet} from "./services/create-sequences-data-set";
-import {logCurrencyAmount} from "./common/utils/logs";
+import {logPositiveBalances} from "./common/utils/logs";
 
 require("dotenv").config();
+import {getAllTradableSymbols} from "./services/get-all-tradable-symbols";
+import {createSymbolsDataSet} from "./services/preparing-symbols";
+import {wsUpdate} from "./adapters/websokets/websoket-adapter";
+import {createSequencesDataSet} from "./services/create-sequences-data-set";
+import {sellAllToUsdt} from "./common/sell-all-to-usdt";
 
-const app = async () => {
+const init = async () =>{
+	// this function return symbolsDataSet and sequencesDataSet
 	const allTradableSymbols = await getAllTradableSymbols();
 	const symbolsDataSet = await createSymbolsDataSet(allTradableSymbols);
 	const sequencesDataSet = await createSequencesDataSet(allTradableSymbols, symbolsDataSet);
-	wsUpdate(symbolsDataSet, sequencesDataSet);
+	return {symbolsDataSet, sequencesDataSet}
+}
+
+const app = async () => {
+	const {symbolsDataSet, sequencesDataSet} =  await init();
+	//wsUpdate(symbolsDataSet, sequencesDataSet);
+
 };
-
-
-
 
 const startApp = async ()=>{
 	try {
-		const allTradableSymbols = await getAllTradableSymbols();
-		const symbolsDataSet = await createSymbolsDataSet(allTradableSymbols);
-		await logCurrencyAmount("USDC");
-		await  logCurrencyAmount("ETH");
-		const SB = await  BinanceService.createOrder("USDC","ETH",1,symbolsDataSet);
-
-		await logCurrencyAmount("USDC");
-		await  logCurrencyAmount("ETH");
-		console.log(SB);
+//	await app();
+await logPositiveBalances()
+	// await sellAllToUsdt()
 	} catch (err) {
 		console.log(err);
 	}

@@ -1,8 +1,5 @@
 import WebSocket from "ws";
 import {askOrBid} from "../../services/utils/utils";
-import {ActionTimer} from "../../common/utils/timer";
-import {tradeAllSequence} from "../../services/trade-sequence";
-
 
 
 let counter = 0;
@@ -13,33 +10,29 @@ const combinedStreamsUrl = `wss://stream.binance.com:9443/stream?streams=${strea
 
 const connection = new WebSocket(combinedStreamsUrl);
 
-
-export const wsUpdate = (symbols: any, allSequences: any) => {
+export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any) => {
 	connection.onopen = async () => {
 		console.log("Connected to Binance combined WebSocket");
 	};
 
-
 	connection.onmessage = async (e) => {
 		try {
 			const data = JSON.parse(e.data.toString());
-			const updSymbols = updatePrices(symbols, data.data);
-			// console.log(updSymbols)
+			const updSymbolsDataSet = updatePrices(symbolsDataSet, data.data);
+			//console.log(data.data)
 
-			const updateSeq = updatePricesInSeq(allSequences, updSymbols);
+			const updateSeq = updatePricesInSeq(sequencesDataSet, updSymbolsDataSet);
 			//console.log(updateSeq)
 			const opp = updateSeq.map(calculateDifferences)
-				.filter((el:any)=> el.priceDiff>0.35 && el.priceDiff<5 && el.priceDiff!==null);
+				.filter((el: any) => el.priceDiff > 0.00 && el.priceDiff < 5 && el.priceDiff !== null)
+				.sort((a:any, b:any) => b.priceDiff - a.priceDiff);
 			if (opp.length>0) {
 				console.log("has found " + opp.length);
-				for (let i=0; i<opp.length;i++){
-					//console.log(opp[0])
-					await tradeAllSequence(opp[0]);
-					counter += (opp[i].priceDiff-0.3);
-				}
-
-				//console.log(opp)
-				console.log("expeсted income "+counter);
+					console.log(opp[0])
+					// await tradeAllSequence(opp[0]);
+					// counter += (opp[i].priceDiff-0.3);
+					//console.log(opp)
+					// console.log("expeсted income "+counter);
 			}
 		} catch (error) {
 			console.error("Ошибка при обработке сообщения:", error);
@@ -57,17 +50,25 @@ export const wsUpdate = (symbols: any, allSequences: any) => {
 };
 
 
-function updatePrices(target:any, tickerData: any) {
-	const symbols = target;
+function updatePrices(symbolsDataSet: any, tickerData: any) {
+	const symbols = {...symbolsDataSet};
 	tickerData.forEach((el: any) => {
-		if (symbols[el.s]) {
-			symbols[el.s].bid = el.b;
-			symbols[el.s].ask = el.a;
+		if (symbolsDataSet[addSlash(el.s, 4)]) {
+			symbols[addSlash(el.s, 4)].bid = el.b;
+			symbols[addSlash(el.s, 4)].ask = el.a;
+		} else if (symbolsDataSet[addSlash(el.s, 3)]) {
+			symbols[addSlash(el.s, 3)].bid = el.b;
+			symbols[addSlash(el.s, 3)].ask = el.a;
 		}
 	});
 	return symbols;
 }
 
+function addSlash(symbol: string, pos: number) {
+
+	return symbol.slice(0, pos) + "/" + symbol.slice(pos);
+
+}
 
 // {
 //     firstSymbol: {
@@ -94,10 +95,11 @@ function updatePrices(target:any, tickerData: any) {
 // },
 
 function updatePricesInSeq(target: any, symbols: any) {
+
 	target.forEach((el: any) => {
-		el.firstSymbol.price = symbols[el.firstSymbol.symbol.replace("/", "")][askOrBid(el.firstSymbol.action)];
-		el.secondSymbol.price = symbols[el.secondSymbol.symbol.replace("/", "")][askOrBid(el.secondSymbol.action)];
-		el.thirdSymbol.price = symbols[el.thirdSymbol.symbol.replace("/", "")][askOrBid(el.thirdSymbol.action)];
+		el.firstSymbol.price = symbols[el.firstSymbol.symbol][askOrBid(el.firstSymbol.action)];
+		el.secondSymbol.price = symbols[el.secondSymbol.symbol][askOrBid(el.secondSymbol.action)];
+		el.thirdSymbol.price = symbols[el.thirdSymbol.symbol][askOrBid(el.thirdSymbol.action)];
 	});
 	return target;
 }

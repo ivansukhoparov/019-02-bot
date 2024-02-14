@@ -16,7 +16,7 @@ export const createSymbolsDataSet = async (tradableSymbols:any)=>{
 	//------------------------------------------------------------------------------
 	//      Now it has view model like this:
 	//      {...
-	//      MAVTUSD: { baseAsset: 'MAV',
+	//      MAVT/USD: { baseAsset: 'MAV',
 	//                 quoteAsset: 'TUSD',
 	//                 bid: null,
 	//                 ask: null,

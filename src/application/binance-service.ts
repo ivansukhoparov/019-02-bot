@@ -26,7 +26,7 @@ export class BinanceService {
 		const side: OrderSide = action;
 
 		if (quantityType === orderQuantity.base) {
-			amount = roundDownNumber(amount, symbol.filters.stepSize);
+			amount = roundDownNumber(+amount,+ symbol.filters.stepSize);
 			const amountInQuote = amount * +symbol.price;
 			if (amountInQuote < symbol.filters.minNotional) {
 				throw new Error("Don't have information about price");
@@ -36,7 +36,7 @@ export class BinanceService {
 				throw new Error("enter grater amount");
 			}
 		}
-		return BinanceAdapter.placeOrder(symbolName, quantityType, amount, side);
+		return await BinanceAdapter.placeOrder(symbolName, quantityType, amount, side);
 	}
 
 	static _getSymbol(currentCurrency: string, targetCurrency: string, symbolsDataSet: any) {

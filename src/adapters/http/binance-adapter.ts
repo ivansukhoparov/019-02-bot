@@ -30,6 +30,7 @@ export class BinanceAdapter {
 		const response = await FetchAdapter.request(url, payload);
 		return response;
 	}
+
 	static async getTickerPrices(): Promise<FetchResponseType> {
 
 		const data: any = {timestamp: Date.now()};
