@@ -7,6 +7,7 @@ import {
 	OrderSide,
 	OrderTypeType
 } from "../../types/fetch-binance/input";
+import {ActionTimer} from "../../common/utils/timer";
 
 const API_KEY = appSettings.binance.keys.api;
 const API_SECRET = appSettings.binance.keys.secret;
@@ -51,7 +52,8 @@ export class BinanceAdapter {
 		quantityAmount: number,
 		side: OrderSide,
 		type: OrderTypeType = "market"): Promise<FetchResponseType> {
-
+		const timer =  new ActionTimer("BinanceAdapter/placeOrder")
+		timer.start()
 		// Example:
 		// placeOrder("BTCUSDT", 0.001, "BUY");
 		const data: any = {
@@ -78,8 +80,9 @@ export class BinanceAdapter {
 			},
 			body: `${queryString}&signature=${signature}`
 		};
-
-		return await FetchAdapter.request(url, payload);
+		const result = await FetchAdapter.request(url, payload);
+timer.stop()
+		return result
 	}
 
 	// static async orderBaseByQuote(base: string,

@@ -2,6 +2,7 @@ import {BinanceAdapter} from "../adapters/http/binance-adapter";
 import {OrderSide} from "../types/fetch-binance/input";
 import {roundDownNumber} from "../services/trade-sequence";
 import {orderAction, orderQuantity} from "../common/common";
+import {ActionTimer} from "../common/utils/timer";
 
 export class BinanceService {
 
@@ -21,22 +22,28 @@ export class BinanceService {
 	//     }
 	// }
 	static async createOrder(currentCurrency: string, targetCurrency: string, amount: number, symbolsDataSet: any) {
+		const timer =  new ActionTimer("BinanceService/createOrder")
+		timer.start()
 		const {symbolName, action, quantityType}: any = this._getSymbol(currentCurrency, targetCurrency,symbolsDataSet);
 		const symbol = symbolsDataSet[symbolName];
 		const side: OrderSide = action;
-
+		let amountInQuote
 		if (quantityType === orderQuantity.base) {
 			amount = roundDownNumber(+amount,+ symbol.filters.stepSize);
-			const amountInQuote = amount * +symbol.price;
-			if (amountInQuote < symbol.filters.minNotional) {
-				throw new Error("Don't have information about price");
-			}
-		} else if (quantityType === orderQuantity.quote) {
-			if (amount < symbol.filters.minNotional) {
-				throw new Error("enter grater amount");
-			}
+			amountInQuote = amount * +symbol.price;
+			// if (amountInQuote < symbol.filters.minNotional) {
+			// 	throw new Error("Don't have information about price");
+			// }
 		}
-		return await BinanceAdapter.placeOrder(symbolName, quantityType, amount, side);
+		// else if (quantityType === orderQuantity.quote) {
+		// 	if (amount < symbol.filters.minNotional) {
+		// 		throw new Error("enter grater amount");
+		// 	}
+		// }
+		const result = await BinanceAdapter.placeOrder(symbolName, quantityType, amount, side);
+		timer.stop()
+
+		return result
 	}
 
 	static _getSymbol(currentCurrency: string, targetCurrency: string, symbolsDataSet: any) {

@@ -1,13 +1,19 @@
 import fetch from "node-fetch";
 import {FetchResponseType} from "../../../types/fetch-binance/input";
+import {ActionTimer} from "../../../common/utils/timer";
 
 export class FetchAdapter {
 	static async request(url: string, init?: any):Promise<FetchResponseType> {
 
 		try {
+			const timer =  new ActionTimer("FetchAdapter/request")
+			timer.start()
 			const response = await fetch(url, init);
 			const responseJson: any = await response.json();
-			return this._responseMapper(responseJson);
+			const result =  this._responseMapper(responseJson);
+			timer.stop()
+			return result
+
 		} catch (error) {
 			console.log(error);
 			throw new Error();

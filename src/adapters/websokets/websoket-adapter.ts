@@ -1,10 +1,15 @@
 import WebSocket from "ws";
 import {askOrBid} from "../../services/utils/utils";
+import {tradeAllSequence} from "../../services/trade-sequence";
+import {ActionTimer} from "../../common/utils/timer";
+import {BinanceAdapter} from "../http/binance-adapter";
 
 
-let counter = 0;
-
-
+let counter = 1000;
+let counter2 = 0;
+let flag = true;
+let flag2 = true;
+let startB: string = "100"
 const streamNames = ["!ticker@arr"];
 const combinedStreamsUrl = `wss://stream.binance.com:9443/stream?streams=${streamNames.join("/")}`;
 
@@ -17,6 +22,13 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any) => {
 
 	connection.onmessage = async (e) => {
 		try {
+			if (flag2) {
+				flag2 = false;
+				console.log("get balance for calculating")
+				startB = await BinanceAdapter.getCurrencyBalance("USDT");
+				console.log("USDT for calculating - " + startB)
+			}
+
 			const data = JSON.parse(e.data.toString());
 			const updSymbolsDataSet = updatePrices(symbolsDataSet, data.data);
 			//console.log(data.data)
@@ -24,16 +36,42 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any) => {
 			const updateSeq = updatePricesInSeq(sequencesDataSet, updSymbolsDataSet);
 			//console.log(updateSeq)
 			const opp = updateSeq.map(calculateDifferences)
-				.filter((el: any) => el.priceDiff > 0.00 && el.priceDiff < 5 && el.priceDiff !== null)
-				.sort((a:any, b:any) => b.priceDiff - a.priceDiff);
-			if (opp.length>0) {
+				.filter((el: any) => el.priceDiff > 0.35 && el.priceDiff < 5 && el.priceDiff !== null)
+				.sort((a: any, b: any) => b.priceDiff - a.priceDiff);
+			if (opp.length > 0 && flag) {
+				flag = false
+				console.log("============================================================");
+				console.log("============================================================");
 				console.log("has found " + opp.length);
+				console.log("============================================================");
+				console.log("============================================================");
+				console.log("Let's do it");
+				console.log("============================================================");
 					console.log(opp[0])
-					// await tradeAllSequence(opp[0]);
+				const tradeTimer = new ActionTimer("trade sequence")
+				tradeTimer.start()
+				await tradeAllSequence(opp[0], updSymbolsDataSet);
+				tradeTimer.stop()
 					// counter += (opp[i].priceDiff-0.3);
 					//console.log(opp)
 					// console.log("expeсted income "+counter);
+				startB = await BinanceAdapter.getCurrencyBalance("USDT");
+				console.log("USDT - " + startB)
+				flag = true
 			}
+			if (counter === 1000) {
+				console.log("status: ok")
+
+				const oppo = updateSeq.map(calculateDifferences).sort((a: any, b: any) => b.priceDiff - a.priceDiff);
+				console.log("max: " + oppo[0].priceDiff)
+
+				console.log("-------------------------------------------------------------")
+				counter = 0
+			}
+			counter++
+
+
+
 		} catch (error) {
 			console.error("Ошибка при обработке сообщения:", error);
 		}
@@ -53,12 +91,30 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any) => {
 function updatePrices(symbolsDataSet: any, tickerData: any) {
 	const symbols = {...symbolsDataSet};
 	tickerData.forEach((el: any) => {
-		if (symbolsDataSet[addSlash(el.s, 4)]) {
-			symbols[addSlash(el.s, 4)].bid = el.b;
-			symbols[addSlash(el.s, 4)].ask = el.a;
-		} else if (symbolsDataSet[addSlash(el.s, 3)]) {
+		if (symbolsDataSet[addSlash(el.s, 3)]) {
 			symbols[addSlash(el.s, 3)].bid = el.b;
 			symbols[addSlash(el.s, 3)].ask = el.a;
+		} else if (symbolsDataSet[addSlash(el.s, 4)]) {
+			symbols[addSlash(el.s, 4)].bid = el.b;
+			symbols[addSlash(el.s, 4)].ask = el.a;
+		} else if (symbolsDataSet[addSlash(el.s, 1)]) {
+			symbols[addSlash(el.s, 1)].bid = el.b;
+			symbols[addSlash(el.s, 1)].ask = el.a;
+		} else if (symbolsDataSet[addSlash(el.s, 2)]) {
+			symbols[addSlash(el.s, 2)].bid = el.b;
+			symbols[addSlash(el.s, 2)].ask = el.a;
+		} else if (symbolsDataSet[addSlash(el.s, 4)]) {
+			symbols[addSlash(el.s, 5)].bid = el.b;
+			symbols[addSlash(el.s, 5)].ask = el.a;
+		} else if (symbolsDataSet[addSlash(el.s, 6)]) {
+			symbols[addSlash(el.s, 6)].bid = el.b;
+			symbols[addSlash(el.s, 6)].ask = el.a;
+		} else if (symbolsDataSet[addSlash(el.s, 7)]) {
+			symbols[addSlash(el.s, 7)].bid = el.b;
+			symbols[addSlash(el.s, 7)].ask = el.a;
+		} else if (symbolsDataSet[addSlash(el.s, 8)]) {
+			symbols[addSlash(el.s, 8)].bid = el.b;
+			symbols[addSlash(el.s, 8)].ask = el.a;
 		}
 	});
 	return symbols;
@@ -136,8 +192,17 @@ const oppot= (data:any)=>{
 export function calculateDifferences(el: any) {
 	//target.map((el: any) => {
 	let diff: number | null = buyOrSell(100, el.firstSymbol.action, el.firstSymbol.price);
+	let diffF: number | null = buyOrSell(+startB, el.firstSymbol.action, el.firstSymbol.price);
+	let logger1 = "symbol 1 " + el.firstSymbol.symbol + " || " + el.firstSymbol.action + " for " + el.firstSymbol.price + " || " + diffF
+
 	diff = buyOrSell(diff, el.secondSymbol.action, el.secondSymbol.price);
+	diffF = buyOrSell(diffF, el.secondSymbol.action, el.secondSymbol.price);
+	let logger2 = "symbol 2 " + el.secondSymbol.symbol + " || " + el.secondSymbol.action + " for " + el.secondSymbol.price + " || " + diffF
+
 	diff = buyOrSell(diff, el.thirdSymbol.action, el.thirdSymbol.price);
+	diffF = buyOrSell(diffF, el.thirdSymbol.action, el.thirdSymbol.price);
+	let logger3 = "symbol 3 " + el.thirdSymbol.symbol + " || " + el.thirdSymbol.action + " for " + el.thirdSymbol.price + " || " + diffF
+
 	if (diff){
 		diff=diff-100;
 	}
@@ -145,6 +210,9 @@ export function calculateDifferences(el: any) {
 	return {
 		...el,
 		priceDiff:diff,
+		logger1: logger1,
+		logger2: logger2,
+		logger3: logger3,
 		//opp:opp
 
 	};

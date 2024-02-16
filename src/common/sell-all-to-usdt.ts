@@ -9,12 +9,10 @@ export const sellAllToUsdt = async () => {
     const tradableCoins = getUniqueCoins(allTradableSymbols);
 
     for (let i = 0; i < tradableCoins.length; i++) {
-        console.log("===========================================")
         const currentCoin = tradableCoins[i];
         const currentCoinAmountBefore = await BinanceAdapter.getCurrencyBalance(currentCoin);
-
         try {
-            console.log(await BinanceService.createOrder(currentCoin, "USDT", currentCoinAmountBefore, symbolsDataSet))
+            await BinanceService.createOrder(currentCoin, "USDT", currentCoinAmountBefore, symbolsDataSet)
             const currentCoinAmountAfter = await BinanceAdapter.getCurrencyBalance(currentCoin);
             const usdtAmountAfter = await BinanceAdapter.getCurrencyBalance("USDT");
             const message = `${currentCoin}  ${currentCoinAmountBefore} || ${currentCoinAmountAfter} - ${currentCoin} and ${usdtAmountAfter} - USDT`

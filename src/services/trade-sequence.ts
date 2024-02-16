@@ -1,37 +1,107 @@
 import {OrderSide, QuantityType} from "../types/fetch-binance/input";
 import {BinanceAdapter} from "../adapters/http/binance-adapter";
 import {TradeInstructionType, TradeSequenceType} from "../types/sequences";
+import {BinanceService} from "../application/binance-service";
 
 
 
-export const tradeThis = async (instruction: TradeInstructionType) => {
-	console.log(instruction.symbol);
-	const symbol = instruction.symbol.replace("/", "");
-	const side: OrderSide = instruction.action;
-	const {quantityCurrency, quantityType} = getQuantityType(instruction);
-	const currencyAmount = await BinanceAdapter.getCurrencyBalance(quantityCurrency);
-	const quantityAmount = roundDownNumber(currencyAmount, +instruction.filters.stepSize);
-	return  BinanceAdapter.placeOrder(symbol, quantityType, quantityAmount, side);
+export const tradeThis = async (instruction: TradeInstructionType, updSymbolsDataSet:any, ident:string) => {
+	console.log(ident + "+++++")
+	console.log(ident +"instruction:  ")
+	console.log(instruction)
+	console.log(ident +"+++++")
+	const currentCurrecny = instruction.currentCurrency
+
+	let targetCurrency
+
+	const separatedSymbol =  instruction.symbol.split("/")
+	if (separatedSymbol[0] === currentCurrecny) targetCurrency = separatedSymbol[1]
+	else targetCurrency = separatedSymbol[0]
+	console.log(ident +"+++++")
+	console.log(ident +"currentCurrecny " +currentCurrecny)
+	console.log(ident +"targetCurrency "+ targetCurrency)
+	console.log(ident +"get balance ")
+
+	const amount = await BinanceAdapter.getCurrencyBalance(currentCurrecny);
+
+	console.log(ident +"amount " + amount)
+	console.log(ident +"+++++")
+	console.log(ident +"do trade ")
+	const result= await BinanceService.createOrder(currentCurrecny, targetCurrency,amount,updSymbolsDataSet)
+	console.log(ident +"result " + result.type)
+	console.dir(result.content)
+	return result.content
+	// console.log(instruction.symbol);
+	// const symbol = instruction.symbol.replace("/", "");
+	// const side: OrderSide = instruction.action;
+	// const {quantityCurrency, quantityType} = getQuantityType(instruction);
+	//
+	// const quantityAmount = roundDownNumber(currencyAmount, +instruction.filters.stepSize);
+	// return  BinanceAdapter.placeOrder(symbol, quantityType, quantityAmount, side);
 };
 
 type s= "firstSymbol"|"secondSymbol"|"thirdSymbol"
 
-export const  tradeAllSequence =async (sequence: TradeSequenceType) => {
+// {
+// 	firstSymbol: {
+// 		symbol: 'ETH/USDT',
+// 			currentCurrency: 'USDT',
+// 			action: 'buy',
+// 			price: '2818.88000000',
+// 			filters: {
+// 			minNotional: '5.00000000',
+// 				minQty: '0.00010000',
+// 				minQtyMarket: '0.00000000',
+// 				stepSize: '0.00010000',
+// 				stepSizeMarket: '0.00010000'
+// 		}
+// 	},
+// 	secondSymbol: {
+// 		symbol: 'ETH/BRL',
+// 			currentCurrency: 'ETH',
+// 			action: 'sell',
+// 			price: '14106.91000000',
+// 			filters: {
+// 			minNotional: '10.00000000',
+// 				minQty: '0.00010000',
+// 				minQtyMarket: '0.00000000',
+// 				stepSize: '0.00010000',
+// 				stepSizeMarket: '0.00010000'
+// 		}
+// 	},
+// 	thirdSymbol: {
+// 		symbol: 'USDT/BRL',
+// 			currentCurrency: 'BRL',
+// 			action: 'buy',
+// 			price: '5.00300000',
+// 			filters: {
+// 			minNotional: '10.00000000',
+// 				minQty: '0.10000000',
+// 				minQtyMarket: '0.00000000',
+// 				stepSize: '0.10000000',
+// 				stepSizeMarket: '0.10000000'
+// 		}
+// 	},
+// 	priceDiff: 0.028741411073426093
 
 
+export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDataSet:any) => {
+	console.log("trade sequence 1");
+	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+	const result1=  await tradeThis(sequence.firstSymbol,updSymbolsDataSet,"1.");
 
-	const result1=  await tradeThis(sequence.firstSymbol);
-	console.log("trade sequence " + result1.type);
-	console.log(sequence.firstSymbol);
-	console.log("============================================================");
-	const result2=  await tradeThis(sequence.secondSymbol);
-	console.log("trade sequence " + result2.type);
+	console.log("====================================================================================================");
+	console.log("trade sequence 2 ");
+	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	const result2=  await tradeThis(sequence.secondSymbol,updSymbolsDataSet,"2.");
 	console.log(sequence.secondSymbol);
-	console.log("============================================================");
-	const result3=  await tradeThis(sequence.thirdSymbol);
-	console.log("trade sequence " + result3.type);
+	console.log("====================================================================================================");
+	console.log("trade sequence 3");
+	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	const result3=  await tradeThis(sequence.thirdSymbol,updSymbolsDataSet,"3.");
+
 	console.log(sequence.thirdSymbol);
-	console.log("============================================================");
+	console.log("====================================================================================================");
 	// console.log("trade sequence " + result.type)
 	// console.log(i);
 	//   console.log(result.content)
