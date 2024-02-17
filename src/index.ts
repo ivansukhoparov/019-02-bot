@@ -19,7 +19,12 @@ const init = async () =>{
 const app = async () => {
 	const {symbolsDataSet, sequencesDataSet} =  await init();
 	console.log("app initiated")
-	 wsUpdate(symbolsDataSet, sequencesDataSet);
+
+
+		const startAmount = await BinanceAdapter.getCurrencyBalance("USDT");
+
+
+	 wsUpdate(symbolsDataSet, sequencesDataSet,startAmount);
 };
 
 const normaliseWallets = async () => {
@@ -52,13 +57,23 @@ const iotatousdt = async (usdt:number) => {
 	await logCurrencyAmount("USDT")
 
 	await BinanceAdapter.placeOrder("IOTAUSDT", "quoteOrderQty", usdt, "sell", "market")
-	await logCurrencyAmount("USDT")
+
 	await logCurrencyAmount("IOTA")
+	await logCurrencyAmount("USDT")
+
 	console.log("============================================================")
 }
 const startApp = async ()=>{
 	try {
-		//await iotatousdt(150)
+		const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");
+		if (balanceTest<140){
+			console.log("low balance")
+			await iotatousdt(150-balanceTest)
+			console.log("transfer money")
+		}else{
+			console.log("balance OK")
+		}
+
 		await logCurrencyAmount("USDT")
 		await app();
 // await normaliseWallets()
