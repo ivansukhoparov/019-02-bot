@@ -66,7 +66,7 @@ const iotatousdt = async (usdt:number) => {
 const startApp = async ()=>{
 	try {
 		const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");
-		if (balanceTest<140){
+		if (balanceTest<100){
 			console.log("low balance")
 			await iotatousdt(150-balanceTest)
 			console.log("transfer money")

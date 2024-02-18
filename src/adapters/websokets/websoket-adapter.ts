@@ -36,18 +36,18 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 			const updateSeq = updatePricesInSeq(sequencesDataSet, updSymbolsDataSet);
 			//console.log(updateSeq)
 			const opp = updateSeq.map(calculateDifferences)
-				.filter((el: any) => el.priceDiff > 0.001 && el.priceDiff < 5 && el.priceDiff !== null)
+				.filter((el: any) => el.priceDiff > 0.45 && el.priceDiff < 5 && el.priceDiff !== null)
 				.sort((a: any, b: any) => b.priceDiff - a.priceDiff);
 			if (opp.length > 0 && flag) {
 				flag = false
-				// console.log("============================================================");
-				// console.log("============================================================");
-				// console.log("has found " + opp.length);
-				// console.log("============================================================");
-				// console.log("============================================================");
-				// console.log("Let's do it");
-				// console.log("============================================================");
-				// 	console.log(opp[0])
+				console.log("============================================================");
+				console.log("============================================================");
+				console.log("has found " + opp.length);
+				console.log("============================================================");
+				console.log("============================================================");
+				console.log("Let's do it");
+				console.log("============================================================");
+					console.log(opp[0])
 				const tradeTimer = new ActionTimer("trade sequence")
 				tradeTimer.start()
 				await tradeAllSequence(opp[0], updSymbolsDataSet,startB);
@@ -57,18 +57,18 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 					// console.log("expeсted income "+counter);
 				startB = await BinanceAdapter.getCurrencyBalance("USDT");
 				console.log("USDT - " + startB)
-				//flag = true
+				flag = true
 			}
-			// if (counter === 1000) {
-			// 	console.log("status: ok")
-			//
-			// 	const oppo = updateSeq.map(calculateDifferences).sort((a: any, b: any) => b.priceDiff - a.priceDiff);
-			// 	console.log("max: " + oppo[0].priceDiff)
-			//
-			// 	console.log("-------------------------------------------------------------")
-			// 	counter = 0
-			// }
-			// counter++
+			if (counter === 1000) {
+				console.log("status: ok")
+
+				const oppo = updateSeq.map(calculateDifferences).sort((a: any, b: any) => b.priceDiff - a.priceDiff);
+				console.log("max: " + oppo[0].priceDiff)
+
+				console.log("-------------------------------------------------------------")
+				counter = 0
+			}
+			counter++
 
 
 
