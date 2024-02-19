@@ -188,8 +188,11 @@ timer.stop()
 		};
 
 		const responseData = await FetchAdapter.request(url, payload);
-		const balance = responseData.content.balances.find((b: AccountBalanceInfoInputType) => b.asset === currency);
-		return balance ? balance.free : null;
+		if (responseData.content.balances) {
+			const balance = responseData.content.balances.find((b: AccountBalanceInfoInputType) => b.asset === currency);
+			return balance ? balance.free : null;
+		}
+		return  null
 	}
 
 	static _createQueryFilter(...filters: any) {

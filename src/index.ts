@@ -23,7 +23,7 @@ const app = async () => {
 
 		const startAmount = await BinanceAdapter.getCurrencyBalance("USDT");
 
-
+	await new Promise(resolve => setTimeout(resolve, 5000));
 	 wsUpdate(symbolsDataSet, sequencesDataSet,startAmount);
 };
 
@@ -73,9 +73,9 @@ const startApp = async ()=>{
 		}else{
 			console.log("balance OK")
 		}
-
 		await logCurrencyAmount("USDT")
 		await app();
+		await logCurrencyAmount("USDT")
 // await normaliseWallets()
 	} catch (err) {
 		console.log(err);
