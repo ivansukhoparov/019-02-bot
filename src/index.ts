@@ -65,6 +65,7 @@ const iotatousdt = async (usdt:number) => {
 }
 const startApp = async ()=>{
 	try {
+		console.log("v0.01")
 		const timer = new ActionTimer("all")
 		timer.start()
 		await BinanceAdapter.getSymbolInfo()

@@ -55,7 +55,13 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 				tradeTimer.start()
 				const sequence = await updateDifferences(opp[0])
 				console.log(sequence)
-				await tradeAllSequence(sequence, updSymbolsDataSet,startB);
+				if (sequence.priceDiff > thresholdValue){
+					await tradeAllSequence(sequence, updSymbolsDataSet,startB);
+				}else	{
+					console.log("sequence ruined :(")
+				}
+
+
 				tradeTimer.stop()
 					// counter += (opp[i].priceDiff-0.3);
 					//console.log(opp)
