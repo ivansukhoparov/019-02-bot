@@ -31,6 +31,8 @@ export const tradeThis = async (instruction: TradeInstructionType, updSymbolsDat
 	const result= await BinanceService.createOrder(currentCurrecny, targetCurrency,amount,updSymbolsDataSet)
 	console.log(ident +"result " + result.type)
 	console.dir(result.content)
+// console.log("symbol.info")
+// 	console.dir(await BinanceAdapter.getSymbolInfo(result.content.symbol))
 	return result.content
 	// console.log(instruction.symbol);
 	// const symbol = instruction.symbol.replace("/", "");
@@ -89,6 +91,7 @@ type s= "firstSymbol"|"secondSymbol"|"thirdSymbol"
 export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDataSet:any,startAmount:string|number) => {
 	console.log("trade sequence 1");
 	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+
 	const result1=  await tradeThis(sequence.firstSymbol,updSymbolsDataSet,+startAmount,"1.");
 	let fills1
 	if (sequence.firstSymbol.action==="buy"){

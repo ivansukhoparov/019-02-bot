@@ -5,6 +5,7 @@ import {createSequencesDataSet} from "./services/create-sequences-data-set";
 import {sellAllToUsdt} from "./common/sell-all-to-usdt";
 import {BinanceAdapter} from "./adapters/http/binance-adapter";
 import {wsUpdate} from "./adapters/websokets/websoket-adapter";
+import {ActionTimer} from "./common/utils/timer";
 
 require("dotenv").config();
 
@@ -64,14 +65,22 @@ const iotatousdt = async (usdt:number) => {
 }
 const startApp = async ()=>{
 	try {
-		// const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");
-		// if (balanceTest<100){
-		// 	console.log("low balance")
-		// 	await iotatousdt(150-balanceTest)
-		// 	console.log("transfer money")
-		// }else{
-		// 	console.log("balance OK")
-		// }
+		const timer = new ActionTimer("all")
+		timer.start()
+		await BinanceAdapter.getSymbolInfo()
+		timer.stop()
+		const timer2 = new ActionTimer("one")
+		timer2.start()
+		await BinanceAdapter.getSymbolInfo("BTCUSDT")
+		timer2.stop()
+		const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");
+		if (balanceTest<100){
+			console.log("low balance")
+			await iotatousdt(150-balanceTest)
+			console.log("transfer money")
+		}else{
+			console.log("balance OK")
+		}
 		await logCurrencyAmount("USDT")
 		await app();
 		await logCurrencyAmount("USDT")

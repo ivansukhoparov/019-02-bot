@@ -4,14 +4,16 @@ import {tradeAllSequence} from "../../services/trade-sequence";
 import {ActionTimer} from "../../common/utils/timer";
 import {BinanceAdapter} from "../http/binance-adapter";
 
-
+const timer =new ActionTimer("update")
 let counter = 1000;
 let counter2 = 0;
 let flag = true;
 let flag2 = true;
 let startB: string = "100"
+const	thresholdValue = 0.4
 const streamNames = ["!ticker@arr"];
 const combinedStreamsUrl = `wss://stream.binance.com:9443/stream?streams=${streamNames.join("/")}`;
+
 
 const connection = new WebSocket(combinedStreamsUrl);
 
@@ -29,16 +31,17 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 				console.log("USDT for calculating - " + startB)
 			}
 
+
+
 			const data = JSON.parse(e.data.toString());
 			const updSymbolsDataSet = updatePrices(symbolsDataSet, data.data);
-			//console.log(data.data)
-
 			const updateSeq = updatePricesInSeq(sequencesDataSet, updSymbolsDataSet);
 			//console.log(updateSeq)
 			const opp = updateSeq.map(calculateDifferences)
-				.filter((el: any) => el.priceDiff > 0.35 && el.priceDiff < 5 && el.priceDiff !== null)
+				.filter((el: any) => el.priceDiff > thresholdValue && el.priceDiff < 5 && el.priceDiff !== null)
 				.sort((a: any, b: any) => b.priceDiff - a.priceDiff);
 			if (opp.length > 0 && flag) {
+
 				flag = false
 				console.log("============================================================");
 				console.log("============================================================");
@@ -50,7 +53,9 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 					console.log(opp[0])
 				const tradeTimer = new ActionTimer("trade sequence")
 				tradeTimer.start()
-				await tradeAllSequence(opp[0], updSymbolsDataSet,startB);
+				const sequence = await updateDifferences(opp[0])
+				console.log(sequence)
+				await tradeAllSequence(sequence, updSymbolsDataSet,startB);
 				tradeTimer.stop()
 					// counter += (opp[i].priceDiff-0.3);
 					//console.log(opp)
@@ -157,6 +162,7 @@ function updatePricesInSeq(target: any, symbols: any) {
 		el.secondSymbol.price = symbols[el.secondSymbol.symbol][askOrBid(el.secondSymbol.action)];
 		el.thirdSymbol.price = symbols[el.thirdSymbol.symbol][askOrBid(el.thirdSymbol.action)];
 	});
+
 	return target;
 }
 
@@ -217,4 +223,37 @@ export function calculateDifferences(el: any) {
 
 	};
 	//  })
+}
+export async function  updateDifferences(el:any) {
+	const fs = await BinanceAdapter.getSymbolInfo(el.firstSymbol.symbol.replace("/", ""))
+	const ss = await BinanceAdapter.getSymbolInfo(el.secondSymbol.symbol.replace("/", ""))
+	const ts = await BinanceAdapter.getSymbolInfo(el.thirdSymbol.symbol.replace("/", ""))
+	el.firstSymbol.price = fs[askOrBid(el.firstSymbol.action)+"Price"];
+	el.secondSymbol.price = ss[askOrBid(el.secondSymbol.action)+"Price"];
+	el.thirdSymbol.price = ts[askOrBid(el.thirdSymbol.action)+"Price"];
+
+	let diff: number | null = buyOrSell(100, el.firstSymbol.action, el.firstSymbol.price);
+	let diffF: number | null = buyOrSell(+startB, el.firstSymbol.action, el.firstSymbol.price);
+	let logger1 = "symbol 1 " + el.firstSymbol.symbol + " || " + el.firstSymbol.action + " for " + el.firstSymbol.price + " || " + diffF
+
+	diff = buyOrSell(diff, el.secondSymbol.action, el.secondSymbol.price);
+	diffF = buyOrSell(diffF, el.secondSymbol.action, el.secondSymbol.price);
+	let logger2 = "symbol 2 " + el.secondSymbol.symbol + " || " + el.secondSymbol.action + " for " + el.secondSymbol.price + " || " + diffF
+
+	diff = buyOrSell(diff, el.thirdSymbol.action, el.thirdSymbol.price);
+	diffF = buyOrSell(diffF, el.thirdSymbol.action, el.thirdSymbol.price);
+	let logger3 = "symbol 3 " + el.thirdSymbol.symbol + " || " + el.thirdSymbol.action + " for " + el.thirdSymbol.price + " || " + diffF
+
+	if (diff){
+		diff=diff-100;
+	}
+	const opp = oppot(el);
+	return {
+		...el,
+		priceDiff:diff,
+		logger1: logger1,
+		logger2: logger2,
+		logger3: logger3,
+	};
+
 }
