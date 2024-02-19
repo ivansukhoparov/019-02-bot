@@ -66,14 +66,6 @@ const iotatousdt = async (usdt:number) => {
 const startApp = async ()=>{
 	try {
 		console.log("v0.01")
-		const timer = new ActionTimer("all")
-		timer.start()
-		await BinanceAdapter.getSymbolInfo()
-		timer.stop()
-		const timer2 = new ActionTimer("one")
-		timer2.start()
-		await BinanceAdapter.getSymbolInfo("BTCUSDT")
-		timer2.stop()
 		const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");
 		if (balanceTest<100){
 			console.log("low balance")
