@@ -59,16 +59,16 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 				console.log("USDT - " + startB)
 				flag = true
 			}
-			// if (counter === 1000) {
-			// 	console.log("status: ok")
-			//
-			// 	const oppo = updateSeq.map(calculateDifferences).sort((a: any, b: any) => b.priceDiff - a.priceDiff);
-			// 	console.log("max: " + oppo[0].priceDiff)
-			//
-			// 	console.log("-------------------------------------------------------------")
-			// 	counter = 0
-			// }
-			// counter++
+			if (counter === 1000) {
+				console.log("status: ok")
+
+				const oppo = updateSeq.map(calculateDifferences).sort((a: any, b: any) => b.priceDiff - a.priceDiff);
+				console.log("max: " + oppo[0].priceDiff)
+
+				console.log("-------------------------------------------------------------")
+				counter = 0
+			}
+			counter++
 
 
 

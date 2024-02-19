@@ -20,8 +20,7 @@ const app = async () => {
 	const {symbolsDataSet, sequencesDataSet} =  await init();
 	console.log("app initiated")
 
-
-		const startAmount = await BinanceAdapter.getCurrencyBalance("USDT");
+	const startAmount = await BinanceAdapter.getCurrencyBalance("USDT");
 
 	await new Promise(resolve => setTimeout(resolve, 5000));
 	 wsUpdate(symbolsDataSet, sequencesDataSet,startAmount);
@@ -65,14 +64,14 @@ const iotatousdt = async (usdt:number) => {
 }
 const startApp = async ()=>{
 	try {
-		const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");
-		if (balanceTest<100){
-			console.log("low balance")
-			await iotatousdt(150-balanceTest)
-			console.log("transfer money")
-		}else{
-			console.log("balance OK")
-		}
+		// const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");
+		// if (balanceTest<100){
+		// 	console.log("low balance")
+		// 	await iotatousdt(150-balanceTest)
+		// 	console.log("transfer money")
+		// }else{
+		// 	console.log("balance OK")
+		// }
 		await logCurrencyAmount("USDT")
 		await app();
 		await logCurrencyAmount("USDT")
