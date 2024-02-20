@@ -6,12 +6,12 @@ export class FetchAdapter {
 	static async request(url: string, init?: any):Promise<FetchResponseType> {
 
 		try {
-			const timer =  new ActionTimer("FetchAdapter/request")
-			timer.start()
+			// const timer =  new ActionTimer("FetchAdapter/request")
+			// timer.start()
 			const response = await fetch(url, init);
 			const responseJson: any = await response.json();
 			const result =  this._responseMapper(responseJson);
-			timer.stop()
+			// timer.stop()
 			return result
 
 		} catch (error) {

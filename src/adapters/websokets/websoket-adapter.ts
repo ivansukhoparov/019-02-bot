@@ -10,10 +10,10 @@ let counter2 = 0;
 let flag = true;
 let flag2 = true;
 let startB: string = "100"
-const	thresholdValue = 0.4
-const streamNames = ["!ticker@arr"];
-const combinedStreamsUrl = `wss://stream.binance.com:9443/stream?streams=${streamNames.join("/")}`;
-
+const	thresholdValue = 0.05
+// const streamNames = ["!ticker@arr"];
+// const combinedStreamsUrl = `wss://stream.binance.com:9443/stream?streams=${streamNames.join("/")}`;
+const combinedStreamsUrl="wss://testnet.binance.vision/ws/!ticker@arr"
 
 const connection = new WebSocket(combinedStreamsUrl);
 
@@ -26,15 +26,16 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 		try {
 			if (flag2) {
 				flag2 = false;
-				console.log("get balance for calculating")
+				// console.log("get balance for calculating")
 				startB = startAmount
-				console.log("USDT for calculating - " + startB)
+				// console.log("USDT for calculating - " + startB)
 			}
 
 
 
 			const data = JSON.parse(e.data.toString());
-			const updSymbolsDataSet = updatePrices(symbolsDataSet, data.data);
+			// const updSymbolsDataSet = updatePrices(symbolsDataSet, data.data); // for real api
+			const updSymbolsDataSet = updatePrices(symbolsDataSet, data); // for test api
 			const updateSeq = updatePricesInSeq(sequencesDataSet, updSymbolsDataSet);
 			//console.log(updateSeq)
 			const opp = updateSeq.map(calculateDifferences)
@@ -43,26 +44,26 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 			if (opp.length > 0 && flag) {
 
 				flag = false
-				console.log("============================================================");
-				console.log("============================================================");
-				console.log("has found " + opp.length);
-				console.log("============================================================");
-				console.log("============================================================");
-				console.log("Let's do it");
-				console.log("============================================================");
-					console.log(opp[0])
-				const tradeTimer = new ActionTimer("trade sequence")
-				tradeTimer.start()
+				// console.log("============================================================");
+				// console.log("============================================================");
+				//  console.log("has found " + opp.length);
+				// console.log("============================================================");
+				// console.log("============================================================");
+				// console.log("Let's do it");
+				// console.log("============================================================");
+				// 	console.log(opp[0])
+				// const tradeTimer = new ActionTimer("trade sequence")
+				// tradeTimer.start()
 				const sequence = await updateDifferences(opp[0])
-				console.log(sequence)
+				// console.log(sequence)
 				if (sequence.priceDiff > thresholdValue){
 					await tradeAllSequence(sequence, updSymbolsDataSet,startB);
 				}else	{
-					console.log("sequence ruined :(")
+					// console.log("sequence ruined :(")
 				}
 
 
-				tradeTimer.stop()
+				// tradeTimer.stop()
 					// counter += (opp[i].priceDiff-0.3);
 					//console.log(opp)
 					// console.log("expeсted income "+counter);
@@ -70,16 +71,16 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 				console.log("USDT - " + startB)
 				flag = true
 			}
-			if (counter === 1000) {
-				console.log("status: ok")
-
-				const oppo = updateSeq.map(calculateDifferences).sort((a: any, b: any) => b.priceDiff - a.priceDiff);
-				console.log("max: " + oppo[0].priceDiff)
-
-				console.log("-------------------------------------------------------------")
-				counter = 0
-			}
-			counter++
+			// if (counter === 1000) {
+			// 	console.log("status: ok")
+			//
+			// 	const oppo = updateSeq.map(calculateDifferences).sort((a: any, b: any) => b.priceDiff - a.priceDiff);
+			// 	console.log("max: " + oppo[0].priceDiff)
+			//
+			// 	console.log("-------------------------------------------------------------")
+			// 	counter = 0
+			// }
+			// counter++
 
 
 

@@ -6,10 +6,10 @@ import {BinanceService} from "../application/binance-service";
 
 
 export const tradeThis = async (instruction: TradeInstructionType, updSymbolsDataSet:any,amount:number, ident:string) => {
-	console.log(ident + "+++++")
-	console.log(ident +"instruction:  ")
-	console.log(instruction)
-	console.log(ident +"+++++")
+	// console.log(ident + "+++++")
+	// console.log(ident +"instruction:  ")
+	// console.log(instruction)
+	// console.log(ident +"+++++")
 	const currentCurrecny = instruction.currentCurrency
 
 	let targetCurrency
@@ -17,20 +17,20 @@ export const tradeThis = async (instruction: TradeInstructionType, updSymbolsDat
 	const separatedSymbol =  instruction.symbol.split("/")
 	if (separatedSymbol[0] === currentCurrecny) targetCurrency = separatedSymbol[1]
 	else targetCurrency = separatedSymbol[0]
-	console.log(ident +"+++++")
-	console.log(ident +"currentCurrecny " +currentCurrecny)
-	console.log(ident +"targetCurrency "+ targetCurrency)
-	console.log(ident +"get balance ")
+	// console.log(ident +"+++++")
+	// console.log(ident +"currentCurrecny " +currentCurrecny)
+	// console.log(ident +"targetCurrency "+ targetCurrency)
+	// console.log(ident +"get balance ")
 
 	// Get amount for traiding
 	// const amount = await BinanceAdapter.getCurrencyBalance(currentCurrecny);
-
-	console.log(ident +"amount " + amount)
-	console.log(ident +"+++++")
-	console.log(ident +"do trade ")
+	//
+	// console.log(ident +"amount " + amount)
+	// console.log(ident +"+++++")
+	// console.log(ident +"do trade ")
 	const result= await BinanceService.createOrder(currentCurrecny, targetCurrency,amount,updSymbolsDataSet)
-	console.log(ident +"result " + result.type)
-	console.dir(result.content)
+	// console.log(ident +"result " + result.type)
+	// console.dir(result.content)
 // console.log("symbol.info")
 // 	console.dir(await BinanceAdapter.getSymbolInfo(result.content.symbol))
 	return result.content
@@ -89,8 +89,8 @@ type s= "firstSymbol"|"secondSymbol"|"thirdSymbol"
 
 
 export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDataSet:any,startAmount:string|number) => {
-	console.log("trade sequence 1");
-	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+	// console.log("trade sequence 1");
+	// console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
 	const result1=  await tradeThis(sequence.firstSymbol,updSymbolsDataSet,+startAmount,"1.");
 	let fills1
@@ -100,9 +100,9 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 		fills1 = result1.cummulativeQuoteQty;
 	}
 
-	console.log("====================================================================================================");
-	console.log("trade sequence 2 ");
-	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	// console.log("====================================================================================================");
+	// console.log("trade sequence 2 ");
+	// console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 	const result2=  await tradeThis(sequence.secondSymbol,updSymbolsDataSet,+fills1,"2.");
 	let fills2
 	if (sequence.secondSymbol.action==="buy"){
@@ -110,14 +110,14 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	}else{
 		fills2 = result2.cummulativeQuoteQty;
 	}
-	console.log(sequence.secondSymbol);
-	console.log("====================================================================================================");
-	console.log("trade sequence 3");
-	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	// console.log(sequence.secondSymbol);
+	// console.log("====================================================================================================");
+	// console.log("trade sequence 3");
+	// console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 	const result3=  await tradeThis(sequence.thirdSymbol,updSymbolsDataSet,+fills2, "3.");
-
-	console.log(sequence.thirdSymbol);
-	console.log("====================================================================================================");
+	//
+	// console.log(sequence.thirdSymbol);
+	// console.log("====================================================================================================");
 	// console.log("trade sequence " + result.type)
 	// console.log(i);
 	//   console.log(result.content)
