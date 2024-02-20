@@ -2,12 +2,16 @@ export const defaultSettings = {
 	binance: {
 		urls: {
 			baseUrl: "https://api.binance.com",
-			websocket: ""
+			websocket: "wss://stream.binance.com:9443/stream?streams="
 		},
 		keys: {
-			api: "",
-			secret: ""
+			api: process.env.API_KEY!,
+			secret: process.env.SECRET_KEY!
+		},
+		params:{
+			thresholdValue:process.env.THRESHOLD_VALUE!
 		}
+
 	}
 };
 

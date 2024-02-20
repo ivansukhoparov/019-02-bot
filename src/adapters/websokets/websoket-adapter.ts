@@ -3,6 +3,7 @@ import {askOrBid} from "../../services/utils/utils";
 import {tradeAllSequence} from "../../services/trade-sequence";
 import {ActionTimer} from "../../common/utils/timer";
 import {BinanceAdapter} from "../http/binance-adapter";
+import {appSettings} from "../../settings/settings";
 
 const timer =new ActionTimer("update")
 let counter = 1000;
@@ -10,7 +11,7 @@ let counter2 = 0;
 let flag = true;
 let flag2 = true;
 let startB: string = "100"
-const	thresholdValue = 0.05
+const thresholdValue = appSettings.binance.params.thresholdValue;
 // const streamNames = ["!ticker@arr"];
 // const combinedStreamsUrl = `wss://stream.binance.com:9443/stream?streams=${streamNames.join("/")}`;
 const combinedStreamsUrl="wss://testnet.binance.vision/ws/!ticker@arr"
