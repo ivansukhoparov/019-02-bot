@@ -3,6 +3,7 @@ require("dotenv").config();
 
 export const testSettings: typeof defaultSettings = {
 	binance: {
+		status:"TEST",
 		urls: {
 			baseUrl: "https://testnet.binance.vision",
 			websocket: "wss://testnet.binance.vision/ws/"
