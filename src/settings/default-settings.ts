@@ -1,6 +1,8 @@
+
+require("dotenv").config();
+
 export const defaultSettings = {
 	binance: {
-		status:"PRODUCTION",
 		urls: {
 			baseUrl: "https://api.binance.com",
 			websocket: "wss://stream.binance.com:9443/stream?streams="
