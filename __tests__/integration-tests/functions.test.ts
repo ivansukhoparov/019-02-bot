@@ -1,7 +1,7 @@
 import {testSymbols} from "./data";
 import {createTradeSequence} from "../../src/services/create-trade-sequence";
 import {ActionTimer} from "../../src/common/utils/timer";
-import {calculateDifferences} from "../../src/adapters/websokets/websoket-adapter";
+import {PredictTradeResult} from "../../src/adapters/websokets/websoket-adapter";
 const a = {
     firstSymbol: { symbol: 'BTCUSDT', action: 'buy', price: '10000' },
     secondSymbol: { symbol: 'BTCEUR', action: 'sell', price: '9000' },
@@ -84,7 +84,7 @@ describe("createTradeSequence function test", () => {
 
     it("test 1", () => {
 
-const result = calculateDifferences(a)
+const result = PredictTradeResult(a)
         console.log(result)
         expect(1).not.toBeNull()
     })

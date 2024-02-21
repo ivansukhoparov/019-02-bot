@@ -6,7 +6,7 @@ import {sellAllToUsdt} from "./common/sell-all-to-usdt";
 import {BinanceAdapter} from "./adapters/http/binance-adapter";
 import {wsUpdate} from "./adapters/websokets/websoket-adapter";
 import {ActionTimer} from "./common/utils/timer";
-import {appSettings} from "./settings/settings";
+import {appMode, appSettings} from "./settings/settings";
 
 require("dotenv").config();
 
@@ -67,6 +67,7 @@ const iotatousdt = async (usdt:number) => {
 const startApp = async ()=>{
 	try {
 		console.log("v0.01.3")
+		console.log("APP MODE " + appMode)
 		console.dir(appSettings)
 		// const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");
 		// if (balanceTest<100){
