@@ -12,7 +12,8 @@ export const defaultSettings = {
 			secret: process.env.SECRET_KEY!
 		},
 		params:{
-			thresholdValue:process.env.THRESHOLD_VALUE!
+			thresholdValue:process.env.THRESHOLD_VALUE!,
+			stopThresholdValue:process.env.STOP_THRESHOLD!
 		}
 
 	}

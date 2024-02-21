@@ -12,7 +12,8 @@ export const testSettings: typeof defaultSettings = {
 			secret: "H9f2TLAyvYFwaFPF08YqJFmXuRkjPbn61QXnENJc1qVm6ozDgregLC0irCTtBMad"
 		},
 		params:{
-			thresholdValue:process.env.TEST_THRESHOLD_VALUE!
+			thresholdValue:process.env.TEST_THRESHOLD_VALUE!,
+			stopThresholdValue:process.env.TEST_STOP_THRESHOLD!
 		}
 	}
 };
