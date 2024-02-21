@@ -22,15 +22,15 @@ export class BinanceService {
 	//     }
 	// }
 	static async createOrder(currentCurrency: string, targetCurrency: string, amount: number, symbolsDataSet: any) {
-		// const timer =  new ActionTimer("BinanceService/createOrder")
-		// timer.start()
+		const timer =  new ActionTimer("BinanceService/createOrder")
+		timer.start()
 		const {symbolName, action, quantityType}: any = this._getSymbol(currentCurrency, targetCurrency,symbolsDataSet);
 		const symbol = symbolsDataSet[symbolName];
 		const side: OrderSide = action;
-		let amountInQuote
+		// let amountInQuote
 		if (quantityType === orderQuantity.base) {
 			amount = roundDownNumber(+amount,+ symbol.filters.stepSize);
-			amountInQuote = amount * +symbol.price;
+			// amountInQuote = amount * +symbol.price;
 			// if (amountInQuote < symbol.filters.minNotional) {
 			// 	throw new Error("Don't have information about price");
 			// }
@@ -41,7 +41,7 @@ export class BinanceService {
 		// 	}
 		// }
 		const result = await BinanceAdapter.placeOrder(symbolName, quantityType, amount, side);
-		// timer.stop()
+		timer.stop()
 
 		return result
 	}

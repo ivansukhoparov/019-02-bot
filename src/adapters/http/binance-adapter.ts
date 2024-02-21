@@ -52,8 +52,8 @@ export class BinanceAdapter {
 		quantityAmount: number,
 		side: OrderSide,
 		type: OrderTypeType = "market"): Promise<FetchResponseType> {
-		// const timer =  new ActionTimer("BinanceAdapter/placeOrder")
-		// timer.start()
+		const timer =  new ActionTimer("BinanceAdapter/placeOrder")
+		timer.start()
 		// Example:
 		// placeOrder("BTCUSDT", 0.001, "BUY");
 		const data: any = {
@@ -80,8 +80,11 @@ export class BinanceAdapter {
 			},
 			body: `${queryString}&signature=${signature}`
 		};
+		console.log("request url "  + url);
+		console.log("body")
+		console.dir(payload)
 		const result = await FetchAdapter.request(url, payload);
-// timer.stop()
+timer.stop()
 		return result
 	}
 

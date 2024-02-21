@@ -4,6 +4,7 @@ import {symbolMapper} from "../types/fetch-binance/mapper";
 export async function getAllTradableSymbols() {
 
 	const response = await BinanceAdapter.getAllSymbols();
+	// console.log(JSON.stringify(response.content.symbols.filter((el: any) => el.symbol === "POLSBNB"), null, 2))
 	const symbols = response.content.symbols.filter((el: any) => el.status === "TRADING").map(symbolMapper);
 	//
 	// status: Этот ключ указывает на текущее состояние торговой пары. Если значение status равно "TRADING",
