@@ -225,22 +225,41 @@ export function PredictTradeResult(el: any) {
 
 	// CHECK FIRST SEQUENCE
 	let expectedResult: number | null = predictOrderResult(+usdtAmount, el.firstSymbol.action, el.firstSymbol.price);
-	if (expectedResult && expectedResult < el.secondSymbol.filters.minNotional) isAllow = false
+
+
 
 	let logger1 = "symbol 1 " + el.firstSymbol.symbol + " || " + el.firstSymbol.action + " for " +
 		+el.firstSymbol.price + " || " + expectedResult + " || " + isAllow
 
 	// CHECK SECOND SEQUENCE
+	if ( el.secondSymbol.action === "buy"){
+		if (expectedResult && expectedResult < el.secondSymbol.filters.minNotional) {
+			isAllow = false
+		}
+	}else{
+		if (expectedResult && expectedResult < el.secondSymbol.filters.minQty) {
+			isAllow = false
+		}
+	}
+
 	expectedResult = predictOrderResult(expectedResult, el.secondSymbol.action, el.secondSymbol.price);
-	if (expectedResult && expectedResult < el.thirdSymbol.filters.minNotional) isAllow = false
 
 	let logger2 = "symbol 2 " + el.secondSymbol.symbol + " || " + el.secondSymbol.action + " for " +
 		+el.secondSymbol.price + " || " + expectedResult + " || " + isAllow
 
 	// CHECK THIRD SEQUENCE
+	if ( el.thirdSymbol.action === "buy"){
+		if (expectedResult && expectedResult < el.secondSymbol.filters.minNotional) {
+			isAllow = false
+		}
+	}else{
+		if (expectedResult && expectedResult < el.secondSymbol.filters.minQty) {
+			isAllow = false
+		}
+	}
 	expectedResult = predictOrderResult(expectedResult, el.thirdSymbol.action, el.thirdSymbol.price);
 	let logger3 = "symbol 3 " + el.thirdSymbol.symbol + " || " + el.thirdSymbol.action + " for " +
-		+el.thirdSymbol.price + " || " + expectedResult
+		+el.thirdSymbol.price + " || " + expectedResult + " || " + isAllow
 
 	if (expectedResultInBase) {
 		expectedResultInBase = expectedResultInBase - 100;
