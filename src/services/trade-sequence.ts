@@ -1,8 +1,8 @@
-import {OrderSide, QuantityType} from "../types/fetch-binance/input";
+import {QuantityType} from "../types/fetch-binance/input";
 import {BinanceAdapter} from "../adapters/http/binance-adapter";
 import {TradeInstructionType, TradeSequenceType} from "../types/sequences";
 import {BinanceService} from "../application/binance-service";
-
+import {logCurrencyAmount} from "../common/utils/logs";
 
 
 export const tradeThis = async (instruction: TradeInstructionType, updSymbolsDataSet:any,amount:number, ident:string) => {
@@ -103,6 +103,8 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	}
 	console.log("result amount");
 	console.log(fills1);
+	console.log("realAmount");
+	await logCurrencyAmount(sequence.secondSymbol.currentCurrency)
 	console.log("====================================================================================================");
 	console.log("trade sequence 2 ");
 	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -116,6 +118,8 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	console.log(sequence.secondSymbol);
 	console.log("result amount");
 	console.log(fills2);
+	console.log("realAmount");
+	await logCurrencyAmount(sequence.thirdSymbol.currentCurrency)
 	console.log("====================================================================================================");
 	console.log("trade sequence 3");
 	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
