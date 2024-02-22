@@ -69,7 +69,7 @@ const iotatousdt = async (usdt:number) => {
 }
 const startApp = async ()=>{
 	try {
-		console.log("v0.01.3")
+		console.log("v0.01.4")
 		console.log("APP MODE " + appMode)
 		console.dir(appSettings)
 
