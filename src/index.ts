@@ -7,6 +7,9 @@ import {BinanceAdapter} from "./adapters/http/binance-adapter";
 import {wsUpdate} from "./adapters/websokets/websoket-adapter";
 import {ActionTimer} from "./common/utils/timer";
 import {appMode, appSettings} from "./settings/settings";
+import {APP_MODES} from "./common/common";
+import {testSettings} from "./settings/test-settings";
+import {defaultSettings} from "./settings/default-settings";
 
 require("dotenv").config();
 
@@ -69,14 +72,20 @@ const startApp = async ()=>{
 		console.log("v0.01.3")
 		console.log("APP MODE " + appMode)
 		console.dir(appSettings)
-		// const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");
-		// if (balanceTest<100){
-		// 	console.log("low balance")
-		// 	await iotatousdt(150-balanceTest)
-		// 	console.log("transfer money")
-		// }else{
-		// 	console.log("balance OK")
-		// }
+
+		if (appMode === APP_MODES.test) {
+			const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");
+			if (balanceTest<100){
+				console.log("low balance")
+				await iotatousdt(150-balanceTest)
+				console.log("transfer money")
+			}else{
+				console.log("balance OK")
+			}
+		}
+
+
+
 		await logCurrencyAmount("USDT")
 		await app();
 		//await logCurrencyAmount("USDT")

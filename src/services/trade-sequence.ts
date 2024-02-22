@@ -104,11 +104,13 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	console.log("result amount");
 	console.log(fills1);
 	console.log("realAmount");
-	await logCurrencyAmount(sequence.secondSymbol.currentCurrency)
+	const usdtAmount1 = await BinanceAdapter.getCurrencyBalance(sequence.secondSymbol.currentCurrency);
+	console.log(sequence.secondSymbol.currentCurrency +" " +usdtAmount1);
+
 	console.log("====================================================================================================");
 	console.log("trade sequence 2 ");
 	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-	const result2=  await tradeThis(sequence.secondSymbol,updSymbolsDataSet,+fills1,"2.");
+	const result2=  await tradeThis(sequence.secondSymbol,updSymbolsDataSet,+usdtAmount1,"2.");
 	let fills2
 	if (sequence.secondSymbol.action==="buy"){
 		 fills2 = result2.executedQty
@@ -119,11 +121,12 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	console.log("result amount");
 	console.log(fills2);
 	console.log("realAmount");
-	await logCurrencyAmount(sequence.thirdSymbol.currentCurrency)
+	const usdtAmount2 = await BinanceAdapter.getCurrencyBalance(sequence.secondSymbol.currentCurrency);
+	console.log(sequence.secondSymbol.currentCurrency +" " +usdtAmount2);
 	console.log("====================================================================================================");
 	console.log("trade sequence 3");
 	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-	const result3=  await tradeThis(sequence.thirdSymbol,updSymbolsDataSet,+fills2, "3.");
+	const result3=  await tradeThis(sequence.thirdSymbol,updSymbolsDataSet,+usdtAmount2, "3.");
 
 	let fills3
 	if (sequence.thirdSymbol.action==="buy"){

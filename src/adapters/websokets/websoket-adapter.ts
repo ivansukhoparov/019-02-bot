@@ -3,7 +3,10 @@ import {askOrBid} from "../../services/utils/utils";
 import {tradeAllSequence} from "../../services/trade-sequence";
 import {ActionTimer} from "../../common/utils/timer";
 import {BinanceAdapter} from "../http/binance-adapter";
-import {appSettings} from "../../settings/settings";
+import {appMode, appSettings} from "../../settings/settings";
+import {APP_MODES} from "../../common/common";
+import {testSettings} from "../../settings/test-settings";
+import {defaultSettings} from "../../settings/default-settings";
 
 const timer =new ActionTimer("update")
 let counter = 500;
@@ -14,9 +17,14 @@ let flag2 = true;
 let usdtAmount: string = "100"
 const thresholdValue = appSettings.binance.params.thresholdValue;
 const stopThresholdValue = appSettings.binance.params.stopThresholdValue
-const streamNames = ["!ticker@arr"];
-const combinedStreamsUrl = `wss://stream.binance.com:9443/stream?streams=${streamNames.join("/")}`;
-//const combinedStreamsUrl="wss://testnet.binance.vision/ws/!ticker@arr"
+let combinedStreamsUrl:string
+
+if (appMode === APP_MODES.test) {
+	combinedStreamsUrl="wss://testnet.binance.vision/ws/!ticker@arr"
+} else {
+	const streamNames = ["!ticker@arr"];
+	combinedStreamsUrl = `wss://stream.binance.com:9443/stream?streams=${streamNames.join("/")}`;
+}
 
 const connection = new WebSocket(combinedStreamsUrl);
 
@@ -37,8 +45,15 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 
 
 			const data = JSON.parse(e.data.toString());
-			const updSymbolsDataSet = updatePrices(symbolsDataSet, data.data); // for real api
-			// const updSymbolsDataSet = updatePrices(symbolsDataSet, data); // for test api
+			let updSymbolsDataSet:any
+
+			if (appMode === APP_MODES.test) {
+				updSymbolsDataSet = updatePrices(symbolsDataSet, data); // for test api
+			} else {
+				updSymbolsDataSet = updatePrices(symbolsDataSet, data.data); // for real api
+			}
+
+
 			const updateSeq = updatePricesInSeq(sequencesDataSet, updSymbolsDataSet);
 			//console.log(updateSeq)
 			const sorted = updateSeq.map(PredictTradeResult).sort((a: any, b: any) => b.priceDiff - a.priceDiff);
