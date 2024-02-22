@@ -231,6 +231,7 @@ export function PredictTradeResult(el: any) {
 
 	// calculate prediction for sequence trade in base
 	let expectedResultInBase: number | null;
+	let expectedResult: number | null;
 	expectedResultInBase = predictOrderResult(100, el.firstSymbol.action, el.firstSymbol.price);
 	expectedResultInBase = predictOrderResult(expectedResultInBase, el.secondSymbol.action, el.secondSymbol.price);
 	expectedResultInBase = predictOrderResult(expectedResultInBase, el.thirdSymbol.action, el.thirdSymbol.price);
@@ -239,7 +240,7 @@ export function PredictTradeResult(el: any) {
 	const logger0 = "start balance is " + isAllow
 
 	// CHECK FIRST SEQUENCE
-	let expectedResult: number | null = predictOrderResult(+usdtAmount, el.firstSymbol.action, el.firstSymbol.price);
+	expectedResult = (predictOrderResult(+usdtAmount, el.firstSymbol.action, el.firstSymbol.price))!*0.99;
 
 
 
@@ -257,7 +258,7 @@ export function PredictTradeResult(el: any) {
 		}
 	}
 
-	expectedResult = predictOrderResult(expectedResult, el.secondSymbol.action, el.secondSymbol.price);
+	expectedResult = (predictOrderResult(expectedResult, el.secondSymbol.action, el.secondSymbol.price))!*0.99;
 
 	let logger2 = "symbol 2 " + el.secondSymbol.symbol + " || " + el.secondSymbol.action + " for " +
 		+el.secondSymbol.price + " || " + expectedResult + " || " + isAllow
@@ -272,7 +273,7 @@ export function PredictTradeResult(el: any) {
 			isAllow = false
 		}
 	}
-	expectedResult = predictOrderResult(expectedResult, el.thirdSymbol.action, el.thirdSymbol.price);
+	expectedResult = (predictOrderResult(expectedResult, el.thirdSymbol.action, el.thirdSymbol.price))!*0.99;
 	let logger3 = "symbol 3 " + el.thirdSymbol.symbol + " || " + el.thirdSymbol.action + " for " +
 		+el.thirdSymbol.price + " || " + expectedResult + " || " + isAllow
 
@@ -295,20 +296,23 @@ export async function  updateDifferences(el:any) {
 	const fs = await BinanceAdapter.getSymbolInfo(el.firstSymbol.symbol.replace("/", ""))
 	const ss = await BinanceAdapter.getSymbolInfo(el.secondSymbol.symbol.replace("/", ""))
 	const ts = await BinanceAdapter.getSymbolInfo(el.thirdSymbol.symbol.replace("/", ""))
+	let diff: number | null
+	let diffF: number | null
+
 	el.firstSymbol.price = fs[askOrBid(el.firstSymbol.action)+"Price"];
 	el.secondSymbol.price = ss[askOrBid(el.secondSymbol.action)+"Price"];
 	el.thirdSymbol.price = ts[askOrBid(el.thirdSymbol.action)+"Price"];
 
-	let diff: number | null = predictOrderResult(100, el.firstSymbol.action, el.firstSymbol.price);
-	let diffF: number | null = predictOrderResult(+usdtAmount, el.firstSymbol.action, el.firstSymbol.price);
+	 diff = predictOrderResult(100, el.firstSymbol.action, el.firstSymbol.price);
+	 diffF = (predictOrderResult(+usdtAmount, el.firstSymbol.action, el.firstSymbol.price)!*0.99);
 	let logger1 = "symbol 1 " + el.firstSymbol.symbol + " || " + el.firstSymbol.action + " for " + el.firstSymbol.price + " || " + diffF
 
 	diff = predictOrderResult(diff, el.secondSymbol.action, el.secondSymbol.price);
-	diffF = predictOrderResult(diffF, el.secondSymbol.action, el.secondSymbol.price);
+	diffF = (predictOrderResult(diffF, el.secondSymbol.action, el.secondSymbol.price))!*0.99;
 	let logger2 = "symbol 2 " + el.secondSymbol.symbol + " || " + el.secondSymbol.action + " for " + el.secondSymbol.price + " || " + diffF
 
 	diff = predictOrderResult(diff, el.thirdSymbol.action, el.thirdSymbol.price);
-	diffF = predictOrderResult(diffF, el.thirdSymbol.action, el.thirdSymbol.price);
+	diffF = (predictOrderResult(diffF, el.thirdSymbol.action, el.thirdSymbol.price))!*0.99;
 	let logger3 = "symbol 3 " + el.thirdSymbol.symbol + " || " + el.thirdSymbol.action + " for " + el.thirdSymbol.price + " || " + diffF
 
 	if (diff){
