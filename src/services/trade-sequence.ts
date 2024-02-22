@@ -121,8 +121,8 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	console.log("result amount");
 	console.log(fills2);
 	console.log("realAmount");
-	const usdtAmount2 = await BinanceAdapter.getCurrencyBalance(sequence.secondSymbol.currentCurrency);
-	console.log(sequence.secondSymbol.currentCurrency +" " +usdtAmount2);
+	const usdtAmount2 = await BinanceAdapter.getCurrencyBalance(sequence.thirdSymbol.currentCurrency);
+	console.log(sequence.thirdSymbol.currentCurrency +" " +usdtAmount2);
 	console.log("====================================================================================================");
 	console.log("trade sequence 3");
 	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
