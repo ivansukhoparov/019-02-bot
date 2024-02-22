@@ -5,11 +5,9 @@ import {ActionTimer} from "../../common/utils/timer";
 import {BinanceAdapter} from "../http/binance-adapter";
 import {appMode, appSettings} from "../../settings/settings";
 import {APP_MODES} from "../../common/common";
-import {testSettings} from "../../settings/test-settings";
-import {defaultSettings} from "../../settings/default-settings";
 
 const timer =new ActionTimer("update")
-let counter = 500;
+let counter = 50;
 let counter2 = 0;
 let maxInInterval: number = 0
 let flag = true;
@@ -56,10 +54,10 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 
 			const updateSeq = updatePricesInSeq(sequencesDataSet, updSymbolsDataSet);
 			//console.log(updateSeq)
-			const sorted = updateSeq.map(PredictTradeResult).sort((a: any, b: any) => b.priceDiff - a.priceDiff);
-			const opp = sorted.filter((el: any) => el.priceDiff > thresholdValue && el.priceDiff < 5 && el.priceDiff !== null)
+			const sorted = updateSeq.map(PredictTradeResult).sort((a: any, b: any) => b.profiTReal - a.profiTReal);
+			const opp = sorted.filter((el: any) => el.profiTReal > thresholdValue && el.profiTReal < 5 && el.profiTReal !== null)
 
-			if (maxInInterval < sorted[0].priceDiff) maxInInterval = sorted[0].priceDiff;
+			if (maxInInterval < sorted[0].profiTReal) maxInInterval = sorted[0].profiTReal;
 
 			if (opp.length > 0 && flag) {
 
@@ -76,8 +74,8 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 				tradeTimer.start()
 				const sequence = await updateDifferences(opp[0])
 				console.log(sequence)
-				if (sequence.priceDiff > thresholdValue && opp[0].isAllow){
-					await tradeAllSequence(sequence, updSymbolsDataSet,usdtAmount);
+				if (sequence.profiTReal > thresholdValue && opp[0].isAllow) {
+					await tradeAllSequence(sequence, updSymbolsDataSet, usdtAmount);
 				}else{
 				 console.log("sequence ruined :(")
 				}
@@ -96,7 +94,7 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 
 
 			}
-			if (counter === 500) {
+			if (counter === 50) {
 				console.log("status: ok")
 
 				console.log("max in period: " + maxInInterval)
@@ -163,30 +161,6 @@ function addSlash(symbol: string, pos: number) {
 
 }
 
-// {
-//     firstSymbol: {
-//         symbol: 'ETH/USDT',
-//             currentCurrency: 'USDT',
-//             action: 'buy',
-//             price: null,
-//             filters: [Object]
-//     },
-//     secondSymbol: {
-//         symbol: 'SNT/ETH',
-//             currentCurrency: 'ETH',
-//             action: 'buy',
-//             price: null,
-//             filters: [Object]
-//     },
-//     thirdSymbol: {
-//         symbol: 'SNT/USDT',
-//             currentCurrency: 'SNT',
-//             action: 'sell',
-//             price: null,
-//             filters: [Object]
-//     }
-// },
-
 function updatePricesInSeq(target: any, symbols: any) {
 
 	target.forEach((el: any) => {
@@ -215,75 +189,67 @@ const predictOrderResult = (target: number | null, act: string, price: string | 
 	return null;
 };
 
-const oppot= (data:any)=>{
-	try{
-		const c =  data.firstSymbol.price-(data.secondSymbol.price*data.thirdSymbol.price);
-		return  c/data.firstSymbol.price*100;
-	}catch(e){
-		return null;
-	}
-
-};
-
-export function PredictTradeResult(el: any) {
+export function PredictTradeResult(sequence: any) {
 
 	let isAllow = true;
 
 	// calculate prediction for sequence trade in base
 	let expectedResultInBase: number | null;
 	let expectedResult: number | null;
-	expectedResultInBase = predictOrderResult(100, el.firstSymbol.action, el.firstSymbol.price);
-	expectedResultInBase = predictOrderResult(expectedResultInBase, el.secondSymbol.action, el.secondSymbol.price);
-	expectedResultInBase = predictOrderResult(expectedResultInBase, el.thirdSymbol.action, el.thirdSymbol.price);
+	expectedResultInBase = (predictOrderResult(100, sequence.firstSymbol.action, sequence.firstSymbol.price))! * 0.999;
+	expectedResultInBase = (predictOrderResult(expectedResultInBase, sequence.secondSymbol.action, sequence.secondSymbol.price))! * 0.999;
+	expectedResultInBase = (predictOrderResult(expectedResultInBase, sequence.thirdSymbol.action, sequence.thirdSymbol.price))! * 0.999;
 
-	if (+usdtAmount < el.firstSymbol.filters.minNotional) isAllow = false
-	const logger0 = "start balance is " + isAllow
+	if (+usdtAmount < sequence.firstSymbol.filters.minNotional) isAllow = false
+	const logger0 = "start balance is " + usdtAmount
 
 	// CHECK FIRST SEQUENCE
-	expectedResult = (predictOrderResult(+usdtAmount, el.firstSymbol.action, el.firstSymbol.price))!*0.99;
+	expectedResult = (predictOrderResult(+usdtAmount, sequence.firstSymbol.action, sequence.firstSymbol.price))! * 0.999;
 
-
-
-	let logger1 = "symbol 1 " + el.firstSymbol.symbol + " || " + el.firstSymbol.action + " for " +
-		+el.firstSymbol.price + " || " + expectedResult + " || " + isAllow
+	let logger1 = "symbol 1 " + sequence.firstSymbol.symbol + " || " + sequence.firstSymbol.action + " for " +
+		+sequence.firstSymbol.price + " || " + expectedResult + " || " + isAllow
 
 	// CHECK SECOND SEQUENCE
-	if ( el.secondSymbol.action === "buy"){
-		if (expectedResult && expectedResult < el.secondSymbol.filters.minNotional) {
+	if (sequence.secondSymbol.action === "buy") {
+		if (expectedResult && expectedResult < sequence.secondSymbol.filters.minNotional) {
 			isAllow = false
 		}
 	}else{
-		if (expectedResult && expectedResult < el.secondSymbol.filters.minQty) {
+		if (expectedResult && expectedResult < sequence.secondSymbol.filters.minQty) {
 			isAllow = false
 		}
 	}
 
-	expectedResult = (predictOrderResult(expectedResult, el.secondSymbol.action, el.secondSymbol.price))!*0.99;
+	expectedResult = (predictOrderResult(expectedResult, sequence.secondSymbol.action, sequence.secondSymbol.price))! * 0.999;
 
-	let logger2 = "symbol 2 " + el.secondSymbol.symbol + " || " + el.secondSymbol.action + " for " +
-		+el.secondSymbol.price + " || " + expectedResult + " || " + isAllow
+	let logger2 = "symbol 2 " + sequence.secondSymbol.symbol + " || " + sequence.secondSymbol.action + " for " +
+		+sequence.secondSymbol.price + " || " + expectedResult + " || " + isAllow
 
 	// CHECK THIRD SEQUENCE
-	if ( el.thirdSymbol.action === "buy"){
-		if (expectedResult && expectedResult < el.secondSymbol.filters.minNotional) {
+	if (sequence.thirdSymbol.action === "buy") {
+		if (expectedResult && expectedResult < sequence.secondSymbol.filters.minNotional) {
 			isAllow = false
 		}
 	}else{
-		if (expectedResult && expectedResult < el.secondSymbol.filters.minQty) {
+		if (expectedResult && expectedResult < sequence.secondSymbol.filters.minQty) {
 			isAllow = false
 		}
 	}
-	expectedResult = (predictOrderResult(expectedResult, el.thirdSymbol.action, el.thirdSymbol.price))!*0.99;
-	let logger3 = "symbol 3 " + el.thirdSymbol.symbol + " || " + el.thirdSymbol.action + " for " +
-		+el.thirdSymbol.price + " || " + expectedResult + " || " + isAllow
+	expectedResult = (predictOrderResult(expectedResult, sequence.thirdSymbol.action, sequence.thirdSymbol.price))! * 0.999;
+	let logger3 = "symbol 3 " + sequence.thirdSymbol.symbol + " || " + sequence.thirdSymbol.action + " for " +
+		+sequence.thirdSymbol.price + " || " + expectedResult + " || " + isAllow
 
 	if (expectedResultInBase) {
 		expectedResultInBase = expectedResultInBase - 100;
 	}
+	if (expectedResult) {
+		expectedResult = expectedResult - (+usdtAmount);
+	}
 
 	return {
-		...el,
-		priceDiff: expectedResultInBase,
+		...sequence,
+		profitInBase: expectedResultInBase,
+		profiTReal: expectedResult,
 		isAllow: isAllow,
 		logger0: logger0,
 		logger1: logger1,
@@ -292,39 +258,14 @@ export function PredictTradeResult(el: any) {
 	};
 }
 
-export async function  updateDifferences(el:any) {
-	const fs = await BinanceAdapter.getSymbolInfo(el.firstSymbol.symbol.replace("/", ""))
-	const ss = await BinanceAdapter.getSymbolInfo(el.secondSymbol.symbol.replace("/", ""))
-	const ts = await BinanceAdapter.getSymbolInfo(el.thirdSymbol.symbol.replace("/", ""))
-	let diff: number | null
-	let diffF: number | null
+export async function updateDifferences(sequence: any) {
+	const fs = await BinanceAdapter.getSymbolInfo(sequence.firstSymbol.symbol.replace("/", ""))
+	const ss = await BinanceAdapter.getSymbolInfo(sequence.secondSymbol.symbol.replace("/", ""))
+	const ts = await BinanceAdapter.getSymbolInfo(sequence.thirdSymbol.symbol.replace("/", ""))
 
-	el.firstSymbol.price = fs[askOrBid(el.firstSymbol.action)+"Price"];
-	el.secondSymbol.price = ss[askOrBid(el.secondSymbol.action)+"Price"];
-	el.thirdSymbol.price = ts[askOrBid(el.thirdSymbol.action)+"Price"];
+	sequence.firstSymbol.price = fs[askOrBid(sequence.firstSymbol.action) + "Price"];
+	sequence.secondSymbol.price = ss[askOrBid(sequence.secondSymbol.action) + "Price"];
+	sequence.thirdSymbol.price = ts[askOrBid(sequence.thirdSymbol.action) + "Price"];
 
-	 diff = predictOrderResult(100, el.firstSymbol.action, el.firstSymbol.price);
-	 diffF = (predictOrderResult(+usdtAmount, el.firstSymbol.action, el.firstSymbol.price)!*0.99);
-	let logger1 = "symbol 1 " + el.firstSymbol.symbol + " || " + el.firstSymbol.action + " for " + el.firstSymbol.price + " || " + diffF
-
-	diff = predictOrderResult(diff, el.secondSymbol.action, el.secondSymbol.price);
-	diffF = (predictOrderResult(diffF, el.secondSymbol.action, el.secondSymbol.price))!*0.99;
-	let logger2 = "symbol 2 " + el.secondSymbol.symbol + " || " + el.secondSymbol.action + " for " + el.secondSymbol.price + " || " + diffF
-
-	diff = predictOrderResult(diff, el.thirdSymbol.action, el.thirdSymbol.price);
-	diffF = (predictOrderResult(diffF, el.thirdSymbol.action, el.thirdSymbol.price))!*0.99;
-	let logger3 = "symbol 3 " + el.thirdSymbol.symbol + " || " + el.thirdSymbol.action + " for " + el.thirdSymbol.price + " || " + diffF
-
-	if (diff){
-		diff=diff-100;
-	}
-	const opp = oppot(el);
-	return {
-		...el,
-		priceDiff:diff,
-		logger1: logger1,
-		logger2: logger2,
-		logger3: logger3,
-	};
-
+	return PredictTradeResult(sequence)
 }
