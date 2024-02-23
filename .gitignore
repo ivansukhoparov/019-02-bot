@@ -12,6 +12,7 @@
 *.sublime*
 dist
 node_modules/
+logs
 npm-debug.*
 Thumbs.db
 .env
