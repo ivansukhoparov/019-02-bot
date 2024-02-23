@@ -96,7 +96,7 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 					// console.log("expeсted income "+counter);
 				usdtAmount = await BinanceAdapter.getCurrencyBalance("USDT");
 				console.log("USDT - " + usdtAmount)
-				if (usdtAmount>stopThresholdValue){
+				if ((+usdtAmount)>(+stopThresholdValue)){
 					flag = true
 				}else {
 					flag = false
