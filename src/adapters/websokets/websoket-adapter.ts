@@ -88,7 +88,7 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 				}
 
 		//		if (sequence.profiTReal > thresholdValue && opp[0].isAllow) {
-					if (sequence.profiTReal > thresholdValue) {
+		// 			if (sequence.profiTReal > thresholdValue) {
 					// await tradeAllSequence(sequence, updSymbolsDataSet, usdtAmount);
 						console.log("symbol.info.before")
 					let firstSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(sequence.firstSymbol.symbol.replace("/", ""))
@@ -110,9 +110,7 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 					extractAndLog(firstSymbol)
 					extractAndLog(secondSymbol)
 					extractAndLog(thirdSymbol)
-				}else{
-				 console.log("sequence ruined :(")
-				}
+
 				tradeTimer.stop()
 					// counter += (opp[i].priceDiff-0.3);
 					//console.log(opp)
