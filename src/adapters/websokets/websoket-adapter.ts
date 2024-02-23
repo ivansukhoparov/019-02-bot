@@ -8,7 +8,7 @@ import {RestApiTickerInfo} from "../../types/fetch-binance/input";
 
 const timer =new ActionTimer("update")
 let counter = 50;
-let counter2 = 0;
+let counter2 = 100;
 let maxInInterval: number = 0
 let flag = true;
 let flag2 = true;
@@ -60,7 +60,7 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 			if (maxInInterval < sorted[0].profiTReal) maxInInterval = sorted[0].profiTReal;
 
 			if (opp.length > 0 && flag) {
-
+const seq = opp[0]
 				flag = false
 				console.log("============================================================");
 				console.log("============================================================");
@@ -69,11 +69,22 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 				console.log("============================================================");
 				console.log("Let's do it");
 				console.log("============================================================");
-				console.log(opp[0])
+				function logSequence (seq:any){
+					const log = {
+						profitInBase: seq.profitInBase,
+						profiTReal: seq.profiTReal,
+						isAllow: seq.isAllow,
+						logger0: seq.logger0,
+						logger1: seq.logger1,
+						logger2: seq.logger2,
+						logger3: seq.logger3
+					}
+					console.log(log)
+				}
+				logSequence(seq)
 				const tradeTimer = new ActionTimer("trade sequence")
 				tradeTimer.start()
-				const sequence = await updateDifferences(opp[0])
-				console.log(sequence)
+
 
 				function extractAndLog(info: RestApiTickerInfo | null) {
 				if (info)	{
@@ -83,17 +94,19 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 							ask: info.askPrice + " || " + info.askQty,
 							last: info.lastPrice + " || " + info.lastQty,
 						}
-						console.log(extracted)
+						//console.log(extracted)
+					console.log(info)
 					}
 				}
 
 		//		if (sequence.profiTReal > thresholdValue && opp[0].isAllow) {
-		// 			if (sequence.profiTReal > thresholdValue) {
 					// await tradeAllSequence(sequence, updSymbolsDataSet, usdtAmount);
+
+
 						console.log("symbol.info.before")
-					let firstSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(sequence.firstSymbol.symbol.replace("/", ""))
-					let secondSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(sequence.secondSymbol.symbol.replace("/", ""))
-					let thirdSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(sequence.thirdSymbol.symbol.replace("/", ""))
+					let firstSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(seq.firstSymbol.symbol.replace("/", ""))
+					let secondSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(seq.secondSymbol.symbol.replace("/", ""))
+					let thirdSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(seq.thirdSymbol.symbol.replace("/", ""))
 					extractAndLog(firstSymbol)
 					extractAndLog(secondSymbol)
 					extractAndLog(thirdSymbol)
@@ -104,12 +117,15 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 					pauseTimer.stop()
 
 					console.log("symbol.info.after")
-					 firstSymbol = await BinanceAdapter.getSymbolInfo(sequence.firstSymbol.symbol.replace("/", ""))
-					 secondSymbol = await BinanceAdapter.getSymbolInfo(sequence.secondSymbol.symbol.replace("/", ""))
-					 thirdSymbol = await BinanceAdapter.getSymbolInfo(sequence.thirdSymbol.symbol.replace("/", ""))
+					 firstSymbol = await BinanceAdapter.getSymbolInfo(seq.firstSymbol.symbol.replace("/", ""))
+					 secondSymbol = await BinanceAdapter.getSymbolInfo(seq.secondSymbol.symbol.replace("/", ""))
+					 thirdSymbol = await BinanceAdapter.getSymbolInfo(seq.thirdSymbol.symbol.replace("/", ""))
 					extractAndLog(firstSymbol)
 					extractAndLog(secondSymbol)
 					extractAndLog(thirdSymbol)
+
+				const sequence = await updateDifferences(opp[0])
+				logSequence(sequence)
 
 				tradeTimer.stop()
 					// counter += (opp[i].priceDiff-0.3);
@@ -117,6 +133,14 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 					// console.log("expeсted income "+counter);
 				usdtAmount = await BinanceAdapter.getCurrencyBalance("USDT");
 				console.log("USDT - " + usdtAmount)
+				counter2 += (+sequence.profitInBase)
+				if (sequence.profiTReal>0){
+					console.log("bingo")
+					console.log(counter2)
+				}else{
+					console.log("loose")
+					console.log(counter2)
+				}
 				if (usdtAmount && (+usdtAmount)>(+stopThresholdValue)){
 					flag = true
 				}else {
