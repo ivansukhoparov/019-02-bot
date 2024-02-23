@@ -77,12 +77,11 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 
 				function extractAndLog(info: RestApiTickerInfo | null) {
 				if (info)	{
-						const bid = info.bidPrice + " || " + info.bidQty;
-						const ask = info.askPrice + " || " + info.askQty;
 						const extracted = {
 							symbol: info.symbol,
 							bid: info.bidPrice + " || " + info.bidQty,
 							ask: info.askPrice + " || " + info.askQty,
+							last: info.lastPrice + " || " + info.lastQty,
 						}
 						console.log(extracted)
 					}
