@@ -98,7 +98,10 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 					extractAndLog(secondSymbol)
 					extractAndLog(thirdSymbol)
 
-					await new Promise(resolve => setTimeout(resolve, 200));
+					const pauseTimer = new ActionTimer("imitation delay")
+					pauseTimer.start()
+					await new Promise(resolve => setTimeout(resolve, 250));
+					pauseTimer.stop()
 
 					console.log("symbol.info.after")
 					 firstSymbol = await BinanceAdapter.getSymbolInfo(sequence.firstSymbol.symbol.replace("/", ""))
