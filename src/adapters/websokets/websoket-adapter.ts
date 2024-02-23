@@ -60,15 +60,14 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 			if (maxInInterval < sorted[0].profiTReal) maxInInterval = sorted[0].profiTReal;
 
 			if (opp.length > 0 && flag) {
-const seq = opp[0]
+				const seq = opp[0]
 				flag = false
-				console.log("============================================================");
+
 				console.log("============================================================");
 				console.log("has found " + opp.length);
 				console.log("============================================================");
-				console.log("============================================================");
-				console.log("Let's do it");
-				console.log("============================================================");
+
+
 				function logSequence (seq:any){
 					const log = {
 						profitInBase: seq.profitInBase,
@@ -103,26 +102,26 @@ const seq = opp[0]
 					// await tradeAllSequence(sequence, updSymbolsDataSet, usdtAmount);
 
 
-						console.log("symbol.info.before")
-					let firstSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(seq.firstSymbol.symbol.replace("/", ""))
-					let secondSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(seq.secondSymbol.symbol.replace("/", ""))
-					let thirdSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(seq.thirdSymbol.symbol.replace("/", ""))
-					extractAndLog(firstSymbol)
-					extractAndLog(secondSymbol)
-					extractAndLog(thirdSymbol)
-
-					const pauseTimer = new ActionTimer("imitation delay")
-					pauseTimer.start()
+				// 	console.log("symbol.info.before")
+				// let firstSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(seq.firstSymbol.symbol.replace("/", ""))
+				// let secondSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(seq.secondSymbol.symbol.replace("/", ""))
+				// let thirdSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(seq.thirdSymbol.symbol.replace("/", ""))
+				// extractAndLog(firstSymbol)
+				// extractAndLog(secondSymbol)
+				// extractAndLog(thirdSymbol)
+				//
+				// const pauseTimer = new ActionTimer("imitation delay")
+				// pauseTimer.start()
 					await new Promise(resolve => setTimeout(resolve, 250));
-					pauseTimer.stop()
-
-					console.log("symbol.info.after")
-					 firstSymbol = await BinanceAdapter.getSymbolInfo(seq.firstSymbol.symbol.replace("/", ""))
-					 secondSymbol = await BinanceAdapter.getSymbolInfo(seq.secondSymbol.symbol.replace("/", ""))
-					 thirdSymbol = await BinanceAdapter.getSymbolInfo(seq.thirdSymbol.symbol.replace("/", ""))
-					extractAndLog(firstSymbol)
-					extractAndLog(secondSymbol)
-					extractAndLog(thirdSymbol)
+				// pauseTimer.stop()
+				//
+				// console.log("symbol.info.after")
+				//  firstSymbol = await BinanceAdapter.getSymbolInfo(seq.firstSymbol.symbol.replace("/", ""))
+				//  secondSymbol = await BinanceAdapter.getSymbolInfo(seq.secondSymbol.symbol.replace("/", ""))
+				//  thirdSymbol = await BinanceAdapter.getSymbolInfo(seq.thirdSymbol.symbol.replace("/", ""))
+				// extractAndLog(firstSymbol)
+				// extractAndLog(secondSymbol)
+				// extractAndLog(thirdSymbol)
 
 				const sequence = await updateDifferences(opp[0])
 				logSequence(sequence)
