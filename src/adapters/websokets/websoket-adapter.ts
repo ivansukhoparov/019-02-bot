@@ -258,11 +258,11 @@ export function PredictTradeResult(sequence: any) {
 
 	// CHECK THIRD SEQUENCE
 	if (sequence.thirdSymbol.action === "buy") {
-		if (expectedResult && expectedResult < sequence.secondSymbol.filters.minNotional) {
+		if (expectedResult && expectedResult < sequence.thirdSymbol.filters.minNotional) {
 			isAllow = false
 		}
 	}else{
-		if (expectedResult && expectedResult < sequence.secondSymbol.filters.minQty) {
+		if (expectedResult && expectedResult < sequence.thirdSymbol.filters.minQty) {
 			isAllow = false
 		}
 	}
