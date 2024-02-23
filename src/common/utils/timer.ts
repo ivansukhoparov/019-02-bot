@@ -8,7 +8,7 @@ export class ActionTimer {
 
 	start() {
 		this.startTime = +(new Date());
-		console.log(`function "${this.funcName}" started`);
+	//	console.log(`function "${this.funcName}" started`);
 	}
 
 	stop() {
