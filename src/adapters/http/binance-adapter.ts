@@ -5,7 +5,7 @@ import {
 	AccountBalanceInfoInputType,
 	FetchResponseType,
 	OrderSide,
-	OrderTypeType
+	OrderTypeType, RestApiTickerInfo
 } from "../../types/fetch-binance/input";
 import {ActionTimer} from "../../common/utils/timer";
 
@@ -198,7 +198,7 @@ timer.stop()
 		return  null
 	}
 
-	static async getSymbolInfo(symbol?: string) {
+	static async getSymbolInfo(symbol?: string){
 		let url = `${BASE_URL}/api/v3/ticker/24hr`;
 
 		if (symbol) {

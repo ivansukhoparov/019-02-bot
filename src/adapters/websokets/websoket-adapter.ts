@@ -1,10 +1,10 @@
 import WebSocket from "ws";
 import {askOrBid} from "../../services/utils/utils";
-import {tradeAllSequence} from "../../services/trade-sequence";
 import {ActionTimer} from "../../common/utils/timer";
 import {BinanceAdapter} from "../http/binance-adapter";
 import {appMode, appSettings} from "../../settings/settings";
 import {APP_MODES} from "../../common/common";
+import {RestApiTickerInfo} from "../../types/fetch-binance/input";
 
 const timer =new ActionTimer("update")
 let counter = 50;
@@ -74,19 +74,39 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 				tradeTimer.start()
 				const sequence = await updateDifferences(opp[0])
 				console.log(sequence)
+
+				function extractAndLog(info: RestApiTickerInfo | null) {
+				if (info)	{
+						const bid = info.bidPrice + " || " + info.bidQty;
+						const ask = info.askPrice + " || " + info.askQty;
+						const extracted = {
+							symbol: info.symbol,
+							bid: info.bidPrice + " || " + info.bidQty,
+							ask: info.askPrice + " || " + info.askQty,
+						}
+						console.log(extracted)
+					}
+				}
+
 				if (sequence.profiTReal > thresholdValue && opp[0].isAllow) {
 					// await tradeAllSequence(sequence, updSymbolsDataSet, usdtAmount);
 						console.log("symbol.info.before")
-						console.dir(await BinanceAdapter.getSymbolInfo(sequence.firstSymbol.symbol.replace("/","")))
-					console.dir(await BinanceAdapter.getSymbolInfo(sequence.secondSymbol.symbol.replace("/","")))
-					console.dir(await BinanceAdapter.getSymbolInfo(sequence.thirdSymbol.symbol.replace("/","")))
+					let firstSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(sequence.firstSymbol.symbol.replace("/", ""))
+					let secondSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(sequence.secondSymbol.symbol.replace("/", ""))
+					let thirdSymbol: RestApiTickerInfo | null = await BinanceAdapter.getSymbolInfo(sequence.thirdSymbol.symbol.replace("/", ""))
+					extractAndLog(firstSymbol)
+					extractAndLog(secondSymbol)
+					extractAndLog(thirdSymbol)
 
 					await new Promise(resolve => setTimeout(resolve, 200));
 
 					console.log("symbol.info.after")
-					console.dir(await BinanceAdapter.getSymbolInfo(sequence.firstSymbol.symbol.replace("/","")))
-					console.dir(await BinanceAdapter.getSymbolInfo(sequence.secondSymbol.symbol.replace("/","")))
-					console.dir(await BinanceAdapter.getSymbolInfo(sequence.thirdSymbol.symbol.replace("/","")))
+					 firstSymbol = await BinanceAdapter.getSymbolInfo(sequence.firstSymbol.symbol.replace("/", ""))
+					 secondSymbol = await BinanceAdapter.getSymbolInfo(sequence.secondSymbol.symbol.replace("/", ""))
+					 thirdSymbol = await BinanceAdapter.getSymbolInfo(sequence.thirdSymbol.symbol.replace("/", ""))
+					extractAndLog(firstSymbol)
+					extractAndLog(secondSymbol)
+					extractAndLog(thirdSymbol)
 				}else{
 				 console.log("sequence ruined :(")
 				}
@@ -96,7 +116,7 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 					// console.log("expeсted income "+counter);
 				usdtAmount = await BinanceAdapter.getCurrencyBalance("USDT");
 				console.log("USDT - " + usdtAmount)
-				if ((+usdtAmount)>(+stopThresholdValue)){
+				if (usdtAmount && (+usdtAmount)>(+stopThresholdValue)){
 					flag = true
 				}else {
 					flag = false
@@ -274,9 +294,11 @@ export async function updateDifferences(sequence: any) {
 	const ss = await BinanceAdapter.getSymbolInfo(sequence.secondSymbol.symbol.replace("/", ""))
 	const ts = await BinanceAdapter.getSymbolInfo(sequence.thirdSymbol.symbol.replace("/", ""))
 
-	sequence.firstSymbol.price = fs[askOrBid(sequence.firstSymbol.action) + "Price"];
-	sequence.secondSymbol.price = ss[askOrBid(sequence.secondSymbol.action) + "Price"];
-	sequence.thirdSymbol.price = ts[askOrBid(sequence.thirdSymbol.action) + "Price"];
+	if (fs && ss && ts) {
+		sequence.firstSymbol.price = fs[askOrBid(sequence.firstSymbol.action) + "Price"];
+		sequence.secondSymbol.price = ss[askOrBid(sequence.secondSymbol.action) + "Price"];
+		sequence.thirdSymbol.price = ts[askOrBid(sequence.thirdSymbol.action) + "Price"];
+	}
 
 	return PredictTradeResult(sequence)
 }
