@@ -1,15 +1,11 @@
-import {logCurrencyAmount, logPositiveBalances} from "./common/utils/logs";
+import {logCurrencyAmount} from "./common/utils/logs";
 import {getAllTradableSymbols} from "./services/get-all-tradable-symbols";
 import {createSymbolsDataSet} from "./services/preparing-symbols";
 import {createSequencesDataSet} from "./services/create-sequences-data-set";
-import {sellAllToUsdt} from "./common/sell-all-to-usdt";
 import {BinanceAdapter} from "./adapters/http/binance-adapter";
 import {wsUpdate} from "./adapters/websokets/websoket-adapter";
-import {ActionTimer} from "./common/utils/timer";
 import {appMode, appSettings} from "./settings/settings";
 import {APP_MODES} from "./common/common";
-import {testSettings} from "./settings/test-settings";
-import {defaultSettings} from "./settings/default-settings";
 
 require("dotenv").config();
 
@@ -31,45 +27,19 @@ const app = async () => {
 	 wsUpdate(symbolsDataSet, sequencesDataSet,startAmount);
 };
 
-const normaliseWallets = async () => {
-	await logPositiveBalances()
-	await sellAllToUsdt()
-	await logPositiveBalances()
-	await logCurrencyAmount("IOTA")
-	await logCurrencyAmount("USDT")
-	let totalUsdtAmount = await BinanceAdapter.getCurrencyBalance("USDT");
-	let amount = 1000;
-	const count = Math.floor(totalUsdtAmount / 1000);
-	for (let i = 0; i < count; i++) {
-		await new Promise(resolve => setTimeout(resolve, 1000));
-		await BinanceAdapter.placeOrder("IOTAUSDT", "quoteOrderQty", amount, "buy", "market")
-
-		await logCurrencyAmount("USDT")
-		await logCurrencyAmount("IOTA")
-		console.log("============================================================")
-	}
-	totalUsdtAmount = await BinanceAdapter.getCurrencyBalance("USDT");
-	amount = totalUsdtAmount - 100;
-	await BinanceAdapter.placeOrder("IOTAUSDT", "quoteOrderQty", amount, "buy", "market")
-	await logCurrencyAmount("USDT")
-	await logCurrencyAmount("IOTA")
-	console.log("============================================================")
-}
 const iotatousdt = async (usdt:number) => {
 	console.log("============================================================")
 	await logCurrencyAmount("IOTA")
 	await logCurrencyAmount("USDT")
-
 	await BinanceAdapter.placeOrder("IOTAUSDT", "quoteOrderQty", usdt, "sell", "market")
-
 	await logCurrencyAmount("IOTA")
 	await logCurrencyAmount("USDT")
-
 	console.log("============================================================")
 }
 const startApp = async ()=>{
 	try {
-		console.log("v0.01.4")
+		await new Promise(resolve => setTimeout(resolve, 1000));
+		console.log("v0.01.5")
 		console.log("APP MODE " + appMode)
 		console.dir(appSettings)
 
@@ -96,3 +66,16 @@ const startApp = async ()=>{
 };
 
 startApp();
+
+// const  test = async()=>{
+// 	const allTradableSymbols = await getAllTradableSymbols();
+// 	const symbolsDataSet = await createSymbolsDataSet(allTradableSymbols);
+// 	const sequencesDataSet = await createSequencesDataSet(allTradableSymbols, symbolsDataSet);
+//
+// }
+//
+// test()
+// const allTradableSymbols = await getAllTradableSymbols();
+//
+// const sequencesDataSet = await createSequencesDataSet(allTradableSymbols, symbolsDataSet);
+// return {symbolsDataSet, sequencesDataSet}

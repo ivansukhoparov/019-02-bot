@@ -75,7 +75,18 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 				const sequence = await updateDifferences(opp[0])
 				console.log(sequence)
 				if (sequence.profiTReal > thresholdValue && opp[0].isAllow) {
-					await tradeAllSequence(sequence, updSymbolsDataSet, usdtAmount);
+					// await tradeAllSequence(sequence, updSymbolsDataSet, usdtAmount);
+						console.log("symbol.info.before")
+						console.dir(await BinanceAdapter.getSymbolInfo(sequence.firstSymbol.symbol.replace("/","")))
+					console.dir(await BinanceAdapter.getSymbolInfo(sequence.secondSymbol.symbol.replace("/","")))
+					console.dir(await BinanceAdapter.getSymbolInfo(sequence.thirdSymbol.symbol.replace("/","")))
+
+					await new Promise(resolve => setTimeout(resolve, 200));
+
+					console.log("symbol.info.after")
+					console.dir(await BinanceAdapter.getSymbolInfo(sequence.firstSymbol.symbol.replace("/","")))
+					console.dir(await BinanceAdapter.getSymbolInfo(sequence.secondSymbol.symbol.replace("/","")))
+					console.dir(await BinanceAdapter.getSymbolInfo(sequence.thirdSymbol.symbol.replace("/","")))
 				}else{
 				 console.log("sequence ruined :(")
 				}
