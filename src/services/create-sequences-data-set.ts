@@ -31,8 +31,8 @@ export const createSequencesDataSet = async (tradableSymbols: any, symbolsDataSe
 	//          [ 'ETH', 'USDT', 'LTO' ],
 	//          [ 'ETH', 'USDT', 'MBL' ],
 	//      ...]
-	const allCombinations = generateCombinations(tradableCoins, 3)
-		//.filter((el: any) => el[1] === "USDT");
+	const allCombinations = generateCombinations(tradableCoins, "USDT")
+
 	//       combinations with "USDT" in central position was filtered because it is start currency
 
 
