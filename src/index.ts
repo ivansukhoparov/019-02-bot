@@ -38,8 +38,8 @@ const iotatousdt = async (usdt:number) => {
 }
 const startApp = async ()=>{
 	try {
-		await new Promise(resolve => setTimeout(resolve, 1000));
-		console.log("v0.01.5")
+		await new Promise(resolve => setTimeout(resolve, 2000));
+		console.log("v0.01.6")
 		console.log("APP MODE " + appMode)
 		console.dir(appSettings)
 
