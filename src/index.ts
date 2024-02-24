@@ -6,6 +6,7 @@ import {BinanceAdapter} from "./adapters/http/binance-adapter";
 import {wsUpdate} from "./adapters/websokets/websoket-adapter";
 import {appMode, appSettings} from "./settings/settings";
 import {APP_MODES} from "./common/common";
+import {LogToFile} from "./common/utils/log-to-file";
 
 require("dotenv").config();
 
@@ -40,8 +41,10 @@ const iotatousdt = async (usdt:number) => {
 
 const startApp = async ()=>{
 	try {
+
 		await new Promise(resolve => setTimeout(resolve, 10000));
-		console.log("v0.01.6.6")
+
+		console.log("v0.01.6.7")
 		console.log("APP MODE " + appMode)
 		console.dir(appSettings)
 

@@ -5,6 +5,7 @@ import {BinanceAdapter} from "../http/binance-adapter";
 import {appMode, appSettings} from "../../settings/settings";
 import {APP_MODES} from "../../common/common";
 import {RestApiTickerInfo} from "../../types/fetch-binance/input";
+import {LogToFile} from "../../common/utils/log-to-file";
 
 const timer =new ActionTimer("update")
 let counter = 50;
@@ -16,6 +17,8 @@ let usdtAmount: string = "100"
 const thresholdValue = appSettings.binance.params.thresholdValue;
 const stopThresholdValue = appSettings.binance.params.stopThresholdValue
 let combinedStreamsUrl:string
+const bingoLog = new LogToFile("./logs/", "bingo.log")
+const looseLog = new LogToFile("./logs/", "loose.log")
 
 if (appMode === APP_MODES.test) {
 	combinedStreamsUrl="wss://testnet.binance.vision/ws/!ticker@arr"
@@ -133,11 +136,20 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 				usdtAmount = await BinanceAdapter.getCurrencyBalance("USDT");
 				console.log("USDT - " + usdtAmount)
 				counter2 += (+sequence.profitInBase)
+				const logData = {
+					calcProfit:seq.profitInBase,
+					profit:sequence.profitInBase,
+					firstSymbol: sequence.firstSymbol.currentCurrency,
+					secondSymbol: sequence.secondSymbol.currentCurrency,
+					thirdSymbol: sequence.thirdSymbol.currentCurrency,
+				}
 				if (sequence.profiTReal>0){
 					console.log("bingo")
+					bingoLog.writeDown(logData)
 					console.log(counter2)
 				}else{
 					console.log("loose")
+					looseLog.writeDown(logData)
 					console.log(counter2)
 				}
 				if (usdtAmount && (+usdtAmount)>(+stopThresholdValue)){
@@ -159,6 +171,7 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 				maxInInterval = 0
 			}
 			counter++
+
 
 
 
