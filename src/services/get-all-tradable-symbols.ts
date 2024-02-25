@@ -27,7 +27,8 @@ export const addPricesToSymbolsArray = async (symbols: any[]) => {
 		const symbol = el.baseAsset + el.quoteAsset;
 		return {
 			...el,
-			price: prices[symbol]
+			price: prices[symbol],
+			change24: null
 		};
 	});
 };

@@ -56,7 +56,7 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 
 
 			const updateSeq = updatePricesInSeq(sequencesDataSet, updSymbolsDataSet);
-			//console.log(updateSeq)
+
 			const sorted = updateSeq.map(PredictTradeResult).sort((a: any, b: any) => b.profiTReal - a.profiTReal);
 			const opp = sorted.filter((el: any) => el.profiTReal > thresholdValue && el.profiTReal < 5 && el.profiTReal !== null)
 
@@ -135,13 +135,16 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 					// console.log("expeсted income "+counter);
 				usdtAmount = await BinanceAdapter.getCurrencyBalance("USDT");
 				console.log("USDT - " + usdtAmount)
-				counter2 += (+sequence.profitInBase)
+				counter2 += (counter2*(+sequence.profitInBase))/100
 				const logData = {
 					calcProfit:seq.profitInBase,
 					profit:sequence.profitInBase,
 					firstSymbol: sequence.firstSymbol.currentCurrency,
+					firstSP: +sequence.firstSymbol.change24,
 					secondSymbol: sequence.secondSymbol.currentCurrency,
+					secondSP: +sequence.secondSymbol.change24,
 					thirdSymbol: sequence.thirdSymbol.currentCurrency,
+					thirdSP: +sequence.thirdSymbol.change24,
 				}
 				if (sequence.profiTReal>0){
 					console.log("bingo")
@@ -194,31 +197,39 @@ export const wsUpdate = (symbolsDataSet: any, sequencesDataSet: any, startAmount
 function updatePrices(symbolsDataSet: any, tickerData: any) {
 	const symbols = {...symbolsDataSet};
 	tickerData.forEach((el: any) => {
-		if (symbolsDataSet[addSlash(el.s, 3)]) {
-			symbols[addSlash(el.s, 3)].bid = el.b;
-			symbols[addSlash(el.s, 3)].ask = el.a;
-		} else if (symbolsDataSet[addSlash(el.s, 4)]) {
-			symbols[addSlash(el.s, 4)].bid = el.b;
-			symbols[addSlash(el.s, 4)].ask = el.a;
-		} else if (symbolsDataSet[addSlash(el.s, 1)]) {
-			symbols[addSlash(el.s, 1)].bid = el.b;
-			symbols[addSlash(el.s, 1)].ask = el.a;
-		} else if (symbolsDataSet[addSlash(el.s, 2)]) {
-			symbols[addSlash(el.s, 2)].bid = el.b;
-			symbols[addSlash(el.s, 2)].ask = el.a;
-		} else if (symbolsDataSet[addSlash(el.s, 4)]) {
-			symbols[addSlash(el.s, 5)].bid = el.b;
-			symbols[addSlash(el.s, 5)].ask = el.a;
-		} else if (symbolsDataSet[addSlash(el.s, 6)]) {
-			symbols[addSlash(el.s, 6)].bid = el.b;
-			symbols[addSlash(el.s, 6)].ask = el.a;
-		} else if (symbolsDataSet[addSlash(el.s, 7)]) {
-			symbols[addSlash(el.s, 7)].bid = el.b;
-			symbols[addSlash(el.s, 7)].ask = el.a;
-		} else if (symbolsDataSet[addSlash(el.s, 8)]) {
-			symbols[addSlash(el.s, 8)].bid = el.b;
-			symbols[addSlash(el.s, 8)].ask = el.a;
+		for (let i = 1;i<10; i++){
+			if (symbolsDataSet[addSlash(el.s, i)]) {
+				 	symbols[addSlash(el.s, i)].bid = el.b;
+				 	symbols[addSlash(el.s, i)].ask = el.a
+				symbols[addSlash(el.s, i)].change24 = el.P
+				 }
 		}
+		// if (symbolsDataSet[addSlash(el.s, 3)]) {
+		// 	symbols[addSlash(el.s, 3)].bid = el.b;
+		// 	symbols[addSlash(el.s, 3)].ask = el.a;
+		// } else if (symbolsDataSet[addSlash(el.s, 4)]) {
+		// 	symbols[addSlash(el.s, 4)].bid = el.b;
+		// 	symbols[addSlash(el.s, 4)].ask = el.a;
+		// } else if (symbolsDataSet[addSlash(el.s, 1)]) {
+		// 	symbols[addSlash(el.s, 1)].bid = el.b;
+		// 	symbols[addSlash(el.s, 1)].ask = el.a;
+		// } else if (symbolsDataSet[addSlash(el.s, 2)]) {
+		// 	symbols[addSlash(el.s, 2)].bid = el.b;
+		// 	symbols[addSlash(el.s, 2)].ask = el.a;
+		// } else if (symbolsDataSet[addSlash(el.s, 4)]) {
+		// 	symbols[addSlash(el.s, 5)].bid = el.b;
+		// 	symbols[addSlash(el.s, 5)].ask = el.a;
+		// } else if (symbolsDataSet[addSlash(el.s, 6)]) {
+		// 	symbols[addSlash(el.s, 6)].bid = el.b;
+		// 	symbols[addSlash(el.s, 6)].ask = el.a;
+		// } else if (symbolsDataSet[addSlash(el.s, 7)]) {
+		// 	symbols[addSlash(el.s, 7)].bid = el.b;
+		// 	symbols[addSlash(el.s, 7)].ask = el.a;
+		// } else if (symbolsDataSet[addSlash(el.s, 8)]) {
+		// 	symbols[addSlash(el.s, 8)].bid = el.b;
+		// 	symbols[addSlash(el.s, 8)].ask = el.a;
+		// }
+
 	});
 	return symbols;
 }
@@ -235,6 +246,9 @@ function updatePricesInSeq(target: any, symbols: any) {
 		el.firstSymbol.price = symbols[el.firstSymbol.symbol][askOrBid(el.firstSymbol.action)];
 		el.secondSymbol.price = symbols[el.secondSymbol.symbol][askOrBid(el.secondSymbol.action)];
 		el.thirdSymbol.price = symbols[el.thirdSymbol.symbol][askOrBid(el.thirdSymbol.action)];
+		el.firstSymbol.change24 = symbols[el.firstSymbol.symbol].change24;
+		el.secondSymbol.change24 = symbols[el.secondSymbol.symbol].change24;
+		el.thirdSymbol.change24 = symbols[el.thirdSymbol.symbol].change24;
 	});
 
 	return target;
