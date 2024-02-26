@@ -6,6 +6,7 @@ export type TradeInstructionType ={
     currentCurrency:string
     action: OrderSide
     price: string|null
+    priceChange24Per: number
     filters: {
         minNotional:string
         minQty: string
@@ -16,8 +17,14 @@ export type TradeInstructionType ={
     }
 }
 
-export type TradeSequenceType = {
-    firstSymbol:  TradeInstructionType
-    secondSymbol: TradeInstructionType
-    thirdSymbol: TradeInstructionType
+export type TradeInstructionWithPredictType = TradeInstructionType & {
+    profitInBase: number
+    profitReal: number
+    isAllow: boolean
 }
+
+export type TradeSequenceNameType = "firstSymbol" | "secondSymbol" | "thirdSymbol"
+
+export type TradeSequenceType = {
+    [U in TradeSequenceNameType]: TradeInstructionType|TradeInstructionWithPredictType;
+};
