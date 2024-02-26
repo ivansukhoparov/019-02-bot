@@ -7,25 +7,26 @@ import {wsUpdate} from "./adapters/websokets/websoket-adapter";
 import {appMode, appSettings} from "./settings/settings";
 import {APP_MODES} from "./common/common";
 import {LogToFile} from "./common/utils/log-to-file";
+import {TradeCore} from "./adapters/websokets/core";
+import {wsUpdate2} from "./adapters/websokets/websoket-adapter-v2";
 
 require("dotenv").config();
 
+
 const init = async () =>{
-	// this function return symbolsDataSet and sequencesDataSet
 	const allTradableSymbols = await getAllTradableSymbols();
 	const symbolsDataSet = await createSymbolsDataSet(allTradableSymbols);
 	const sequencesDataSet = await createSequencesDataSet(allTradableSymbols, symbolsDataSet);
-	return {symbolsDataSet, sequencesDataSet}
+	return new TradeCore(0.1,100,symbolsDataSet,sequencesDataSet)
 }
 
 const app = async () => {
-	const {symbolsDataSet, sequencesDataSet} =  await init();
+	const binanceCore =  await init();
 	console.log("app initiated")
 
-	const startAmount = await BinanceAdapter.getCurrencyBalance("USDT");
-
-	await new Promise(resolve => setTimeout(resolve, 5000));
-	 wsUpdate(symbolsDataSet, sequencesDataSet,startAmount);
+	//console.log(binanceCore.commissionAmount)
+	await new Promise(resolve => setTimeout(resolve, 1000));
+	wsUpdate2(binanceCore);
 };
 
 const iotatousdt = async (usdt:number) => {
@@ -42,9 +43,9 @@ const iotatousdt = async (usdt:number) => {
 const startApp = async ()=>{
 	try {
 
-		await new Promise(resolve => setTimeout(resolve, 10000));
+	//	await new Promise(resolve => setTimeout(resolve, 10000));
 
-		console.log("v0.01.6.8")
+		console.log("v0.02.0.1")
 		console.log("APP MODE " + appMode)
 		console.dir(appSettings)
 
