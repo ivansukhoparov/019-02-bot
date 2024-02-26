@@ -22,7 +22,7 @@ export type tickerOutputDataType = {
     }
 }
 
-export type tickerReceivedDataType = {
+export type TickerReceivedDataType = {
     e: string // Тип события (24hrTicker означает, что это данные тикера за 24 часа).
     E: string // Время отправки сообщения (в миллисекундах с начала эпохи Unix).
     s: string // Символ торговой пары (CTSIBNB в данном случае).
