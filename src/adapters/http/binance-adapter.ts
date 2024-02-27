@@ -80,9 +80,7 @@ export class BinanceAdapter {
 			},
 			body: `${queryString}&signature=${signature}`
 		};
-		console.log("request url "  + url);
-		console.log("body")
-		console.dir(payload)
+
 		const result = await FetchAdapter.request(url, payload);
 timer.stop()
 		return result
