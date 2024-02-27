@@ -29,7 +29,7 @@ export class BinanceService {
 		const side: OrderSide = action;
 		// let amountInQuote
 		if (quantityType === orderQuantity.base) {
-			amount = roundDownNumber(+amount,+ symbol.filters.stepSize);
+			amount = roundDownNumber(+amount, +symbol.filters.stepSize);
 			// amountInQuote = amount * +symbol.price;
 			// if (amountInQuote < symbol.filters.minNotional) {
 			// 	throw new Error("Don't have information about price");
@@ -40,7 +40,8 @@ export class BinanceService {
 		// 		throw new Error("enter grater amount");
 		// 	}
 		// }
-		const result = await BinanceAdapter.placeOrder(symbolName, quantityType, amount, side);
+		const totalAmount:number = +amount.toFixed(8)
+		const result = await BinanceAdapter.placeOrder(symbolName, quantityType, totalAmount, side);
 		timer.stop()
 
 		return result
