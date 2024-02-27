@@ -1,11 +1,17 @@
-import {TradeInstructionType, TradeSequenceNameType, TradeSequenceType} from "../../types/sequences";
+import {
+    TradeInstructionType,
+    TradeSequenceNameType,
+    TradeSequenceNameTypePredictType,
+    TradeSequenceType
+} from "../../types/sequences";
 import {orderAction} from "../../common/common";
 import {BinanceService} from "../../application/binance-service";
 import {MarketUpdateDataType} from "../../types/web-soket-binance/output";
 import {askOrBid} from "../../services/utils/utils";
 import {BinanceAdapter} from "../http/binance-adapter";
 import {appSettings} from "../../settings/settings";
-import {asyncLogCurrencyAmount} from "../../common/utils/logs";
+import {LogToFile} from "../../common/utils/log-to-file";
+import {Logger} from "../../common/utils/logger";
 
 export type TradeCoreStatus = "run" | "stop"
 export const TRADE_CORE_STATUSES: { [T: string]: TradeCoreStatus } = {
@@ -15,18 +21,21 @@ export const TRADE_CORE_STATUSES: { [T: string]: TradeCoreStatus } = {
 
 const _100_PERCENT: 100 = 100
 
-const thresholdValue = appSettings.binance.params.thresholdValue;
-const stopThresholdValue = appSettings.binance.params.stopThresholdValue
-
+const thresholdValue = +appSettings.binance.params.thresholdValue;
+const stopThresholdValue = +appSettings.binance.params.stopThresholdValue
+const resultsLog = new LogToFile("./logs/", "results.log")
 export class TradeCore {
     private commissionAmount: number;
     private startAmount: number;
     private symbolsDataSet: any;
     private sequencesDataSet: TradeSequenceType[];
+    private flag = true
 
     private _status: TradeCoreStatus = TRADE_CORE_STATUSES.run;
     private instructionsName: TradeSequenceNameType[] = ["firstSymbol", "secondSymbol", "thirdSymbol"]
-
+    // LOGGER
+    private tradeLogger
+    private eventLogger
     constructor(commissionAmount: number,
                 startAmount: number,
                 symbolsDataSet: any,
@@ -35,35 +44,81 @@ export class TradeCore {
         this.startAmount = startAmount
         this.symbolsDataSet = symbolsDataSet
         this.sequencesDataSet = sequencesDataSet
+        // LOGGER
+        this.tradeLogger = new Logger("./logs/tradeLogs.log")
+        this.tradeLogger.flushFile()
+        this.eventLogger = new Logger("./logs/eventsLogs.log")
+        this.eventLogger.flushFile()
     }
 
     async onDataUpdate(marketData: MarketUpdateDataType[]) {
+        const logId = +(new Date()) // LOGGER
+
         this.updateSymbolsDataSet(marketData);
         this.updateSequencesDataSet();
-        const matches = this.sequencesDataSet
-            .map( (el)=>{
+        const matches: TradeSequenceNameTypePredictType[] = this.sequencesDataSet
+            .map((el: TradeSequenceType) => {
                return  this.predictTradeResult(el)
             })
             .sort((a: any, b: any) => b.profiTReal - a.profiTReal)
-            .filter((el: any) => el.profitReal > thresholdValue && el.profiTReal < 5 && el.profitReal !== null)
+            .filter((el: any) => el.profitInBase > thresholdValue && el.profitInBase < 5 && el.profitInBase !== null)
+
         if (matches.length > 0 ){
-            await  this.doTradeSequence(matches[0])
-            asyncLogCurrencyAmount("USDT")
+            if (this.flag) {
+                this.flag = false
+                const sequence: TradeSequenceNameTypePredictType = matches[0]
+                this.tradeLogger.startNewLog(logId) // LOGGER
+                this.eventLogger.startNewLog(logId) // LOGGER
+                this.tradeLogger.writeToLog("foundSequence", sequence) // LOGGER
+
+                await new Promise(resolve => setTimeout(resolve, 200));
+                const correctedSequence: TradeSequenceNameTypePredictType = await this.correctionTradeResult(sequence)
+                this.tradeLogger.writeToLog("correctedSequence", correctedSequence) // LOGGER
+
+                if (correctedSequence.profitInBase > thresholdValue) {
+                    await this.doTradeSequence(correctedSequence)
+                    const amount = await BinanceAdapter.getCurrencyBalance("USDT");
+
+                    if (+amount < +stopThresholdValue) {
+                        console.log("trading stop")
+                        this._status = TRADE_CORE_STATUSES.stop
+                    }
+                    this.tradeLogger.writeToLog("resultAmount", amount) // LOGGER
+                    this.eventLogger.writeToLog("resultAmount", amount)//LOGGER
+
+                    this.tradeLogger.writeToLog("result", "success")//LOGGER
+                    this.eventLogger.writeToLog("result", "success")//LOGGER
+
+                    console.log("event id - " + logId + " | success | " + "balance - " + amount);
+                    this.flag = true
+                } else {
+                    this.tradeLogger.writeToLog("result", "wrong sequence")//LOGGER
+                    this.eventLogger.writeToLog("result", "wrong sequence")//LOGGER
+                    console.log("event id - " + logId + " | wrong sequence | ");
+                }
+                this.eventLogger.writeDownLogToFile() //LOGGER
+                this.tradeLogger.writeDownLogToFile() //LOGGER
+                this.flag = true
+            }
         }
     }
 
     async doTradeSequence(sequence: TradeSequenceType) {
-        let amount = this.startAmount
-
+        let amount: number = this.startAmount
         for (let i = 0; i < this.instructionsName.length; i++) {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]
+
+            this.tradeLogger.writeToLog("instruction-" + (i + 1), sequence[instructionName]) // LOGGER
+            this.tradeLogger.writeToLog("instruction_" + (i + 1) + "_amount", amount) // LOGGER
+
             if (this._status === TRADE_CORE_STATUSES.run) {
                 const result = await this.doTradeInstruction(sequence[instructionName], amount);
+                let fills = +result.executedQty
+                if (sequence[instructionName].action === orderAction.sell) fills = +result.cummulativeQuoteQty;
+                amount = +(fills - (fills / _100_PERCENT * this.commissionAmount)).toFixed(4)
 
-                let fills = result.executedQty
-                if (sequence[instructionName].action === orderAction.sell) fills = result.cummulativeQuoteQty;
-
-                amount = fills - (fills/_100_PERCENT * this.commissionAmount)
+                this.tradeLogger.writeToLog("instruction_" + (i + 1) + "_result", result) // LOGGER
+                this.tradeLogger.writeToLog("instruction_" + (i + 1) + "_executedQty", fills) // LOGGER
 
                 // if quick calculating will entail error with quality amount use string below:
                 // const amount = await BinanceAdapter.getCurrencyBalance(sequence.secondSymbol.currentCurrency);
@@ -83,7 +138,11 @@ export class TradeCore {
 
         const result = await BinanceService.createOrder(currentCurrency, targetCurrency, amount, updSymbolsDataSet)
 
-        if (result.type === "error") this.status = TRADE_CORE_STATUSES.stop
+        if (result.type === "error") {
+            console.log("trading stop")
+            this.status = TRADE_CORE_STATUSES.stop
+            console.log(result.content)
+        }
         return result.content
     };
 
@@ -98,6 +157,7 @@ export class TradeCore {
                 }
             }
         });
+
         this.symbolsDataSet = NewSymbolsDataSet
     }
 
@@ -114,14 +174,14 @@ export class TradeCore {
         this.sequencesDataSet = newSequencesDataSet;
     }
 
-    predictTradeResult(sequence: any): TradeSequenceType {
-        const commissionRatio = (_100_PERCENT - this.commissionAmount)/_100_PERCENT
+    predictTradeResult(sequence: any): TradeSequenceNameTypePredictType {
+        const commissionRatio = +((_100_PERCENT - this.commissionAmount) / _100_PERCENT).toFixed(4)
         let isAllow = true;
 
         // calculate prediction for sequence trade in base
-        let expectedResultInBase: number | null;
+        let expectedResultInBase: number | null = _100_PERCENT;
         let expectedResult: number | null = this.startAmount;
-        expectedResultInBase = (this.calculateOrderResult(_100_PERCENT, sequence.firstSymbol.action, sequence.firstSymbol.price))! * commissionRatio;
+        expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence.firstSymbol.action, sequence.firstSymbol.price))! * commissionRatio;
         expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence.secondSymbol.action, sequence.secondSymbol.price))! * commissionRatio;
         expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence.thirdSymbol.action, sequence.thirdSymbol.price))! * commissionRatio;
 
@@ -151,13 +211,15 @@ export class TradeCore {
         };
     }
 
-    async correctionTradeResult(sequence: any): Promise<TradeSequenceType> {
+    async correctionTradeResult(sequence: TradeSequenceNameTypePredictType): Promise<TradeSequenceNameTypePredictType> {
         const correctedSequence: TradeSequenceType = {...sequence}
         for (let i = 0; i < this.instructionsName.length; i++) {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]
 
             const correctedData = await BinanceAdapter.getSymbolInfo(correctedSequence[instructionName].symbol.replace("/", ""))
             correctedSequence[instructionName].price = correctedData[askOrBid(correctedSequence[instructionName].action) + "Price"];
+            correctedSequence[instructionName].lastPriceChange = +correctedData.lastPrice;
+            correctedSequence[instructionName].lastQuantity = +correctedData.lastQty;
         }
 
         return this.predictTradeResult(correctedSequence)
