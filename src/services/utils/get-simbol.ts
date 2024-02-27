@@ -14,6 +14,7 @@ export const getSymbol = (base: string,
 			symbol: base + "/" + quot,
 			currentCurrency: currentCurrency,
 			action: action,
+			priceChange24Per:null,
 			price: symbolsDataSet[base + "/" + quot][askOrBid(action)],
 			filters:{...symbolsDataSet[base + "/" + quot].filters}
 		};
@@ -24,6 +25,7 @@ export const getSymbol = (base: string,
 			symbol: quot + "/" + base,
 			currentCurrency: currentCurrency,
 			action: reverseAction,
+			priceChange24Per:null,
 			price: symbolsDataSet[quot + "/" + base][askOrBid(reverseAction)],
 			filters:{...symbolsDataSet[quot + "/" + base].filters}
 		};
