@@ -14,8 +14,11 @@ export const getSymbol = (base: string,
 			symbol: base + "/" + quot,
 			currentCurrency: currentCurrency,
 			action: action,
-			priceChange24Per:null,
+			actionQty: null,
 			price: symbolsDataSet[base + "/" + quot][askOrBid(action)],
+			priceChange24Per: null,
+			lastPriceChange: null,
+			lastQuantity: null,
 			filters:{...symbolsDataSet[base + "/" + quot].filters}
 		};
 	} else if (symbolsDataSet[quot +"/"+ base] !== undefined) {
@@ -25,9 +28,12 @@ export const getSymbol = (base: string,
 			symbol: quot + "/" + base,
 			currentCurrency: currentCurrency,
 			action: reverseAction,
-			priceChange24Per:null,
+			actionQty: null,
 			price: symbolsDataSet[quot + "/" + base][askOrBid(reverseAction)],
-			filters:{...symbolsDataSet[quot + "/" + base].filters}
+			priceChange24Per:null,
+			lastPriceChange: null,
+			lastQuantity: null,
+			filters: {...symbolsDataSet[quot + "/" + base].filters}
 		};
 	} else {
 		// Return null if don't have satisfy symbol

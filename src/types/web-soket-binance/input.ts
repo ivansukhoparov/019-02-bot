@@ -7,7 +7,7 @@ export type tickerDataType = {
   //  A: string //Количество для лучшей цены продажи.
 }
 
-export type tickerOutputDataType = {
+export type TickerOutputDataType = {
     symbol: string //Символ торговой пары (CTSIBNB в данном случае).
     baseAsset: string
     quoteAsset: string

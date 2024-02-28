@@ -1,17 +1,20 @@
 import {BinanceAdapter} from "../adapters/http/binance-adapter";
 import {symbolMapper} from "../types/fetch-binance/mapper";
+import {TickerOutputDataType} from "../types/web-soket-binance/input";
 
 export async function getAllTradableSymbols() {
 
 	const response = await BinanceAdapter.getAllSymbols();
 	// console.log(JSON.stringify(response.content.symbols.filter((el: any) => el.symbol === "POLSBNB"), null, 2))
-	const symbols = response.content.symbols.filter((el: any) => el.status === "TRADING").map(symbolMapper);
+	const symbols:TickerOutputDataType[] = response.content.symbols
+		.filter((el: any) => el.status === "TRADING")
+		.map(symbolMapper);
 	//
 	// status: Этот ключ указывает на текущее состояние торговой пары. Если значение status равно "TRADING",
 	// это означает, что пара активна и торгуется. "BREAK" означает, что торговля по этой паре в данный момент
 	// приостановлена или не проводится.
 	//
-	const symbolsWithPrices = addPricesToSymbolsArray(symbols);
+	const symbolsWithPrices = await addPricesToSymbolsArray(symbols);
 	return symbolsWithPrices;
 }
 
@@ -28,7 +31,6 @@ export const addPricesToSymbolsArray = async (symbols: any[]) => {
 		return {
 			...el,
 			price: prices[symbol],
-			change24: null
 		};
 	});
 };
