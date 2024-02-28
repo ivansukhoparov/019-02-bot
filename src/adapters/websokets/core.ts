@@ -71,7 +71,7 @@ export class TradeCore {
                 this.eventLogger.startNewLog(logId) // LOGGER
                 this.tradeLogger.writeToLog("foundSequence", sequence) // LOGGER
 
-                await new Promise(resolve => setTimeout(resolve, 200));
+              //  await new Promise(resolve => setTimeout(resolve, 200));
                 const correctedSequence: TradeSequenceNameTypePredictType = await this.correctionTradeResult(sequence)
                 this.tradeLogger.writeToLog("correctedSequence", correctedSequence) // LOGGER
 
