@@ -151,7 +151,7 @@ export type FetchResponseType = {
 
 export type QuantityType = "quantity" | "quoteOrderQty"
 
-export type RestApiTickerInfo=    {
+export type RestApiTickerInfo = {
         symbol: string
         priceChange: string
         priceChangePercent: string

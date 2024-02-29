@@ -12,6 +12,7 @@ import {BinanceAdapter} from "../http/binance-adapter";
 import {appSettings} from "../../settings/settings";
 import {LogToFile} from "../../common/utils/log-to-file";
 import {Logger} from "../../common/utils/logger";
+import {calculateStartAmount} from "./calculate-start-amount";
 
 export type TradeCoreStatus = "run" | "stop"
 export const TRADE_CORE_STATUSES: { [T: string]: TradeCoreStatus } = {
@@ -45,7 +46,7 @@ export class TradeCore {
         this.symbolsDataSet = symbolsDataSet
         this.sequencesDataSet = sequencesDataSet
         // LOGGER
-        this.tradeLogger = new Logger("./logs/tradeLogs.log")
+        this.tradeLogger = new Logger("./logs/tradeLogs.js")
         this.tradeLogger.flushFile()
         this.eventLogger = new Logger("./logs/eventsLogs.log")
         this.eventLogger.flushFile()
@@ -75,7 +76,9 @@ export class TradeCore {
                 const correctedSequence: TradeSequenceNameTypePredictType = await this.correctionTradeResult(sequence)
                 this.tradeLogger.writeToLog("correctedSequence", correctedSequence) // LOGGER
 
-                if (correctedSequence.profitInBase > thresholdValue) {
+                const correctedStartAmount = calculateStartAmount(correctedSequence, this.startAmount)
+                if (correctedSequence.profitInBase > thresholdValue && +correctedStartAmount.result>0.01) {
+                    this.startAmount = +correctedStartAmount.startAmount
                     await this.doTradeSequence(correctedSequence)
                     const amount = await BinanceAdapter.getCurrencyBalance("USDT");
 
