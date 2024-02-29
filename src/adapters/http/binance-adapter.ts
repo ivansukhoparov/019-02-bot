@@ -200,16 +200,28 @@ timer.stop()
 		let url = `${BASE_URL}/api/v3/ticker/24hr`;
 
 		if (symbol) {
-			url = `${BASE_URL}/api/v3/ticker/24hr?symbol=${symbol}`;
+			url = `${BASE_URL}/api/v3/ticker/24hr?symbol=${JSON.stringify(symbol)}`;
 		}
-
-
 		const responseData = await FetchAdapter.request(url);
 		if (responseData.content) {
 			return responseData.content
 		}
 		return null
 	}
+
+	static async getSymbolsInfo(symbol?: string[]){
+		let url = `${BASE_URL}/api/v3/ticker/24hr`;
+
+		if (symbol) {
+			url = `${BASE_URL}/api/v3/ticker/24hr?symbols=${JSON.stringify(symbol)}`;
+		}
+		const responseData = await FetchAdapter.request(url);
+		if (responseData.content) {
+			return responseData.content
+		}
+		return null
+	}
+
 	static _createQueryFilter(...filters: any) {
 		let filter = "";
 		for (let i = 0; i < arguments.length; i++) {
