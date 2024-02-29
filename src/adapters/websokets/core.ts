@@ -213,15 +213,19 @@ export class TradeCore {
 
     async correctionTradeResult(sequence: TradeSequenceNameTypePredictType): Promise<TradeSequenceNameTypePredictType> {
         const correctedSequence: TradeSequenceType = {...sequence}
+        const symbolsForRequest = []
+        for (let i = 0; i < this.instructionsName.length; i++) {
+            symbolsForRequest.push(correctedSequence[this.instructionsName[i]].symbol.replace("/", ""))
+       }
+        const correctionDataArray = await BinanceAdapter.getSymbolsInfo(symbolsForRequest)
+
         for (let i = 0; i < this.instructionsName.length; i++) {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]
-
-            const correctedData = await BinanceAdapter.getSymbolInfo(correctedSequence[instructionName].symbol.replace("/", ""))
-            correctedSequence[instructionName].price = correctedData[askOrBid(correctedSequence[instructionName].action) + "Price"];
-            correctedSequence[instructionName].lastPriceChange = +correctedData.lastPrice;
-            correctedSequence[instructionName].lastQuantity = +correctedData.lastQty;
+            correctedSequence[instructionName].price = correctionDataArray[i][askOrBid(correctedSequence[instructionName].action) + "Price"];
+            correctedSequence[instructionName].actionQty = correctionDataArray[i][askOrBid(correctedSequence[instructionName].action) + "Qty"];
+            correctedSequence[instructionName].lastPriceChange = +correctionDataArray[i].priceChangePercent;
+            correctedSequence[instructionName].lastQuantity = +correctionDataArray[i].lastQty;
         }
-
         return this.predictTradeResult(correctedSequence)
     }
 
