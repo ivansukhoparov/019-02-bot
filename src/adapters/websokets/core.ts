@@ -12,7 +12,7 @@ import {BinanceAdapter} from "../http/binance-adapter";
 import {appSettings} from "../../settings/settings";
 import {LogToFile} from "../../common/utils/log-to-file";
 import {Logger} from "../../common/utils/logger";
-import {calculateStartAmount} from "./calculate-start-amount";
+
 
 export type TradeCoreStatus = "run" | "stop"
 export const TRADE_CORE_STATUSES: { [T: string]: TradeCoreStatus } = {
@@ -76,14 +76,14 @@ export class TradeCore {
                 const correctedSequence: TradeSequenceNameTypePredictType = await this.correctionTradeResult(sequence)
                 this.tradeLogger.writeToLog("correctedSequence", correctedSequence) // LOGGER
 
-                const correctedStartAmount = calculateStartAmount(correctedSequence, this.startAmount)
+                const correctedStartAmount = this.correctStartAmount(correctedSequence, this.startAmount)
                 if (correctedSequence.profitInBase > thresholdValue && +correctedStartAmount.result>0.01) {
                     this.startAmount = +correctedStartAmount.startAmount
                     await this.doTradeSequence(correctedSequence)
                     const amount = await BinanceAdapter.getCurrencyBalance("USDT");
 
                     if (+amount < +stopThresholdValue) {
-                        console.log("trading stop")
+                        console.log("trading stop by stopThresholdValue")
                         this._status = TRADE_CORE_STATUSES.stop
                     }
                     this.tradeLogger.writeToLog("resultAmount", amount) // LOGGER
@@ -142,7 +142,7 @@ export class TradeCore {
         const result = await BinanceService.createOrder(currentCurrency, targetCurrency, amount, updSymbolsDataSet)
 
         if (result.type === "error") {
-            console.log("trading stop")
+            console.log("trading stop doTradeInstruction error")
             this.status = TRADE_CORE_STATUSES.stop
             console.log(result.content)
         }
@@ -226,11 +226,83 @@ export class TradeCore {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]
             correctedSequence[instructionName].price = correctionDataArray[i][askOrBid(correctedSequence[instructionName].action) + "Price"];
             correctedSequence[instructionName].actionQty = correctionDataArray[i][askOrBid(correctedSequence[instructionName].action) + "Qty"];
+            correctedSequence[instructionName].actionQtyInQuote = +correctedSequence[instructionName].actionQty! * +correctedSequence[instructionName].price!;
             correctedSequence[instructionName].lastPriceChange = +correctionDataArray[i].priceChangePercent;
             correctedSequence[instructionName].lastQuantity = +correctionDataArray[i].lastQty;
         }
         return this.predictTradeResult(correctedSequence)
     }
+
+    correctStartAmount  (sequence: any, start: number) {
+        let startAmount = start
+        let result = 0;
+
+
+        let _1StartAmount = startAmount
+        let _1EndAmount = (this.calculateOrderResult(_1StartAmount, sequence.firstSymbol.action, sequence.firstSymbol.price))! * 0.999
+        let _2StartAmount = _1EndAmount
+        let _2EndAmount = (this.calculateOrderResult(_2StartAmount, sequence.secondSymbol.action, sequence.secondSymbol.price))! * 0.999
+        let _3StartAmount = _2EndAmount
+        let _3EndAmount = (this.calculateOrderResult(_3StartAmount, sequence.thirdSymbol.action, sequence.firstSymbol.price))! * 0.999
+
+        // in 3rd instruction current-currency always is 2nd instructions end-trade currency therefore if 3th instruction
+        // current-currency has index = 0 then we accept baseQty as actual amount before trade this
+        let _3StartAmountReal = +sequence.thirdSymbol.actionQty
+        // Available amount for trade 3-symbol in current-currency if current-currency is base asset
+        if (sequence.thirdSymbol.symbol.split("/")[1] === sequence.thirdSymbol.currentCurrency) {
+            _3StartAmountReal = +sequence.thirdSymbol.actionQtyInQuote
+            // Available amount for trade 3-symbol in current-currency if current-currency is quote asset
+        }
+
+        // in 3rd instruction current-currency always is 2nd instructions end-trade currency therefore if 3th instruction
+        // current-currency has index = 0 then we accept baseQty as actual amount before trade this
+        let _2StartAmountReal = +sequence.secondSymbol.actionQty
+        // Available amount for trade 3-symbol in current-currency if current-currency is base asset
+        if (sequence.secondSymbol.symbol.split("/")[1] === sequence.secondSymbol.currentCurrency) {
+            _2StartAmountReal = +sequence.secondSymbol.actionQtyInQuote
+            // Available amount for trade 3-symbol in current-currency if current-currency is quote asset
+        }
+
+        // in 3rd instruction current-currency always is 2nd instructions end-trade currency therefore if 3th instruction
+        // current-currency has index = 0 then we accept baseQty as actual amount before trade this
+        let _1StartAmountReal = +sequence.firstSymbol.actionQty
+        // Available amount for trade 3-symbol in current-currency if current-currency is base asset
+        if (sequence.firstSymbol.symbol.split("/")[1] === sequence.firstSymbol.currentCurrency) {
+            _1StartAmountReal = +sequence.firstSymbol.actionQtyInQuote
+            // Available amount for trade 3-symbol in current-currency if current-currency is quote asset
+        }
+
+        console.log(_3StartAmountReal +" " + _3StartAmount)
+        if (_3StartAmount > _3StartAmountReal) {
+            _2EndAmount = _3StartAmountReal
+            _2StartAmount = this.calculateOrderResultReverse(_2EndAmount, sequence.secondSymbol.action, sequence.secondSymbol.price)! / 0.999
+        }
+
+
+        console.log(_2StartAmountReal + " " + _2StartAmount)
+        _1EndAmount=_2StartAmount
+        if (_2StartAmount > _2StartAmountReal) {
+            _1EndAmount = _2StartAmountReal
+        }
+        _1StartAmount = this.calculateOrderResultReverse(_1EndAmount, sequence.firstSymbol.action, sequence.firstSymbol.price)! / 0.999
+
+        console.log(_1StartAmountReal + " " + _1StartAmount)
+        startAmount = Math.floor(_1StartAmount)
+        if (_1StartAmount > _1StartAmountReal) {
+            startAmount = Math.floor(_1StartAmountReal)
+        }
+
+
+        _1StartAmount = startAmount
+        _1EndAmount = (this.calculateOrderResult(_1StartAmount, sequence.firstSymbol.action, sequence.firstSymbol.price))! * 0.999
+        _2StartAmount = _1EndAmount
+        _2EndAmount = (this.calculateOrderResult(_2StartAmount, sequence.secondSymbol.action, sequence.firstSymbol.price))! * 0.999
+        _3StartAmount = _2EndAmount
+        _3EndAmount = (this.calculateOrderResult(_3StartAmount, sequence.thirdSymbol.action, sequence.firstSymbol.price))! * 0.999
+
+        return {startAmount: startAmount, result: _3EndAmount}
+    }
+
 
     calculateOrderResult(target: number | null, act: string, price: string | null) {
         if (target !== null) {
@@ -240,6 +312,23 @@ export class TradeCore {
                         return (target! / +price);
                     case "sell":
                         return (target! * +price);
+                    default:
+                        return null;
+                }
+            }
+        }
+        return null;
+    };
+
+    calculateOrderResultReverse (target: any, act: any, price: any) {
+
+        if (target !== null) {
+            if (price !== null) {
+                switch (act) {
+                    case "buy":
+                        return (target * +price);
+                    case "sell":
+                        return (target / +price);
                     default:
                         return null;
                 }

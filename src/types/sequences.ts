@@ -5,8 +5,9 @@ export type TradeInstructionType ={
     symbol: string
     currentCurrency:string
     action: OrderSide
-    actionQty:number | null
     price: string|null
+    actionQty:number | null
+    actionQtyInQuote: number | null
     priceChange24Per: number | null
     lastPriceChange?: number | null
     lastQuantity?: number|null
