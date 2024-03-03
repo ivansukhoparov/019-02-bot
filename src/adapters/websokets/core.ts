@@ -81,7 +81,10 @@ export class TradeCore {
                 this.tradeLogger.writeToLog("corrected result - ", correctedStartAmount.result)//LOGGER
                 console.log("corrected Start Amount", correctedStartAmount)//LOGGER
 
-                if (correctedSequence.profitInBase > thresholdValue && +correctedStartAmount.result>+correctedStartAmount.startAmount) {
+                if (correctedSequence.profitInBase > thresholdValue
+                    && (+correctedStartAmount.result - (+correctedStartAmount.startAmount))>0.1
+                    && +correctedStartAmount.startAmount> 10
+                ) {
 
                     this.startAmount = +correctedStartAmount.startAmount
                     await this.doTradeSequence(correctedSequence)
