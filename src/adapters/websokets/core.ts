@@ -46,7 +46,7 @@ export class TradeCore {
         this.symbolsDataSet = symbolsDataSet
         this.sequencesDataSet = sequencesDataSet
         // LOGGER
-        this.tradeLogger = new Logger("./logs/tradeLogs.js")
+        this.tradeLogger = new Logger("./logs/tradeLogs.log")
         this.tradeLogger.flushFile()
         this.eventLogger = new Logger("./logs/eventsLogs.log")
         this.eventLogger.flushFile()
