@@ -80,7 +80,7 @@ export class TradeCore {
                 this.tradeLogger.writeToLog("corrected Start Amount - ", correctedStartAmount.startAmount)//LOGGER
                 this.tradeLogger.writeToLog("corrected result - ", correctedStartAmount.result)//LOGGER
                 console.log("corrected Start Amount", correctedStartAmount)//LOGGER
-
+                console.log("profit in base ", correctedSequence.profitInBase)//LOGGER
                 if (correctedSequence.profitInBase > thresholdValue
                     && (+correctedStartAmount.result - (+correctedStartAmount.startAmount))>0.01
                     && +correctedStartAmount.startAmount> 10

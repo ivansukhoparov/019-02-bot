@@ -122,7 +122,7 @@ const startApp = async ()=>{
 
 		//	await new Promise(resolve => setTimeout(resolve, 10000));
 
-		console.log("v0.02.3.1")
+		console.log("v0.02.3.2")
 		console.log("APP MODE " + appMode)
 		console.dir(appSettings)
 
