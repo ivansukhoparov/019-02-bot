@@ -1,7 +1,7 @@
 import {
     TradeInstructionType,
     TradeSequenceNameType,
-    TradeSequenceNameTypePredictType,
+    TradeSequenceWithPredictType,
     TradeSequenceType
 } from "../../types/sequences";
 import {orderAction} from "../../common/common";
@@ -57,7 +57,7 @@ export class TradeCore {
 
         this.updateSymbolsDataSet(marketData);
         this.updateSequencesDataSet();
-        const matches: TradeSequenceNameTypePredictType[] = this.sequencesDataSet
+        const matches: TradeSequenceWithPredictType[] = this.sequencesDataSet
             .map((el: TradeSequenceType) => {
                return  this.predictTradeResult(el)
             })
@@ -67,17 +67,22 @@ export class TradeCore {
         if (matches.length > 0 ){
             if (this.flag) {
                 this.flag = false
-                const sequence: TradeSequenceNameTypePredictType = matches[0]
+                const sequence: TradeSequenceWithPredictType = matches[0]
                 this.tradeLogger.startNewLog(logId) // LOGGER
                 this.eventLogger.startNewLog(logId) // LOGGER
                 this.tradeLogger.writeToLog("foundSequence", sequence) // LOGGER
 
               //  await new Promise(resolve => setTimeout(resolve, 200));
-                const correctedSequence: TradeSequenceNameTypePredictType = await this.correctionTradeResult(sequence)
+                const correctedSequence: TradeSequenceWithPredictType = await this.correctTradeResult(sequence)
                 this.tradeLogger.writeToLog("correctedSequence", correctedSequence) // LOGGER
 
                 const correctedStartAmount = this.correctStartAmount(correctedSequence, this.startAmount)
-                if (correctedSequence.profitInBase > thresholdValue && +correctedStartAmount.result>0.01) {
+                this.tradeLogger.writeToLog("corrected Start Amount - ", correctedStartAmount.startAmount)//LOGGER
+                this.tradeLogger.writeToLog("corrected result - ", correctedStartAmount.result)//LOGGER
+                console.log("corrected Start Amount", correctedStartAmount)//LOGGER
+
+                if (correctedSequence.profitInBase > thresholdValue && +correctedStartAmount.result>+correctedStartAmount.startAmount) {
+
                     this.startAmount = +correctedStartAmount.startAmount
                     await this.doTradeSequence(correctedSequence)
                     const amount = await BinanceAdapter.getCurrencyBalance("USDT");
@@ -177,30 +182,30 @@ export class TradeCore {
         this.sequencesDataSet = newSequencesDataSet;
     }
 
-    predictTradeResult(sequence: any): TradeSequenceNameTypePredictType {
+    predictTradeResult(sequence: TradeSequenceType|TradeSequenceWithPredictType): TradeSequenceWithPredictType {
         const commissionRatio = +((_100_PERCENT - this.commissionAmount) / _100_PERCENT).toFixed(4)
         let isAllow = true;
 
         // calculate prediction for sequence trade in base
         let expectedResultInBase: number | null = _100_PERCENT;
         let expectedResult: number | null = this.startAmount;
-        expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence.firstSymbol.action, sequence.firstSymbol.price))! * commissionRatio;
-        expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence.secondSymbol.action, sequence.secondSymbol.price))! * commissionRatio;
-        expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence.thirdSymbol.action, sequence.thirdSymbol.price))! * commissionRatio;
+        expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence.firstSymbol.action, +sequence.firstSymbol.price!))! * commissionRatio;
+        expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence.secondSymbol.action, +sequence.secondSymbol.price!))! * commissionRatio;
+        expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence.thirdSymbol.action, +sequence.thirdSymbol.price!))! * commissionRatio;
 
         for (let i = 0; i < this.instructionsName.length; i++) {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]
             if (sequence[instructionName].action === "buy") {
-                if (expectedResult && expectedResult < sequence[instructionName].filters.minNotional) isAllow = false
+                if (expectedResult && expectedResult < +sequence[instructionName].filters.minNotional) isAllow = false
             } else {
-                if (expectedResult && expectedResult < sequence[instructionName].filters.minQty) isAllow = false
+                if (expectedResult && expectedResult < +sequence[instructionName].filters.minQty) isAllow = false
             }
-            expectedResult = (this.calculateOrderResult(expectedResult, sequence[instructionName].action, sequence[instructionName].price))! * commissionRatio;
+            expectedResult = (this.calculateOrderResult(expectedResult, sequence[instructionName].action, +sequence[instructionName].price!))! * commissionRatio;
         }
 
 
         if (expectedResultInBase) {
-            expectedResultInBase = expectedResultInBase - 100;
+            expectedResultInBase = expectedResultInBase - (+_100_PERCENT);
         }
         if (expectedResult) {
             expectedResult = expectedResult - (this.startAmount);
@@ -214,8 +219,12 @@ export class TradeCore {
         };
     }
 
-    async correctionTradeResult(sequence: TradeSequenceNameTypePredictType): Promise<TradeSequenceNameTypePredictType> {
-        const correctedSequence: TradeSequenceType = {...sequence}
+    async correctTradeResult(sequence: TradeSequenceWithPredictType): Promise<TradeSequenceWithPredictType> {
+        const correctedSequence: TradeSequenceType = {
+            firstSymbol:{...sequence.firstSymbol},
+            secondSymbol:{...sequence.secondSymbol},
+            thirdSymbol:{...sequence.thirdSymbol},
+        }
         const symbolsForRequest = []
         for (let i = 0; i < this.instructionsName.length; i++) {
             symbolsForRequest.push(correctedSequence[this.instructionsName[i]].symbol.replace("/", ""))
@@ -224,26 +233,28 @@ export class TradeCore {
 
         for (let i = 0; i < this.instructionsName.length; i++) {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]
-            correctedSequence[instructionName].price = correctionDataArray[i][askOrBid(correctedSequence[instructionName].action) + "Price"];
-            correctedSequence[instructionName].actionQty = correctionDataArray[i][askOrBid(correctedSequence[instructionName].action) + "Qty"];
+            const symbol = correctedSequence[instructionName].symbol.replace("/","")
+            const symbolData = correctionDataArray.find((el:any)=>el.symbol===symbol)
+            correctedSequence[instructionName].price = +(symbolData[askOrBid(correctedSequence[instructionName].action) + "Price"]);
+            correctedSequence[instructionName].actionQty = +(symbolData[askOrBid(correctedSequence[instructionName].action) + "Qty"]);
             correctedSequence[instructionName].actionQtyInQuote = +correctedSequence[instructionName].actionQty! * +correctedSequence[instructionName].price!;
-            correctedSequence[instructionName].lastPriceChange = +correctionDataArray[i].priceChangePercent;
-            correctedSequence[instructionName].lastQuantity = +correctionDataArray[i].lastQty;
+            correctedSequence[instructionName].lastPriceChange = +symbolData.priceChangePercent;
+            correctedSequence[instructionName].lastQuantity = +symbolData.lastQty;
         }
+
         return this.predictTradeResult(correctedSequence)
     }
 
     correctStartAmount  (sequence: any, start: number) {
         let startAmount = start
-        let result = 0;
-
 
         let _1StartAmount = startAmount
         let _1EndAmount = (this.calculateOrderResult(_1StartAmount, sequence.firstSymbol.action, sequence.firstSymbol.price))! * 0.999
         let _2StartAmount = _1EndAmount
         let _2EndAmount = (this.calculateOrderResult(_2StartAmount, sequence.secondSymbol.action, sequence.secondSymbol.price))! * 0.999
         let _3StartAmount = _2EndAmount
-        let _3EndAmount = (this.calculateOrderResult(_3StartAmount, sequence.thirdSymbol.action, sequence.firstSymbol.price))! * 0.999
+        let _3EndAmount = (this.calculateOrderResult(_3StartAmount, sequence.thirdSymbol.action, sequence.thirdSymbol.price))! * 0.999
+console.log("_3EndAmount " + _3EndAmount)
 
         // in 3rd instruction current-currency always is 2nd instructions end-trade currency therefore if 3th instruction
         // current-currency has index = 0 then we accept baseQty as actual amount before trade this
@@ -272,39 +283,34 @@ export class TradeCore {
             // Available amount for trade 3-symbol in current-currency if current-currency is quote asset
         }
 
-        console.log(_3StartAmountReal +" " + _3StartAmount)
         if (_3StartAmount > _3StartAmountReal) {
             _2EndAmount = _3StartAmountReal
             _2StartAmount = this.calculateOrderResultReverse(_2EndAmount, sequence.secondSymbol.action, sequence.secondSymbol.price)! / 0.999
         }
 
-
-        console.log(_2StartAmountReal + " " + _2StartAmount)
         _1EndAmount=_2StartAmount
         if (_2StartAmount > _2StartAmountReal) {
             _1EndAmount = _2StartAmountReal
         }
         _1StartAmount = this.calculateOrderResultReverse(_1EndAmount, sequence.firstSymbol.action, sequence.firstSymbol.price)! / 0.999
 
-        console.log(_1StartAmountReal + " " + _1StartAmount)
         startAmount = Math.floor(_1StartAmount)
         if (_1StartAmount > _1StartAmountReal) {
             startAmount = Math.floor(_1StartAmountReal)
         }
 
-
         _1StartAmount = startAmount
         _1EndAmount = (this.calculateOrderResult(_1StartAmount, sequence.firstSymbol.action, sequence.firstSymbol.price))! * 0.999
         _2StartAmount = _1EndAmount
-        _2EndAmount = (this.calculateOrderResult(_2StartAmount, sequence.secondSymbol.action, sequence.firstSymbol.price))! * 0.999
+        _2EndAmount = (this.calculateOrderResult(_2StartAmount, sequence.secondSymbol.action, sequence.secondSymbol.price))! * 0.999
         _3StartAmount = _2EndAmount
-        _3EndAmount = (this.calculateOrderResult(_3StartAmount, sequence.thirdSymbol.action, sequence.firstSymbol.price))! * 0.999
+        _3EndAmount = (this.calculateOrderResult(_3StartAmount, sequence.thirdSymbol.action, sequence.thirdSymbol.price))! * 0.999
 
         return {startAmount: startAmount, result: _3EndAmount}
     }
 
 
-    calculateOrderResult(target: number | null, act: string, price: string | null) {
+    calculateOrderResult(target: number | null, act: string, price: string | number | null) {
         if (target !== null) {
             if (price !== null) {
                 switch (act) {

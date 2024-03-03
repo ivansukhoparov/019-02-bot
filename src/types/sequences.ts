@@ -5,7 +5,7 @@ export type TradeInstructionType ={
     symbol: string
     currentCurrency:string
     action: OrderSide
-    price: string|null
+    price: string|number|null
     actionQty:number | null
     actionQtyInQuote: number | null
     priceChange24Per: number | null
@@ -21,7 +21,7 @@ export type TradeInstructionType ={
     }
 }
 
-export type TradeInstructionWithPredictType = TradeInstructionType & {
+export type ddd = TradeInstructionType & {
     profitInBase: number
     profitReal: number
     isAllow: boolean
@@ -30,10 +30,10 @@ export type TradeInstructionWithPredictType = TradeInstructionType & {
 export type TradeSequenceNameType = "firstSymbol" | "secondSymbol" | "thirdSymbol"
 
 export type TradeSequenceType = {
-    [U in TradeSequenceNameType]: TradeInstructionType|TradeInstructionWithPredictType;
+    [U in TradeSequenceNameType]: TradeInstructionType;
 };
 
-export type TradeSequenceNameTypePredictType = TradeSequenceType & {
+export type TradeSequenceWithPredictType = TradeSequenceType & {
     profitInBase: number
     profitReal: number
     isAllow: boolean
