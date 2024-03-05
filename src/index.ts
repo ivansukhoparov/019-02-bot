@@ -79,23 +79,13 @@ const iotatousdt = async (usdt:number) => {
 /// NEW VERSION BELOW
 
 
-
-
-
-
-
-
-
-
 import {logCurrencyAmount} from "./common/utils/logs";
 import {getAllTradableSymbols} from "./services/get-all-tradable-symbols";
 import {createSymbolsDataSet} from "./services/preparing-symbols";
 import {createSequencesDataSet} from "./services/create-sequences-data-set";
 import {BinanceAdapter} from "./adapters/http/binance-adapter";
-import {wsUpdate} from "./adapters/websokets/websoket-adapter";
 import {appMode, appSettings} from "./settings/settings";
 import {APP_MODES} from "./common/common";
-import {LogToFile} from "./common/utils/log-to-file";
 import {TradeCore} from "./adapters/websokets/core";
 import {wsUpdate2} from "./adapters/websokets/websoket-adapter-v2";
 
@@ -122,9 +112,10 @@ const startApp = async ()=>{
 
 		//	await new Promise(resolve => setTimeout(resolve, 10000));
 
-		console.log("v0.02.3.2")
+		console.log("v0.02.3.3")
 		console.log("APP MODE " + appMode)
 		console.dir(appSettings)
+		console.log("correctedStartAmountResult >0.01 && correctedStartAmount.startAmount> 6")
 
 		if (appMode === APP_MODES.test) {
 			const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");

@@ -64,7 +64,7 @@ export class TradeCore {
             .sort((a: any, b: any) => b.profiTReal - a.profiTReal)
             .filter((el: any) => el.profitInBase > thresholdValue && el.profitInBase < 5 && el.profitInBase !== null)
 
-        if (matches.length > 0 ){
+        if (matches.length > 0 && this._status === TRADE_CORE_STATUSES.run){
             if (this.flag) {
                 this.flag = false
                 const sequence: TradeSequenceWithPredictType = matches[0]
@@ -80,10 +80,9 @@ export class TradeCore {
                 this.tradeLogger.writeToLog("corrected Start Amount - ", correctedStartAmount.startAmount)//LOGGER
                 this.tradeLogger.writeToLog("corrected result - ", correctedStartAmount.result)//LOGGER
                 console.log("corrected Start Amount", correctedStartAmount)//LOGGER
-                console.log("profit in base ", correctedSequence.profitInBase)//LOGGER
                 if (correctedSequence.profitInBase > thresholdValue
                     && (+correctedStartAmount.result - (+correctedStartAmount.startAmount))>0.01
-                    && +correctedStartAmount.startAmount> 10
+                    && +correctedStartAmount.startAmount> 6
                 ) {
 
                     this.startAmount = +correctedStartAmount.startAmount
@@ -91,7 +90,7 @@ export class TradeCore {
                     const amount = await BinanceAdapter.getCurrencyBalance("USDT");
 
                     if (+amount < +stopThresholdValue) {
-                        console.log("trading stop by stopThresholdValue")
+                        console.log(" =============== trading stop by stopThresholdValue ===============")
                         this._status = TRADE_CORE_STATUSES.stop
                     }
                     this.tradeLogger.writeToLog("resultAmount", amount) // LOGGER
@@ -100,12 +99,11 @@ export class TradeCore {
                     this.tradeLogger.writeToLog("result", "success")//LOGGER
                     this.eventLogger.writeToLog("result", "success")//LOGGER
 
-                    console.log("event id - " + logId + " | success | " + "balance - " + amount);
+                    console.log("event id - " + logId + " | has been traded success | " + "balance - " + amount);
                     this.flag = true
                 } else {
                     this.tradeLogger.writeToLog("result", "wrong sequence")//LOGGER
                     this.eventLogger.writeToLog("result", "wrong sequence")//LOGGER
-                    console.log("event id - " + logId + " | wrong sequence | ");
                 }
                 this.eventLogger.writeDownLogToFile() //LOGGER
                 this.tradeLogger.writeDownLogToFile() //LOGGER
@@ -150,7 +148,7 @@ export class TradeCore {
         const result = await BinanceService.createOrder(currentCurrency, targetCurrency, amount, updSymbolsDataSet)
 
         if (result.type === "error") {
-            console.log("trading stop doTradeInstruction error")
+            console.log("=============== trading stop doTradeInstruction error ===============")
             this.status = TRADE_CORE_STATUSES.stop
             console.log(result.content)
         }
@@ -257,7 +255,6 @@ export class TradeCore {
         let _2EndAmount = (this.calculateOrderResult(_2StartAmount, sequence.secondSymbol.action, sequence.secondSymbol.price))! * 0.999
         let _3StartAmount = _2EndAmount
         let _3EndAmount = (this.calculateOrderResult(_3StartAmount, sequence.thirdSymbol.action, sequence.thirdSymbol.price))! * 0.999
-console.log("_3EndAmount " + _3EndAmount)
 
         // in 3rd instruction current-currency always is 2nd instructions end-trade currency therefore if 3th instruction
         // current-currency has index = 0 then we accept baseQty as actual amount before trade this
