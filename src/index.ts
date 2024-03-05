@@ -112,10 +112,10 @@ const startApp = async ()=>{
 
 		//	await new Promise(resolve => setTimeout(resolve, 10000));
 
-		console.log("v0.02.3.3")
+		console.log("v0.02.3.4")
 		console.log("APP MODE " + appMode)
 		console.dir(appSettings)
-		console.log("correctedStartAmountResult >0.01 && correctedStartAmount.startAmount> 6")
+		console.log("correctedStartAmountResult >0.01 && correctedStartAmount.startAmount>= 6")
 
 		if (appMode === APP_MODES.test) {
 			const balanceTest = await BinanceAdapter.getCurrencyBalance("USDT");

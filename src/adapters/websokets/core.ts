@@ -82,7 +82,7 @@ export class TradeCore {
                 console.log("corrected Start Amount", correctedStartAmount)//LOGGER
                 if (correctedSequence.profitInBase > thresholdValue
                     && (+correctedStartAmount.result - (+correctedStartAmount.startAmount))>0.01
-                    && +correctedStartAmount.startAmount> 6
+                    && +correctedStartAmount.startAmount>= 6
                 ) {
 
                     this.startAmount = +correctedStartAmount.startAmount
