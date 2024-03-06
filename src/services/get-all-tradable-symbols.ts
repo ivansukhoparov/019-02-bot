@@ -1,10 +1,10 @@
-import {BinanceAdapter} from "../adapters/http/binance-adapter";
+import {BinanceHttpAdapter} from "../adapters/http/binance.http.adapter";
 import {symbolMapper} from "../types/fetch-binance/mapper";
 import {TickerOutputDataType} from "../types/web-soket-binance/input";
 
 export async function getAllTradableSymbols() {
 
-	const response = await BinanceAdapter.getAllSymbols();
+	const response = await BinanceHttpAdapter.getAllSymbols();
 	// console.log(JSON.stringify(response.content.symbols.filter((el: any) => el.symbol === "POLSBNB"), null, 2))
 	const symbols:TickerOutputDataType[] = response.content.symbols
 		.filter((el: any) => el.status === "TRADING")
@@ -19,7 +19,7 @@ export async function getAllTradableSymbols() {
 }
 
 export const addPricesToSymbolsArray = async (symbols: any[]) => {
-	const pricesArray = await BinanceAdapter.getTickerPrices();
+	const pricesArray = await BinanceHttpAdapter.getTickerPrices();
 	const prices = pricesArray.content.reduce((acc: any, el: any) => {
 		acc[el.symbol] = el.price;
 		return acc;

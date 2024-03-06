@@ -3,15 +3,15 @@ import {
     TradeSequenceNameType,
     TradeSequenceWithPredictType,
     TradeSequenceType
-} from "../../types/sequences";
-import {orderAction} from "../../common/common";
-import {BinanceService} from "../../application/binance-service";
-import {MarketUpdateDataType} from "../../types/web-soket-binance/output";
-import {askOrBid} from "../../services/utils/utils";
-import {BinanceAdapter} from "../http/binance-adapter";
-import {appSettings} from "../../settings/settings";
-import {LogToFile} from "../../common/utils/log-to-file";
-import {Logger} from "../../common/utils/logger";
+} from "../types/sequences";
+import {orderAction} from "../common/common";
+import {BinanceService} from "../application/binance-service";
+import {MarketUpdateDataType} from "../types/web-soket-binance/output";
+import {askOrBid} from "../services/utils/utils";
+import {BinanceHttpAdapter} from "../adapters/http/binance.http.adapter";
+import {appSettings} from "../settings/settings";
+import {LogToFile} from "../common/utils/log-to-file";
+import {Logger} from "../common/utils/logger";
 
 
 export type TradeCoreStatus = "run" | "stop"
@@ -87,7 +87,7 @@ export class TradeCore {
 
                     this.startAmount = +correctedStartAmount.startAmount
                     await this.doTradeSequence(correctedSequence)
-                    const amount = await BinanceAdapter.getCurrencyBalance("USDT");
+                    const amount = await BinanceHttpAdapter.getCurrencyBalance("USDT");
 
                     if (+amount < +stopThresholdValue) {
                         console.log(" =============== trading stop by stopThresholdValue ===============")
@@ -130,7 +130,7 @@ export class TradeCore {
                 this.tradeLogger.writeToLog("instruction_" + (i + 1) + "_executedQty", fills) // LOGGER
 
                 // if quick calculating will entail error with quality amount use string below:
-                // const amount = await BinanceAdapter.getCurrencyBalance(sequence.secondSymbol.currentCurrency);
+                // const amount = await BinanceHttpAdapter.getCurrencyBalance(sequence.secondSymbol.currentCurrency);
             }
         }
     };
@@ -230,7 +230,7 @@ export class TradeCore {
         for (let i = 0; i < this.instructionsName.length; i++) {
             symbolsForRequest.push(correctedSequence[this.instructionsName[i]].symbol.replace("/", ""))
        }
-        const correctionDataArray = await BinanceAdapter.getSymbolsInfo(symbolsForRequest)
+        const correctionDataArray = await BinanceHttpAdapter.getSymbolsInfo(symbolsForRequest)
 
         for (let i = 0; i < this.instructionsName.length; i++) {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]

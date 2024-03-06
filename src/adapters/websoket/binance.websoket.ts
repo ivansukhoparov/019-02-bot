@@ -4,7 +4,7 @@ import {appMode, appSettings} from "../../settings/settings";
 import {APP_MODES} from "../../common/common";
 import {MarketUpdateDataType} from "../../types/web-soket-binance/output";
 import {marketDataMapper} from "../../types/web-soket-binance/mapper";
-import {TradeCore} from "./core";
+import {TradeCore} from "../../core/trade.core";
 
 
 
@@ -20,7 +20,7 @@ if (appMode === APP_MODES.test) {
 
 const connection = new WebSocket(combinedStreamsUrl);
 
-export const wsUpdate2 = (tradeCore:TradeCore) => {
+export const wsUpdate = (tradeCore:TradeCore) => {
 
     connection.onopen = async () => {
         console.log("Connected to Binance combined WebSocket");

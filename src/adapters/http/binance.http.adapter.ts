@@ -5,15 +5,16 @@ import {
 	AccountBalanceInfoInputType,
 	FetchResponseType,
 	OrderSide,
-	OrderTypeType, RestApiTickerInfo
+	OrderTypeType
 } from "../../types/fetch-binance/input";
 import {ActionTimer} from "../../common/utils/timer";
+import crypto from "crypto";
 
 const API_KEY = appSettings.binance.keys.api;
 const API_SECRET = appSettings.binance.keys.secret;
 const BASE_URL = appSettings.binance.urls.baseUrl;
 
-export class BinanceAdapter {
+export class BinanceHttpAdapter {
 
 	static async getAccountInfo(): Promise<FetchResponseType> {
 
@@ -52,7 +53,7 @@ export class BinanceAdapter {
 		quantityAmount: number,
 		side: OrderSide,
 		type: OrderTypeType = "market"): Promise<FetchResponseType> {
-		const timer =  new ActionTimer("BinanceAdapter/placeOrder")
+		const timer = new ActionTimer("BinanceHttpAdapter/placeOrder")
 		timer.start()
 		// Example:
 		// placeOrder("BTCUSDT", 0.001, "BUY");
@@ -82,7 +83,7 @@ export class BinanceAdapter {
 		};
 
 		const result = await FetchAdapter.request(url, payload);
-timer.stop()
+		timer.stop()
 		return result
 	}
 
@@ -233,4 +234,8 @@ timer.stop()
 		}
 		return filter;
 	}
+
+
 }
+
+///https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=3

@@ -1,19 +1,19 @@
-import {BinanceAdapter} from "../../adapters/http/binance-adapter";
+import {BinanceHttpAdapter} from "../../adapters/http/binance.http.adapter";
 
 export const logCurrencyAmount = async (currency: string) => {
-	const amount = await BinanceAdapter.getCurrencyBalance(currency);
+	const amount = await BinanceHttpAdapter.getCurrencyBalance(currency);
 	console.log(currency + " - " + amount);
 };
 
 
 export const asyncLogCurrencyAmount = (currency: string) => {
-	new Promise((resolve, reject) => resolve(BinanceAdapter.getCurrencyBalance(currency)))
+	new Promise((resolve, reject) => resolve(BinanceHttpAdapter.getCurrencyBalance(currency)))
 		.then((value) => console.log(currency + " - " + value));
 };
 
 
 export const logPositiveBalances = async () => {
-	const all = await BinanceAdapter.getAllWallets();
+	const all = await BinanceHttpAdapter.getAllWallets();
 
 	for (let i = 0; i < all.length; i++) {
 		if (all[i].free > 0) {

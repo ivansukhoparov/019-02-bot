@@ -1,7 +1,7 @@
 import {BinanceService} from "../../src/application/binance-service";
 import {symbolsDataSet_test} from "../tests-data-sets/symbols-data-set";
 import {orderAction, orderQuantity} from "../../src/common/common";
-import {BinanceAdapter} from "../../src/adapters/http/binance-adapter";
+import {BinanceHttpAdapter} from "../../src/adapters/http/binance.http.adapter";
 import {roundDownNumber} from "../../src/services/trade-sequence";
 
 

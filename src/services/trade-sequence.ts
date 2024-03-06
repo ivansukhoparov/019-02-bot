@@ -1,5 +1,5 @@
 import {QuantityType} from "../types/fetch-binance/input";
-import {BinanceAdapter} from "../adapters/http/binance-adapter";
+import {BinanceHttpAdapter} from "../adapters/http/binance.http.adapter";
 import {TradeInstructionType, TradeSequenceType} from "../types/sequences";
 import {BinanceService} from "../application/binance-service";
 import {logCurrencyAmount} from "../common/utils/logs";
@@ -23,7 +23,7 @@ export const tradeThis = async (instruction: TradeInstructionType, updSymbolsDat
 	console.log(ident +"get balance ")
 
 	// Get amount for traiding
-	// const amount = await BinanceAdapter.getCurrencyBalance(currentCurrecny);
+	// const amount = await BinanceHttpAdapter.getCurrencyBalance(currentCurrecny);
 	//
 	console.log(ident +"amount " + amount)
 	console.log(ident +"+++++")
@@ -33,7 +33,7 @@ export const tradeThis = async (instruction: TradeInstructionType, updSymbolsDat
 	console.dir(result.content)
 	if (result.type === "success"){
 		console.log("symbol.info")
-		console.dir(await BinanceAdapter.getSymbolInfo(result.content.symbol))
+		console.dir(await BinanceHttpAdapter.getSymbolInfo(result.content.symbol))
 	}
 	return result.content
 	// console.log(instruction.symbol);
@@ -42,7 +42,7 @@ export const tradeThis = async (instruction: TradeInstructionType, updSymbolsDat
 	// const {quantityCurrency, quantityType} = getQuantityType(instruction);
 	//
 	// const quantityAmount = roundDownNumber(currencyAmount, +instruction.filters.stepSize);
-	// return  BinanceAdapter.placeOrder(symbol, quantityType, quantityAmount, side);
+	// return  BinanceHttpAdapter.placeOrder(symbol, quantityType, quantityAmount, side);
 };
 
 type s= "firstSymbol"|"secondSymbol"|"thirdSymbol"
@@ -104,7 +104,7 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	console.log("result amount");
 	console.log(fills1);
 	console.log("realAmount");
-	const usdtAmount1 = await BinanceAdapter.getCurrencyBalance(sequence.secondSymbol.currentCurrency);
+	const usdtAmount1 = await BinanceHttpAdapter.getCurrencyBalance(sequence.secondSymbol.currentCurrency);
 	console.log(sequence.secondSymbol.currentCurrency +" " +usdtAmount1);
 
 	console.log("====================================================================================================");
@@ -121,7 +121,7 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	console.log("result amount");
 	console.log(fills2);
 	console.log("realAmount");
-	const usdtAmount2 = await BinanceAdapter.getCurrencyBalance(sequence.thirdSymbol.currentCurrency);
+	const usdtAmount2 = await BinanceHttpAdapter.getCurrencyBalance(sequence.thirdSymbol.currentCurrency);
 	console.log(sequence.thirdSymbol.currentCurrency +" " +usdtAmount2);
 	console.log("====================================================================================================");
 	console.log("trade sequence 3");

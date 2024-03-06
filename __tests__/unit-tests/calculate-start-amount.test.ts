@@ -1,7 +1,7 @@
 import {getAllTradableSymbols} from "../../src/services/get-all-tradable-symbols";
 import {createSymbolsDataSet} from "../../src/services/preparing-symbols";
 import {createSequencesDataSet} from "../../src/services/create-sequences-data-set";
-import {TradeCore} from "../../src/adapters/websokets/core";
+import {TradeCore} from "../../src/core/trade.core";
 
 const _1 = {
     "firstSymbol": {
