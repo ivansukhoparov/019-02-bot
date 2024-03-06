@@ -3,7 +3,7 @@ import {createSignature} from "./utils/create-signature";
 import {FetchAdapter} from "./utils/fetch-adapter";
 import {
 	AccountBalanceInfoInputType,
-	FetchResponseType,
+	ApiResponseType,
 	OrderSide,
 	OrderTypeType
 } from "../../types/fetch-binance/input";
@@ -16,7 +16,7 @@ const BASE_URL = appSettings.binance.urls.baseUrl;
 
 export class BinanceHttpAdapter {
 
-	static async getAccountInfo(): Promise<FetchResponseType> {
+	static async getAccountInfo(): Promise<ApiResponseType> {
 
 		const data: any = {timestamp: Date.now()};
 		const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
@@ -33,7 +33,7 @@ export class BinanceHttpAdapter {
 		return response;
 	}
 
-	static async getTickerPrices(): Promise<FetchResponseType> {
+	static async getTickerPrices(): Promise<ApiResponseType> {
 
 		const data: any = {timestamp: Date.now()};
 		const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
@@ -52,7 +52,7 @@ export class BinanceHttpAdapter {
 		quantityType: "quantity" | "quoteOrderQty",
 		quantityAmount: number,
 		side: OrderSide,
-		type: OrderTypeType = "market"): Promise<FetchResponseType> {
+		type: OrderTypeType = "market"): Promise<ApiResponseType> {
 		const timer = new ActionTimer("BinanceHttpAdapter/placeOrder")
 		timer.start()
 		// Example:
@@ -129,7 +129,7 @@ export class BinanceHttpAdapter {
 	//     return res
 	// }
 
-	static async getAllSymbols(): Promise<FetchResponseType> {
+	static async getAllSymbols(): Promise<ApiResponseType> {
 		const url = `${BASE_URL}/api/v3/exchangeInfo`;
 		const response = await FetchAdapter.request(url);
 		return response;
@@ -138,7 +138,7 @@ export class BinanceHttpAdapter {
 	// This function return array with all available to trade coins (currencies) => ["BTC", "ETH", "USDT" ...etc]
 	static async getAllAvailableTickers() {
 		// Get account info
-		const accountInfo: FetchResponseType = await this.getAccountInfo();
+		const accountInfo: ApiResponseType = await this.getAccountInfo();
 		// Take array balances with wallets, and from each wallet take coin (currency) name and return it
 		return accountInfo.content.balances.map((wallet: AccountBalanceInfoInputType) => {
 			return wallet.asset;
@@ -147,7 +147,7 @@ export class BinanceHttpAdapter {
 
 	static async getAllWallets() {
 		// Get account info
-		const accountInfo: FetchResponseType = await this.getAccountInfo();
+		const accountInfo: ApiResponseType = await this.getAccountInfo();
 		// Take array balances with wallets, and from each wallet take coin (currency) name and return it
 		return accountInfo.content.balances;
 	}

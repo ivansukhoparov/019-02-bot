@@ -143,7 +143,7 @@ export type OrderTypeType = "market" | "limit" | "stop_loss" | "stop_loss_limit"
 
 export type OrderSide =  "buy" | "sell"
 
-export type FetchResponseType = {
+export type ApiResponseType = {
     type: "error" | "success"
     content: ResponseErrorType | any
 }

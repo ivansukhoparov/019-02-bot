@@ -1,9 +1,9 @@
 import fetch from "node-fetch";
-import {FetchResponseType} from "../../../types/fetch-binance/input";
+import {ApiResponseType} from "../../../types/fetch-binance/input";
 import {ActionTimer} from "../../../common/utils/timer";
 
 export class FetchAdapter {
-	static async request(url: string, init?: any):Promise<FetchResponseType> {
+	static async request(url: string, init?: any):Promise<ApiResponseType> {
 
 		try {
 			const timer =  new ActionTimer("FetchAdapter/request")
@@ -20,7 +20,7 @@ export class FetchAdapter {
 		}
 	}
 
-	static _responseMapper(response: any):FetchResponseType {
+	static _responseMapper(response: any):ApiResponseType {
 		const responseKeys = Object.keys(response);
 		if (responseKeys.length === 2 && responseKeys[0] === "code" && responseKeys[1] === "msg") {
 			return {
