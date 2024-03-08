@@ -1,10 +1,5 @@
 import {appSettings} from "../../settings/settings";
-import {
-	AccountBalanceInfoInputType,
-	ApiResponseType,
-	OrderSide,
-	OrderTypeType
-} from "../../types/fetch-binance/input";
+import {AccountBalanceInfoInputType, ApiResponseType, OrderSide, OrderTypeType} from "../../types/fetch-binance/input";
 import crypto from "crypto";
 import {FetchAdapterREF} from "./utils/fetch-adapter REF";
 
@@ -33,7 +28,6 @@ export class BinanceHttpAdapterREF {
 	}
 
 	async getTickerPrices(): Promise<ApiResponseType> {
-
 		const data: any = {timestamp: Date.now()};
 		const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
 		const signature = this._createSignature(queryString, API_SECRET);
@@ -196,6 +190,5 @@ export class BinanceHttpAdapterREF {
 			};
 		}
 	}
-
 }
 
