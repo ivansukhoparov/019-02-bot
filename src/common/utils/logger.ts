@@ -11,6 +11,11 @@ export class Logger {
         // this.logId = logId
     }
 
+    writeDownTestData(key: string, value: any){
+        this.logData[key] = value;
+        this.writeDownLogToFile()
+    }
+
     writeToLog(key: string, value: any) {
         this.logData[key] = value;
         this.logData[key + "Timestamp"] = +(new Date());

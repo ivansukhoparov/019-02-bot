@@ -13,7 +13,7 @@ export class ActionTimer {
 
 	stop() {
 		const duration:number = (+(new Date()) - this.startTime) / 1000;
-	//	console.log(`function" ${this.funcName}" done in -- ${duration} sec`);
+//console.log(`function" ${this.funcName}" done in -- ${duration} sec`);
 	}
 }
 

@@ -1,11 +1,10 @@
 import WebSocket from "ws";
 
-import {appMode, appSettings} from "../../settings/settings";
+import {appMode} from "../../settings/settings";
 import {APP_MODES} from "../../common/common";
 import {MarketUpdateDataType} from "../../types/web-soket-binance/output";
 import {marketDataMapper} from "../../types/web-soket-binance/mapper";
 import {TradeCore} from "../../core/trade.core";
-
 
 
 let combinedStreamsUrl: string
@@ -33,9 +32,9 @@ export const wsUpdate = (tradeCore:TradeCore) => {
             if (appMode !== APP_MODES.test) marketData = marketData.data
             const mappedMarketData: MarketUpdateDataType[] = marketData.map(marketDataMapper)
             await tradeCore.onDataUpdate(mappedMarketData)
-
         } catch (error) {
-            console.error("Ошибка при обработке сообщения:", error);
+            console.error("trade error:", error);
+            connection.close()
         }
     };
 

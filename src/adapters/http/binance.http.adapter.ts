@@ -234,7 +234,10 @@ export class BinanceHttpAdapter {
 		}
 		return filter;
 	}
-
+	static async getDepth(symbol: string){
+		const url = `${BASE_URL}/api/v3/depth?symbol=${symbol}&limit=3`;
+		return await FetchAdapter.request(url);
+	}
 
 }
 
