@@ -34,8 +34,7 @@ export const wsUpdate = (tradeCore:TradeCore) => {
             await tradeCore.onDataUpdate(mappedMarketData)
         } catch (error) {
             console.error("trade error:", error);
-            connection.close()
-
+          //  connection.close()
         }
     };
 
