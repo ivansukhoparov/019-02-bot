@@ -163,17 +163,18 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
 
     async doTradeSequence(sequence: TradeSequenceType) {
         let amount: number = this.startAmount
+
         for (let i = 0; i < this.instructionsName.length; i++) {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]
 
-            this.tradeLogger.writeToLog("instruction-" + (i + 1), sequence[instructionName]) // LOGGER
+            this.tradeLogger.writeToLog("instruction_" + (i + 1), sequence[instructionName]) // LOGGER
             this.tradeLogger.writeToLog("instruction_" + (i + 1) + "_amount", amount) // LOGGER
 
             if (this._status === TRADE_CORE_STATUSES.run) {
                 const result = await this.doTradeInstruction(sequence[instructionName], amount);
                 let fills = +result.executedQty
                 if (sequence[instructionName].action === orderAction.sell) fills = +result.cummulativeQuoteQty;
-                amount = +(fills - (fills / _100_PERCENT * this.commissionAmount)).toFixed(4)
+                amount = +(fills - (fills / _100_PERCENT * this.commissionAmount)).toFixed(8)
 
                 this.tradeLogger.writeToLog("instruction_" + (i + 1) + "_result", result) // LOGGER
                 this.tradeLogger.writeToLog("instruction_" + (i + 1) + "_executedQty", fills) // LOGGER
@@ -234,7 +235,7 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
     }
 
     predictTradeResult(sequence: TradeSequenceType|TradeSequenceWithPredictType): TradeSequenceWithPredictType {
-        const commissionRatio = +((_100_PERCENT - this.commissionAmount) / _100_PERCENT).toFixed(4)
+        const commissionRatio = +((_100_PERCENT - this.commissionAmount) / _100_PERCENT).toFixed(8)
         let isAllow = true;
 
         // calculate prediction for sequence trade in base
