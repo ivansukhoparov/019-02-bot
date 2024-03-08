@@ -117,9 +117,9 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
                                 correctedStartAmount=correctedStartAmount2
                                 correctedSequence = sequenceCopy
                                 this.startAmount = +correctedStartAmount2.startAmount
-                                console.log(" + new parameters apply + ")
+                                console.log(" +++ new parameters apply +++ ")
                             } else {
-                                console.log(" + new parameters does not apply + ")
+                                console.log(" --- new parameters does not apply --- ")
                             }
                         }
                     }
