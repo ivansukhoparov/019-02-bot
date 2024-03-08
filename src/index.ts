@@ -9,7 +9,7 @@ require("dotenv").config();
 
 const startApp = async ()=>{
 	try {
-		console.log("v0.02.4.1")
+		console.log("v0.02.4.2")
 		console.log("APP MODE " + appMode)
 		console.dir(appSettings)
 		console.log("correctedStartAmountResult >0.01 && correctedStartAmount.startAmount>= 6")

@@ -124,10 +124,8 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
                         }
                     }
 
-                    if (this.startAmount >= 6 && (
-                         (+correctedStartAmount.result - (+correctedStartAmount.startAmount))>0.01
-
-                    )) {
+                    if (this.startAmount >= 10
+                        && ((+correctedStartAmount.result - (+correctedStartAmount.startAmount)) > 0.01)) {
                         await this.doTradeSequence(correctedSequence)
                         const amount = await BinanceHttpAdapter.getCurrencyBalance("USDT");
 

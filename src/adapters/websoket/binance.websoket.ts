@@ -35,6 +35,7 @@ export const wsUpdate = (tradeCore:TradeCore) => {
         } catch (error) {
             console.error("trade error:", error);
             connection.close()
+
         }
     };
 
