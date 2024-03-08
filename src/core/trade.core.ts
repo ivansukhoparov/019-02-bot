@@ -82,7 +82,7 @@ export class TradeCore {
                     this.tradeLogger.writeToLog("correctedSequence", correctedSequence) // LOGGER
                     this.tradeLogger.writeToLog("corrected Start Amount - ", correctedStartAmount.startAmount)//LOGGER
                     this.tradeLogger.writeToLog("corrected result - ", correctedStartAmount.result)//LOGGER
-                    console.log("corrected Start Amount", correctedStartAmount)//LOGGER
+                    this.tradeLogger.writeToLog("corrected Start Amount", correctedStartAmount)//LOGGER
                 }
 
                 if (correctedSequence.profitInBase > thresholdValue
@@ -111,15 +111,15 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
                             }
 
                             const correctedStartAmount2= this.correctStartAmount(sequenceCopy, 100)
-                            console.log("corrected Start Amount 2", correctedStartAmount2)//LOGGER
+                            this.tradeLogger.writeToLog("corrected Start Amount 2", correctedStartAmount2)//LOGGER
 
                             if ((+correctedStartAmount2.result - (+correctedStartAmount2.startAmount)) > 0.01) {
                                 correctedStartAmount=correctedStartAmount2
                                 correctedSequence = sequenceCopy
                                 this.startAmount = +correctedStartAmount2.startAmount
-                                console.log(" +++ new parameters apply +++ ")
+                                this.tradeLogger.writeToLog("clarifyResult", " +++ new parameters apply +++ ")
                             } else {
-                                console.log(" --- new parameters does not apply --- ")
+                                this.tradeLogger.writeToLog("clarifyResult"," --- new parameters does not apply --- ")
                             }
                         }
                     }
@@ -156,7 +156,7 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
                     this.tradeLogger.writeDownLogToFile() //LOGGER
                 }
                 this.flag = true
-                console.log(" ===============  ===============")
+
             }
         }
     }
