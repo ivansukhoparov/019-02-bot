@@ -22,8 +22,8 @@ export const TRADE_CORE_STATUSES: { [T: string]: TradeCoreStatus } = {
 
 const _100_PERCENT: 100 = 100
 
-const thresholdValue = +appSettings.binance.params.thresholdValue;
-const stopThresholdValue = +appSettings.binance.params.stopThresholdValue
+let thresholdValue = +appSettings.binance.params.thresholdValue;
+let stopThresholdValue = +appSettings.binance.params.stopThresholdValue
 const resultsLog = new LogToFile("./logs/", "results.log")
 export class TradeCore {
     private commissionAmount: number;
@@ -61,6 +61,7 @@ export class TradeCore {
             })
             .sort((a: any, b: any) => b.profiTReal - a.profiTReal)
             .filter((el: any) => el.profitInBase > thresholdValue && el.profitInBase < 5 && el.profitInBase !== null)
+
         return matches
     }
     async onDataUpdate(marketData: MarketUpdateDataType[]) {
@@ -70,9 +71,11 @@ export class TradeCore {
 
         if (matches.length > 0 && this._status === TRADE_CORE_STATUSES.run){
             this.startAmount = 100
+
             if (this.flag) {
                 this.flag = false
-                const sequence: TradeSequenceWithPredictType = matches[0]
+                const sequence: TradeSequenceWithPredictType = {...matches[0]}
+                //  console.log(sequence)
                 let  correctedSequence: TradeSequenceWithPredictType = await this.correctTradeResult(sequence)
                 let correctedStartAmount = this.correctStartAmount(correctedSequence, this.startAmount)
                 {   // LOGGER
@@ -84,11 +87,8 @@ export class TradeCore {
                     this.tradeLogger.writeToLog("corrected result - ", correctedStartAmount.result)//LOGGER
                     this.tradeLogger.writeToLog("corrected Start Amount", correctedStartAmount)//LOGGER
                 }
-
-                if (correctedSequence.profitInBase > thresholdValue
-
-                    // && +correctedStartAmount.startAmount>= 6
-                ) {
+                console.log("corrected Start Amount", correctedStartAmount)//LOGGER
+                if (correctedSequence.profitInBase > thresholdValue) {
                     this.startAmount = +correctedStartAmount.startAmount
 const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount.startAmount)
 
@@ -112,7 +112,7 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
 
                             const correctedStartAmount2= this.correctStartAmount(sequenceCopy, 100)
                             this.tradeLogger.writeToLog("corrected Start Amount 2", correctedStartAmount2)//LOGGER
-
+                            console.log("corrected Start Amount 2", correctedStartAmount2)//LOGGER
                             if ((+correctedStartAmount2.result - (+correctedStartAmount2.startAmount)) > 0.01) {
                                 correctedStartAmount=correctedStartAmount2
                                 correctedSequence = sequenceCopy
@@ -127,8 +127,7 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
                     if (this.startAmount >= 10
                         && ((+correctedStartAmount.result - (+correctedStartAmount.startAmount)) > 0.01)) {
                         await this.doTradeSequence(correctedSequence)
-                        const amount = await BinanceHttpAdapter.getCurrencyBalance("USDT");
-
+                        const amount = await BinanceHttpAdapter.getCurrencyBalance(appSettings.binance.params.startCurrency);
                         if (+amount < +stopThresholdValue) {
                             console.log(" =============== trading stop by stopThresholdValue ===============")
                             this._status = TRADE_CORE_STATUSES.stop

@@ -12,6 +12,7 @@ export const defaultSettings = {
 			secret: process.env.SECRET_KEY!
 		},
 		params:{
+			startCurrency:process.env.START_CURRENCY!,
 			thresholdValue:process.env.THRESHOLD_VALUE!,
 			stopThresholdValue:process.env.STOP_THRESHOLD!
 		}

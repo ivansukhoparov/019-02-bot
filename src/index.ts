@@ -25,7 +25,7 @@ const startApp = async ()=>{
 			}
 		}
 
-		await logCurrencyAmount("USDT")
+		await logCurrencyAmount(appSettings.binance.params.startCurrency)
 		await app();
 	} catch (err) {
 		console.log(err);
