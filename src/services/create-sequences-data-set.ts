@@ -43,9 +43,9 @@ export const createSequencesDataSet = async (tradableSymbols: any, symbolsDataSe
 	//      Get array in view model like this:
 	//      [...
 	//          {
-	//            firstSymbol: {symbol: 'BNB/USDT', currentCurrency: 'USDT', action: 'buy', price: null, filters{...}},
-	//            secondSymbol: {symbol: 'MATIC/BNB', currentCurrency: 'BNB', action: 'buy', price: null, filters{...}},
-	//            thirdSymbol: {symbol: 'MATIC/USDT', currentCurrency: 'USDT', action: 'sell', price: null, filters{...}}
+	//            _1_Instruction: {symbol: 'BNB/USDT', currentCurrency: 'USDT', action: 'buy', price: null, filters{...}},
+	//            _2_Instruction: {symbol: 'MATIC/BNB', currentCurrency: 'BNB', action: 'buy', price: null, filters{...}},
+	//            _3_Instruction: {symbol: 'MATIC/USDT', currentCurrency: 'USDT', action: 'sell', price: null, filters{...}}
 	//          },
 	//      ...]
 

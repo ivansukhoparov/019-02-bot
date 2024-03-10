@@ -3,9 +3,9 @@
 // import {ActionTimer} from "../../src/common/utils/timer";
 // import {PredictTradeResult} from "../../src/adapters/websoket/websoket-adapter";
 // const a = {
-//     firstSymbol: { symbol: 'BTCUSDT', action: 'buy', price: '10000' },
-//     secondSymbol: { symbol: 'BTCEUR', action: 'sell', price: '9000' },
-//     thirdSymbol: { symbol: 'EURUSDT', action: 'sell', price: '1.1' }
+//     _1_Instruction: { symbol: 'BTCUSDT', action: 'buy', price: '10000' },
+//     _2_Instruction: { symbol: 'BTCEUR', action: 'sell', price: '9000' },
+//     _3_Instruction: { symbol: 'EURUSDT', action: 'sell', price: '1.1' }
 // }
 // describe("createTradeSequence function test", () => {
 //
@@ -14,17 +14,17 @@
 //         const sequence = createTradeSequence(['BTC', 'USDT', 'EUR'], testSymbols);
 //         console.log(sequence);
 //         expect(sequence).toEqual({
-//             firstSymbol: {
+//             _1_Instruction: {
 //                 symbol: "BTCUSDT",
 //                 action: "buy",
 //                 price: "11000"
 //             },
-//             secondSymbol:{
+//             _2_Instruction:{
 //                 symbol: "BTCEUR",
 //                 action: "sell",
 //                 price: "9000"
 //             },
-//             thirdSymbol:{
+//             _3_Instruction:{
 //                 symbol: "EURUSDT",
 //                 action: "sell",
 //                 price: "1.1"
@@ -37,17 +37,17 @@
 //         const sequence = createTradeSequence(['TCP', 'USDT', 'EUR'], testSymbols);
 //         console.log(sequence);
 //         expect(sequence).toEqual({
-//             firstSymbol: {
+//             _1_Instruction: {
 //                 symbol: "TCPUSDT",
 //                 action: "buy",
 //                 price: "10"
 //             },
-//             secondSymbol:{
+//             _2_Instruction:{
 //                 symbol: "TCPEUR",
 //                 action: "sell",
 //                 price: null
 //             },
-//             thirdSymbol:{
+//             _3_Instruction:{
 //                 symbol: "EURUSDT",
 //                 action: "sell",
 //                 price: "1.1"

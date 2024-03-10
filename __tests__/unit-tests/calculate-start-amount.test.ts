@@ -4,7 +4,7 @@ import {createSequencesDataSet} from "../../src/services/create-sequences-data-s
 import {TradeCore} from "../../src/core/trade.core";
 
 const _1 = {
-    "firstSymbol": {
+    "_1_Instruction": {
         "symbol": "ETH/USDT",
         "currentCurrency": "USDT",
         "action": "buy",
@@ -22,7 +22,7 @@ const _1 = {
             "stepSizeMarket": "0.00010000"
         }
     },
-    "secondSymbol": {
+    "_2_Instruction": {
         "symbol": "MANA/ETH",
         "currentCurrency": "ETH",
         "action": "buy",
@@ -40,7 +40,7 @@ const _1 = {
             "stepSizeMarket": "1.00000000"
         }
     },
-    "thirdSymbol": {
+    "_3_Instruction": {
         "symbol": "MANA/USDT",
         "currentCurrency": "MANA",
         "action": "sell",
@@ -63,7 +63,7 @@ const _1 = {
     "isAllow": true
 }
 const _2 = {
-    "firstSymbol": {
+    "_1_Instruction": {
         "symbol": "ETH/USDT",
         "currentCurrency": "USDT",
         "action": "buy",
@@ -81,7 +81,7 @@ const _2 = {
             "stepSizeMarket": "0.00010000"
         }
     },
-    "secondSymbol": {
+    "_2_Instruction": {
         "symbol": "MANA/ETH",
         "currentCurrency": "ETH",
         "action": "buy",
@@ -99,7 +99,7 @@ const _2 = {
             "stepSizeMarket": "1.00000000"
         }
     },
-    "thirdSymbol": {
+    "_3_Instruction": {
         "symbol": "USDT/MANA",
         "currentCurrency": "MANA",
         "action": "buy",
@@ -122,7 +122,7 @@ const _2 = {
     "isAllow": true
 }
 const _3 = {
-    "firstSymbol": {
+    "_1_Instruction": {
         "symbol": "ETH/USDT",
         "currentCurrency": "USDT",
         "action": "buy",
@@ -140,7 +140,7 @@ const _3 = {
             "stepSizeMarket": "0.00010000"
         }
     },
-    "secondSymbol": {
+    "_2_Instruction": {
         "symbol": "MANA/ETH",
         "currentCurrency": "ETH",
         "action": "buy",
@@ -158,7 +158,7 @@ const _3 = {
             "stepSizeMarket": "1.00000000"
         }
     },
-    "thirdSymbol": {
+    "_3_Instruction": {
         "symbol": "USDT/MANA",
         "currentCurrency": "MANA",
         "action": "buy",
@@ -181,7 +181,7 @@ const _3 = {
     "isAllow": true
 }
 const _4 = {
-    "firstSymbol": {
+    "_1_Instruction": {
         "symbol": "ETH/USDT",
         "currentCurrency": "USDT",
         "action": "buy",
@@ -199,7 +199,7 @@ const _4 = {
             "stepSizeMarket": "0.00010000"
         }
     },
-    "secondSymbol": {
+    "_2_Instruction": {
         "symbol": "ETH/MANA",
         "currentCurrency": "ETH",
         "action": "sell",
@@ -217,7 +217,7 @@ const _4 = {
             "stepSizeMarket": "1.00000000"
         }
     },
-    "thirdSymbol": {
+    "_3_Instruction": {
         "symbol": "USDT/MANA",
         "currentCurrency": "MANA",
         "action": "buy",
@@ -240,7 +240,7 @@ const _4 = {
     "isAllow": true
 }
 const _5 = {
-    "firstSymbol": {
+    "_1_Instruction": {
         "symbol": "ETH/USDT",
         "currentCurrency": "USDT",
         "action": "buy",
@@ -258,7 +258,7 @@ const _5 = {
             "stepSizeMarket": "0.00010000"
         }
     },
-    "secondSymbol": {
+    "_2_Instruction": {
         "symbol": "MANA/ETH",
         "currentCurrency": "ETH",
         "action": "buy",
@@ -276,7 +276,7 @@ const _5 = {
             "stepSizeMarket": "1.00000000"
         }
     },
-    "thirdSymbol": {
+    "_3_Instruction": {
         "symbol": "USDT/MANA",
         "currentCurrency": "MANA",
         "action": "buy",
@@ -299,7 +299,7 @@ const _5 = {
     "isAllow": true
 }
 const _6 = {
-    "firstSymbol": {
+    "_1_Instruction": {
         "symbol": "USDT/ETH",
         "currentCurrency": "USDT",
         "action": "sell",
@@ -317,7 +317,7 @@ const _6 = {
             "stepSizeMarket": "0.00010000"
         }
     },
-    "secondSymbol": {
+    "_2_Instruction": {
         "symbol": "MANA/ETH",
         "currentCurrency": "ETH",
         "action": "buy",
@@ -335,7 +335,7 @@ const _6 = {
             "stepSizeMarket": "1.00000000"
         }
     },
-    "thirdSymbol": {
+    "_3_Instruction": {
         "symbol": "USDT/MANA",
         "currentCurrency": "MANA",
         "action": "buy",

@@ -45,10 +45,10 @@ export const tradeThis = async (instruction: TradeInstructionType, updSymbolsDat
 	// return  BinanceHttpAdapter.placeOrder(symbol, quantityType, quantityAmount, side);
 };
 
-type s= "firstSymbol"|"secondSymbol"|"thirdSymbol"
+type s= "_1_Instruction"|"_2_Instruction"|"_3_Instruction"
 
 // {
-// 	firstSymbol: {
+// 	_1_Instruction: {
 // 		symbol: 'ETH/USDT',
 // 			currentCurrency: 'USDT',
 // 			action: 'buy',
@@ -61,7 +61,7 @@ type s= "firstSymbol"|"secondSymbol"|"thirdSymbol"
 // 				stepSizeMarket: '0.00010000'
 // 		}
 // 	},
-// 	secondSymbol: {
+// 	_2_Instruction: {
 // 		symbol: 'ETH/BRL',
 // 			currentCurrency: 'ETH',
 // 			action: 'sell',
@@ -74,7 +74,7 @@ type s= "firstSymbol"|"secondSymbol"|"thirdSymbol"
 // 				stepSizeMarket: '0.00010000'
 // 		}
 // 	},
-// 	thirdSymbol: {
+// 	_3_Instruction: {
 // 		symbol: 'USDT/BRL',
 // 			currentCurrency: 'BRL',
 // 			action: 'buy',
@@ -94,9 +94,9 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	console.log("trade sequence 1");
 	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
-	const result1=  await tradeThis(sequence.firstSymbol,updSymbolsDataSet,+startAmount,"1.");
+	const result1=  await tradeThis(sequence._1_Instruction,updSymbolsDataSet,+startAmount,"1.");
 	let fills1
-	if (sequence.firstSymbol.action==="buy"){
+	if (sequence._1_Instruction.action==="buy"){
 		fills1 = result1.executedQty
 	}else{
 		fills1 = result1.cummulativeQuoteQty;
@@ -104,38 +104,38 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	console.log("result amount");
 	console.log(fills1);
 	console.log("realAmount");
-	const usdtAmount1 = await BinanceHttpAdapter.getCurrencyBalance(sequence.secondSymbol.currentCurrency);
-	console.log(sequence.secondSymbol.currentCurrency +" " +usdtAmount1);
+	const usdtAmount1 = await BinanceHttpAdapter.getCurrencyBalance(sequence._2_Instruction.currentCurrency);
+	console.log(sequence._2_Instruction.currentCurrency +" " +usdtAmount1);
 
 	console.log("====================================================================================================");
 	console.log("trade sequence 2 ");
 	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-	const result2=  await tradeThis(sequence.secondSymbol,updSymbolsDataSet,+usdtAmount1,"2.");
+	const result2=  await tradeThis(sequence._2_Instruction,updSymbolsDataSet,+usdtAmount1,"2.");
 	let fills2
-	if (sequence.secondSymbol.action==="buy"){
+	if (sequence._2_Instruction.action==="buy"){
 		 fills2 = result2.executedQty
 	}else{
 		fills2 = result2.cummulativeQuoteQty;
 	}
-	console.log(sequence.secondSymbol);
+	console.log(sequence._2_Instruction);
 	console.log("result amount");
 	console.log(fills2);
 	console.log("realAmount");
-	const usdtAmount2 = await BinanceHttpAdapter.getCurrencyBalance(sequence.thirdSymbol.currentCurrency);
-	console.log(sequence.thirdSymbol.currentCurrency +" " +usdtAmount2);
+	const usdtAmount2 = await BinanceHttpAdapter.getCurrencyBalance(sequence._3_Instruction.currentCurrency);
+	console.log(sequence._3_Instruction.currentCurrency +" " +usdtAmount2);
 	console.log("====================================================================================================");
 	console.log("trade sequence 3");
 	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-	const result3=  await tradeThis(sequence.thirdSymbol,updSymbolsDataSet,+usdtAmount2, "3.");
+	const result3=  await tradeThis(sequence._3_Instruction,updSymbolsDataSet,+usdtAmount2, "3.");
 
 	let fills3
-	if (sequence.thirdSymbol.action==="buy"){
+	if (sequence._3_Instruction.action==="buy"){
 		fills3 = result3.executedQty
 	}else{
 		fills3 = result3.cummulativeQuoteQty;
 	}
 
-	console.log(sequence.thirdSymbol);
+	console.log(sequence._3_Instruction);
 	console.log("result amount");
 	console.log(fills3);
 	console.log("====================================================================================================");

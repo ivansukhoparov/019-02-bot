@@ -27,7 +27,7 @@ export type ddd = TradeInstructionType & {
     isAllow: boolean
 }
 
-export type TradeSequenceNameType = "firstSymbol" | "secondSymbol" | "thirdSymbol"
+export type TradeSequenceNameType = "_1_Instruction" | "_2_Instruction" | "_3_Instruction"
 
 export type TradeSequenceType = {
     [U in TradeSequenceNameType]: TradeInstructionType;
