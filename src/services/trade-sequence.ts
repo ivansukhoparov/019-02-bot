@@ -1,5 +1,5 @@
 import {QuantityType} from "../types/fetch-binance/input";
-import {BinanceHttpAdapter} from "../adapters/http/binance.http.adapter";
+import {BinanceHttpAdapterOLD} from "../adapters/http/binanceHttpAdapterOLD";
 import {TradeInstructionType, TradeSequenceType} from "../types/sequences";
 import {BinanceService} from "../application/binance-service";
 import {logCurrencyAmount} from "../common/utils/logs";
@@ -33,7 +33,7 @@ export const tradeThis = async (instruction: TradeInstructionType, updSymbolsDat
 	console.dir(result.content)
 	if (result.type === "success"){
 		console.log("symbol.info")
-		console.dir(await BinanceHttpAdapter.getSymbolInfo(result.content.symbol))
+		console.dir(await BinanceHttpAdapterOLD.getSymbolInfo(result.content.symbol))
 	}
 	return result.content
 	// console.log(instruction.symbol);
@@ -104,7 +104,7 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	console.log("result amount");
 	console.log(fills1);
 	console.log("realAmount");
-	const usdtAmount1 = await BinanceHttpAdapter.getCurrencyBalance(sequence._2_Instruction.currentCurrency);
+	const usdtAmount1 = await BinanceHttpAdapterOLD.getCurrencyBalance(sequence._2_Instruction.currentCurrency);
 	console.log(sequence._2_Instruction.currentCurrency +" " +usdtAmount1);
 
 	console.log("====================================================================================================");
@@ -121,7 +121,7 @@ export const  tradeAllSequence =async (sequence: TradeSequenceType,updSymbolsDat
 	console.log("result amount");
 	console.log(fills2);
 	console.log("realAmount");
-	const usdtAmount2 = await BinanceHttpAdapter.getCurrencyBalance(sequence._3_Instruction.currentCurrency);
+	const usdtAmount2 = await BinanceHttpAdapterOLD.getCurrencyBalance(sequence._3_Instruction.currentCurrency);
 	console.log(sequence._3_Instruction.currentCurrency +" " +usdtAmount2);
 	console.log("====================================================================================================");
 	console.log("trade sequence 3");

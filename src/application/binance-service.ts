@@ -1,4 +1,4 @@
-import {BinanceHttpAdapter} from "../adapters/http/binance.http.adapter";
+import {BinanceHttpAdapterOLD} from "../adapters/http/binanceHttpAdapterOLD";
 import {OrderSide} from "../types/fetch-binance/input";
 import {roundDownNumber} from "../services/trade-sequence";
 import {orderAction, orderQuantity} from "../common/common";
@@ -41,7 +41,7 @@ export class BinanceService {
 		// 	}
 		// }
 		const totalAmount:number = +amount.toFixed(8)
-		const result = await BinanceHttpAdapter.placeOrder(symbolName, quantityType, totalAmount, side);
+		const result = await BinanceHttpAdapterOLD.placeOrder(symbolName, quantityType, totalAmount, side);
 		timer.stop()
 
 		return result

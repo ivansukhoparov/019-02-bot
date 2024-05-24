@@ -1,5 +1,5 @@
 import {logCurrencyAmount} from "../../common/utils/logs";
-import {BinanceHttpAdapter} from "../../adapters/http/binance.http.adapter";
+import {BinanceHttpAdapterOLD} from "../../adapters/http/binanceHttpAdapterOLD";
 import {getAllTradableSymbols} from "../../services/get-all-tradable-symbols";
 import {createSymbolsDataSet, getUniqueCoins} from "../../services/preparing-symbols";
 import {BinanceService} from "../../application/binance-service";
@@ -8,7 +8,7 @@ export const iotaToUsdt = async (usdt:number) => {
     console.log("============================================================")
     await logCurrencyAmount("IOTA")
     await logCurrencyAmount("USDT")
-    await BinanceHttpAdapter.placeOrder("IOTAUSDT", "quoteOrderQty", usdt, "sell", "market")
+    await BinanceHttpAdapterOLD.placeOrder("IOTAUSDT", "quoteOrderQty", usdt, "sell", "market")
     await logCurrencyAmount("IOTA")
     await logCurrencyAmount("USDT")
     console.log("============================================================")
@@ -20,11 +20,11 @@ export const sellAllToUsdt = async () => {
 
     for (let i = 0; i < tradableCoins.length; i++) {
         const currentCoin = tradableCoins[i];
-        const currentCoinAmountBefore = await BinanceHttpAdapter.getCurrencyBalance(currentCoin);
+        const currentCoinAmountBefore = await BinanceHttpAdapterOLD.getCurrencyBalance(currentCoin);
         try {
             await BinanceService.createOrder(currentCoin, "USDT", currentCoinAmountBefore, symbolsDataSet)
-            const currentCoinAmountAfter = await BinanceHttpAdapter.getCurrencyBalance(currentCoin);
-            const usdtAmountAfter = await BinanceHttpAdapter.getCurrencyBalance("USDT");
+            const currentCoinAmountAfter = await BinanceHttpAdapterOLD.getCurrencyBalance(currentCoin);
+            const usdtAmountAfter = await BinanceHttpAdapterOLD.getCurrencyBalance("USDT");
             const message = `${currentCoin}  ${currentCoinAmountBefore} || ${currentCoinAmountAfter} - ${currentCoin} and ${usdtAmountAfter} - USDT`
             console.log(message);
         } catch (e) {

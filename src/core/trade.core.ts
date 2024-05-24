@@ -8,7 +8,7 @@ import {orderAction} from "../common/common";
 import {BinanceService} from "../application/binance-service";
 import {MarketUpdateDataType} from "../types/web-soket-binance/output";
 import {askOrBid} from "../services/utils/utils";
-import {BinanceHttpAdapter} from "../adapters/http/binance.http.adapter";
+import {BinanceHttpAdapterOLD} from "../adapters/http/binanceHttpAdapterOLD";
 import {appSettings} from "../settings/settings";
 import {LogToFile} from "../common/utils/log-to-file";
 import {Logger} from "../common/utils/logger";
@@ -25,6 +25,7 @@ const _100_PERCENT: 100 = 100
 let thresholdValue = +appSettings.binance.params.thresholdValue;
 let stopThresholdValue = +appSettings.binance.params.stopThresholdValue
 const resultsLog = new LogToFile("./logs/", "results.log")
+
 export class TradeCore {
     private commissionAmount: number;
     private startAmount: number;
@@ -37,6 +38,7 @@ export class TradeCore {
     // LOGGER
     private tradeLogger
     private eventLogger
+
     constructor(commissionAmount: number,
                 startAmount: number,
                 symbolsDataSet: any,
@@ -64,19 +66,20 @@ export class TradeCore {
 
         return matches
     }
+
     async onDataUpdate(marketData: MarketUpdateDataType[]) {
         const logId = +(new Date()) // LOGGER
 
         const matches = this.catchMatches(marketData)
 
-        if (matches.length > 0 && this._status === TRADE_CORE_STATUSES.run){
+        if (matches.length > 0 && this._status === TRADE_CORE_STATUSES.run) {
             this.startAmount = 100
 
             if (this.flag) {
                 this.flag = false
                 const sequence: TradeSequenceWithPredictType = {...matches[0]}
                 //  console.log(sequence)
-                let  correctedSequence: TradeSequenceWithPredictType = await this.correctTradeResult(sequence)
+                let correctedSequence: TradeSequenceWithPredictType = await this.correctTradeResult(sequence)
                 let correctedStartAmount = this.correctStartAmount(correctedSequence, this.startAmount)
                 {   // LOGGER
                     this.tradeLogger.startNewLog(logId) // LOGGER
@@ -90,18 +93,18 @@ export class TradeCore {
                 console.log("corrected Start Amount", correctedStartAmount)//LOGGER
                 if (correctedSequence.profitInBase > thresholdValue) {
                     this.startAmount = +correctedStartAmount.startAmount
-const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount.startAmount)
+                    const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount.startAmount)
 
                     if (this.startAmount < 10
-                    || firstCorrectProfit<0.01 ) {
+                        || firstCorrectProfit < 0.01) {
                         const toClarrify = correctedStartAmount.correctedInstruction
                         if (toClarrify.length > 0) {
-                            const sequenceCopy = {...correctedSequence }
+                            const sequenceCopy = {...correctedSequence}
 
                             for (let i = 0; i < toClarrify.length; i++) {
                                 const symbolToClarify = sequenceCopy[toClarrify[i]].symbol.replace("/", "");
                                 const side = askOrBid(sequenceCopy[toClarrify[i]].action) + "s"
-                                const res = await BinanceHttpAdapter.getDepth(symbolToClarify)
+                                const res = await BinanceHttpAdapterOLD.getDepth(symbolToClarify)
                                 const newValues = this.clarify(res.content[side], 2)
                                 sequenceCopy[toClarrify[i]].price = newValues.averageSellPrice
                                 sequenceCopy[toClarrify[i]].actionQty = newValues.averageAmount
@@ -110,16 +113,16 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
                                 // console.log(newValues)
                             }
 
-                            const correctedStartAmount2= this.correctStartAmount(sequenceCopy, 100)
+                            const correctedStartAmount2 = this.correctStartAmount(sequenceCopy, 100)
                             this.tradeLogger.writeToLog("corrected Start Amount 2", correctedStartAmount2)//LOGGER
                             console.log("corrected Start Amount 2", correctedStartAmount2)//LOGGER
                             if ((+correctedStartAmount2.result - (+correctedStartAmount2.startAmount)) > 0.01) {
-                                correctedStartAmount=correctedStartAmount2
+                                correctedStartAmount = correctedStartAmount2
                                 correctedSequence = sequenceCopy
                                 this.startAmount = +correctedStartAmount2.startAmount
                                 this.tradeLogger.writeToLog("clarifyResult", " +++ new parameters apply +++ ")
                             } else {
-                                this.tradeLogger.writeToLog("clarifyResult"," --- new parameters does not apply --- ")
+                                this.tradeLogger.writeToLog("clarifyResult", " --- new parameters does not apply --- ")
                             }
                         }
                     }
@@ -127,7 +130,7 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
                     if (this.startAmount >= 10
                         && ((+correctedStartAmount.result - (+correctedStartAmount.startAmount)) > 0.01)) {
                         await this.doTradeSequence(correctedSequence)
-                        const amount = await BinanceHttpAdapter.getCurrencyBalance(appSettings.binance.params.startCurrency);
+                        const amount = await BinanceHttpAdapterOLD.getCurrencyBalance(appSettings.binance.params.startCurrency);
                         if (+amount < +stopThresholdValue) {
                             console.log(" =============== trading stop by stopThresholdValue ===============")
                             this._status = TRADE_CORE_STATUSES.stop
@@ -231,7 +234,7 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
         this.sequencesDataSet = newSequencesDataSet;
     }
 
-    predictTradeResult(sequence: TradeSequenceType|TradeSequenceWithPredictType): TradeSequenceWithPredictType {
+    predictTradeResult(sequence: TradeSequenceType | TradeSequenceWithPredictType): TradeSequenceWithPredictType {
         const commissionRatio = +((_100_PERCENT - this.commissionAmount) / _100_PERCENT).toFixed(8)
         let isAllow = true;
 
@@ -270,20 +273,20 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
 
     async correctTradeResult(sequence: TradeSequenceWithPredictType): Promise<TradeSequenceWithPredictType> {
         const correctedSequence: TradeSequenceType = {
-            _1_Instruction:{...sequence._1_Instruction},
-            _2_Instruction:{...sequence._2_Instruction},
-            _3_Instruction:{...sequence._3_Instruction},
+            _1_Instruction: {...sequence._1_Instruction},
+            _2_Instruction: {...sequence._2_Instruction},
+            _3_Instruction: {...sequence._3_Instruction},
         }
         const symbolsForRequest = []
         for (let i = 0; i < this.instructionsName.length; i++) {
             symbolsForRequest.push(correctedSequence[this.instructionsName[i]].symbol.replace("/", ""))
-       }
-        const correctionDataArray = await BinanceHttpAdapter.getSymbolsInfo(symbolsForRequest)
+        }
+        const correctionDataArray = await BinanceHttpAdapterOLD.getSymbolsInfo(symbolsForRequest)
 
         for (let i = 0; i < this.instructionsName.length; i++) {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]
-            const symbol = correctedSequence[instructionName].symbol.replace("/","")
-            const symbolData = correctionDataArray.find((el:any)=>el.symbol===symbol)
+            const symbol = correctedSequence[instructionName].symbol.replace("/", "")
+            const symbolData = correctionDataArray.find((el: any) => el.symbol === symbol)
             correctedSequence[instructionName].price = +(symbolData[askOrBid(correctedSequence[instructionName].action) + "Price"]);
             correctedSequence[instructionName].actionQty = +(symbolData[askOrBid(correctedSequence[instructionName].action) + "Qty"]);
             correctedSequence[instructionName].actionQtyInQuote = +correctedSequence[instructionName].actionQty! * +correctedSequence[instructionName].price!;
@@ -294,7 +297,7 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
         return this.predictTradeResult(correctedSequence)
     }
 
-    correctStartAmount  (sequence: any, start: number) {
+    correctStartAmount(sequence: any, start: number) {
         let startAmount = start
         let correctedInstruction: Array<"_1_Instruction" | "_2_Instruction" | "_3_Instruction"> = []
 
@@ -338,7 +341,7 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
             correctedInstruction.push("_3_Instruction")
         }
 
-        _1EndAmount=_2StartAmount
+        _1EndAmount = _2StartAmount
         if (_2StartAmount > _2StartAmountReal) {
             _1EndAmount = _2StartAmountReal
             correctedInstruction.push("_2_Instruction")
@@ -378,7 +381,7 @@ const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount
         return null;
     };
 
-    calculateOrderResultReverse (target: any, act: any, price: any) {
+    calculateOrderResultReverse(target: any, act: any, price: any) {
 
         if (target !== null) {
             if (price !== null) {

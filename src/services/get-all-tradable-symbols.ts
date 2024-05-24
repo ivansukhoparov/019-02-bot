@@ -1,38 +1,38 @@
-import {BinanceHttpAdapter} from "../adapters/http/binance.http.adapter";
+import {BinanceHttpAdapterOLD} from "../adapters/http/binanceHttpAdapterOLD";
 import {symbolMapper} from "../types/fetch-binance/mapper";
 import {TickerOutputDataType} from "../types/web-soket-binance/input";
 
 export async function getAllTradableSymbols() {
 
-	const response = await BinanceHttpAdapter.getAllSymbols();
-	// console.log(JSON.stringify(response.content.symbols.filter((el: any) => el.symbol === "POLSBNB"), null, 2))
-	const symbols:TickerOutputDataType[] = response.content.symbols
-		.filter((el: any) => el.status === "TRADING")
-		.map(symbolMapper);
-	//
-	// status: Этот ключ указывает на текущее состояние торговой пары. Если значение status равно "TRADING",
-	// это означает, что пара активна и торгуется. "BREAK" означает, что торговля по этой паре в данный момент
-	// приостановлена или не проводится.
-	//
-	const symbolsWithPrices = await addPricesToSymbolsArray(symbols);
-	return symbolsWithPrices;
+    const response = await BinanceHttpAdapterOLD.getAllSymbols();
+    // console.log(JSON.stringify(response.content.symbols.filter((el: any) => el.symbol === "POLSBNB"), null, 2))
+    const symbols: TickerOutputDataType[] = response.content.symbols
+        .filter((el: any) => el.status === "TRADING")
+        .map(symbolMapper);
+    //
+    // status: Этот ключ указывает на текущее состояние торговой пары. Если значение status равно "TRADING",
+    // это означает, что пара активна и торгуется. "BREAK" означает, что торговля по этой паре в данный момент
+    // приостановлена или не проводится.
+    //
+    const symbolsWithPrices = await addPricesToSymbolsArray(symbols);
+    return symbolsWithPrices;
 }
 
 export const addPricesToSymbolsArray = async (symbols: any[]) => {
-	const pricesArray = await BinanceHttpAdapter.getTickerPrices();
-	const prices = pricesArray.content.reduce((acc: any, el: any) => {
-		acc[el.symbol] = el.price;
-		return acc;
-	}, {});
+    const pricesArray = await BinanceHttpAdapterOLD.getTickerPrices();
+    const prices = pricesArray.content.reduce((acc: any, el: any) => {
+        acc[el.symbol] = el.price;
+        return acc;
+    }, {});
 
 
-	return symbols.map((el: any) => {
-		const symbol = el.baseAsset + el.quoteAsset;
-		return {
-			...el,
-			price: prices[symbol],
-		};
-	});
+    return symbols.map((el: any) => {
+        const symbol = el.baseAsset + el.quoteAsset;
+        return {
+            ...el,
+            price: prices[symbol],
+        };
+    });
 };
 
 

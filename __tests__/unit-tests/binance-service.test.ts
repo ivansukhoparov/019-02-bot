@@ -1,7 +1,7 @@
 import {BinanceService} from "../../src/application/binance-service";
 import {symbolsDataSet_test} from "../tests-data-sets/symbols-data-set";
 import {orderAction, orderQuantity} from "../../src/common/common";
-import {BinanceHttpAdapter} from "../../src/adapters/http/binance.http.adapter";
+import {BinanceHttpAdapterOLD} from "../../src/adapters/http/binanceHttpAdapterOLD";
 
 
 describe("binance-services methods tests", () => {
