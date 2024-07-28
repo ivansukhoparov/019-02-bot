@@ -1,7 +1,7 @@
 import {generateCombinations} from "./utils/utils";
 import {createTradeSequence} from "./create-trade-sequence";
 import {getUniqueCoins} from "./preparing-symbols";
-import {appSettings} from "../settings/settings";
+import {appSettingsOld} from "../settings/settings";
 
 export const createSequencesDataSet = async (tradableSymbols: any, symbolsDataSet: any) => {
 	//      receive : getAllTradableSymbols(), createSymbolsDataSet()
@@ -32,7 +32,7 @@ export const createSequencesDataSet = async (tradableSymbols: any, symbolsDataSe
 	//          [ 'ETH', 'USDT', 'LTO' ],
 	//          [ 'ETH', 'USDT', 'MBL' ],
 	//      ...]
-	const allCombinations = generateCombinations(tradableCoins, appSettings.binance.params.startCurrency)
+	const allCombinations = generateCombinations(tradableCoins, appSettingsOld.binance.params.startCurrency)
 
 	//       combinations with "USDT" in central position was filtered because it is start currency
 

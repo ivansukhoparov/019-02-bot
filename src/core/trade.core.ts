@@ -9,7 +9,7 @@ import {BinanceService} from "../application/binance-service";
 import {MarketUpdateDataType} from "../types/web-soket-binance/output";
 import {askOrBid} from "../services/utils/utils";
 import {BinanceHttpAdapterOLD} from "../adapters/http/binanceHttpAdapterOLD";
-import {appSettings} from "../settings/settings";
+import {appSettingsOld} from "../settings/settings";
 import {LogToFile} from "../common/utils/log-to-file";
 import {Logger} from "../common/utils/logger";
 
@@ -22,8 +22,8 @@ export const TRADE_CORE_STATUSES: { [T: string]: TradeCoreStatus } = {
 
 const _100_PERCENT: 100 = 100
 
-let thresholdValue = +appSettings.binance.params.thresholdValue;
-let stopThresholdValue = +appSettings.binance.params.stopThresholdValue
+let thresholdValue = +appSettingsOld.binance.params.thresholdValue;
+let stopThresholdValue = +appSettingsOld.binance.params.stopThresholdValue
 const resultsLog = new LogToFile("./logs/", "results.log")
 
 export class TradeCore {
@@ -130,7 +130,7 @@ export class TradeCore {
                     if (this.startAmount >= 10
                         && ((+correctedStartAmount.result - (+correctedStartAmount.startAmount)) > 0.01)) {
                         await this.doTradeSequence(correctedSequence)
-                        const amount = await BinanceHttpAdapterOLD.getCurrencyBalance(appSettings.binance.params.startCurrency);
+                        const amount = await BinanceHttpAdapterOLD.getCurrencyBalance(appSettingsOld.binance.params.startCurrency);
                         if (+amount < +stopThresholdValue) {
                             console.log(" =============== trading stop by stopThresholdValue ===============")
                             this._status = TRADE_CORE_STATUSES.stop

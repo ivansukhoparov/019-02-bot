@@ -1,6 +1,6 @@
 import {logCurrencyAmount} from "./common/utils/logs";
 import {BinanceHttpAdapterStatic} from "./adapters/http/binance.http.adapter.static";
-import {appMode, appSettings} from "./settings/settings";
+import {appMode, appSettingsOld} from "./settings/settings";
 import {APP_MODES} from "./common/common";
 import {iotaToUsdt} from "./core/utils/test.mode.utils";
 import {app} from "./app";
@@ -11,7 +11,7 @@ const startApp = async ()=>{
 	try {
 		console.log("v0.02.4.3")
 		console.log("APP MODE " + appMode)
-		console.dir(appSettings)
+		console.dir(appSettingsOld)
 		console.log("correctedStartAmountResult >0.01 && correctedStartAmount.startAmount>= 6")
 
 		if (appMode === APP_MODES.test) {
@@ -25,7 +25,7 @@ const startApp = async ()=>{
 			}
 		}
 
-		await logCurrencyAmount(appSettings.binance.params.startCurrency)
+		await logCurrencyAmount(appSettingsOld.binance.params.startCurrency)
 		await app();
 	} catch (err) {
 		console.log(err);

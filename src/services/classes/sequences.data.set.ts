@@ -2,7 +2,7 @@ import {AvailableSymbols} from "./available.symbols";
 import {ioc} from "../../composition.root";
 import {getUniqueCoins} from "../preparing-symbols";
 import {generateCombinations} from "../utils/utils";
-import {appSettings} from "../../settings/settings";
+import {appSettingsOld} from "../../settings/settings";
 import {createTradeSequence} from "../create-trade-sequence";
 import {SymbolsDataSet} from "./symbols.data.set";
 
@@ -44,7 +44,7 @@ export class SequencesDataSet {
         //          [ 'ETH', 'USDT', 'LTO' ],
         //          [ 'ETH', 'USDT', 'MBL' ],
         //      ...]
-        const allCombinations = generateCombinations(tradableCoins, appSettings.binance.params.startCurrency)
+        const allCombinations = generateCombinations(tradableCoins, appSettingsOld.binance.params.startCurrency)
 
         //       combinations with "USDT" in central position was filtered because it is start currency
 

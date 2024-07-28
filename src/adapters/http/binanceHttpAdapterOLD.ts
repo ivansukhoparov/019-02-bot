@@ -1,4 +1,4 @@
-import {appSettings} from "../../settings/settings";
+import {appSettingsOld} from "../../settings/settings";
 import {createSignature} from "./utils/create-signature";
 import {FetchAdapter} from "./utils/fetch.adapter";
 import {
@@ -10,9 +10,9 @@ import {
 import {ActionTimer} from "../../common/utils/timer";
 import crypto from "crypto";
 
-const API_KEY = appSettings.binance.keys.api;
-const API_SECRET = appSettings.binance.keys.secret;
-const BASE_URL = appSettings.binance.urls.baseUrl;
+const API_KEY = appSettingsOld.binance.keys.api;
+const API_SECRET = appSettingsOld.binance.keys.secret;
+const BASE_URL = appSettingsOld.binance.urls.baseUrl;
 
 export class BinanceHttpAdapterOLD {
 

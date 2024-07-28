@@ -4,11 +4,11 @@ import {APP_MODES} from "../common/common";
 
 require("dotenv").config();
 export const appMode: string = process.env.APP_MODE!
-export let appSettings: typeof defaultSettings;
+export let appSettingsOld: typeof defaultSettings;
 
 if (appMode === APP_MODES.test) {
-    appSettings = testSettings;
+    appSettingsOld = testSettings;
 } else {
-    appSettings = defaultSettings;
+    appSettingsOld = defaultSettings;
 }
 
