@@ -1,9 +1,10 @@
 import {AvailableSymbols} from "./available.symbols";
 import {ioc} from "../../composition.root";
-import {getUniqueCoins, SymbolsDataSet} from "../preparing-symbols";
+import {getUniqueCoins} from "../preparing-symbols";
 import {generateCombinations} from "../utils/utils";
 import {appSettings} from "../../settings/settings";
 import {createTradeSequence} from "../create-trade-sequence";
+import {SymbolsDataSet} from "./symbols.data.set";
 
 export class SequencesDataSet {
     private sequencesDataSet: any
