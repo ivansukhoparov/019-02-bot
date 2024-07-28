@@ -1,4 +1,4 @@
-import {appSettings} from "../../settings/settings";
+import {appSettingsOld} from "../../settings/settings";
 import {AccountBalanceInfoInputType, ApiResponseType, OrderSide, OrderTypeType} from "../../types/fetch-binance/input";
 import crypto from "crypto";
 import {FetchAdapter} from "./utils/fetch.adapter";
@@ -6,9 +6,9 @@ import {MarketHttpAdapterInterface} from "./interfaces/market.http.adapter.inter
 import {ioc} from "../../composition.root";
 import {HttpAdapterInterface} from "./interfaces/http.adapter.interface";
 
-const API_KEY = appSettings.binance.keys.api;
-const API_SECRET = appSettings.binance.keys.secret;
-const BASE_URL = appSettings.binance.urls.baseUrl;
+const API_KEY = appSettingsOld.binance.keys.api;
+const API_SECRET = appSettingsOld.binance.keys.secret;
+const BASE_URL = appSettingsOld.binance.urls.baseUrl;
 
 export class BinanceHttpAdapter implements MarketHttpAdapterInterface {
     constructor(protected httpAdapter: HttpAdapterInterface = ioc.httpAdapter) {
