@@ -1,6 +1,7 @@
 import {testSettings} from "./test-settings";
 import {defaultSettings} from "./default-settings";
 import {APP_MODES} from "../common/common";
+import {injectable} from "inversify";
 
 require("dotenv").config();
 export const appMode: string = process.env.APP_MODE!
@@ -13,6 +14,8 @@ if (appMode === APP_MODES.test) {
 }
 
 export class AppSettings{
+    public marketName = "Binance"
+
     public commissionAmount = 0.1
     public startAmount = 100
     public minStartAmount = 10

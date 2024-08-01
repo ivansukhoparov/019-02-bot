@@ -11,7 +11,10 @@ import {askOrBid} from "../services/utils/utils";
 import {BinanceHttpAdapterOLD} from "../adapters/http/binanceHttpAdapterOLD";
 import {appSettingsOld} from "../settings/settings";
 import {LogToFile} from "../common/utils/log-to-file";
-import {ioc} from "../composition.root";
+import {inject, injectable} from "inversify";
+import {appSettings} from "../index";
+import {SymbolsDataSet} from "../services/classes/symbols.data.set";
+import {SequencesDataSet} from "../services/classes/sequences.data.set";
 
 
 export type TradeCoreStatus = "run" | "stop"
@@ -26,17 +29,20 @@ let thresholdValue = +appSettingsOld.binance.params.thresholdValue;
 let stopThresholdValue = +appSettingsOld.binance.params.stopThresholdValue
 const resultsLog = new LogToFile("./logs/", "results.log")
 
-
+@injectable()
 export class TradeCoreNew {
+    protected symbolsDataSet: SymbolsDataSet
+    protected sequencesDataSet: SequencesDataSet
+
     private tradeAllowed = true
     private _status: TradeCoreStatus = TRADE_CORE_STATUSES.run;
     private instructionsName: TradeSequenceNameType[] = ["_1_Instruction", "_2_Instruction", "_3_Instruction"]
-    private startAmount: number
+    private startAmount: number = appSettings.startAmount
 
-    constructor(protected core = ioc.appSettings,
-                protected symbolsDataSet = ioc.symbolsDataSet,
-                protected sequencesDataSet = ioc.sequencesDataSet) {
-        this.startAmount = core.startAmount
+    constructor(@inject(SymbolsDataSet) symbolsDataSet: SymbolsDataSet,
+                @inject(SequencesDataSet) sequencesDataSet: SequencesDataSet) {
+        this.symbolsDataSet=symbolsDataSet
+        this.sequencesDataSet=sequencesDataSet
     }
 
     catchMatches() {
@@ -66,7 +72,7 @@ export class TradeCoreNew {
 
             // correct expected result with fresh data if this flag is active in settings
             // use this for excluding short price fluctuations
-            if (this.core.excludeShortFluctuations) {
+            if (appSettings.excludeShortFluctuations) {
                 sequence = await this.correctTradeResult(sequence)
             }
 
@@ -74,14 +80,14 @@ export class TradeCoreNew {
             let correctedAmounts = this.correctStartAmount(sequence, this.startAmount)
 
             // if profit after sequence will trade more then minimum allowed profit work this sequence as it is
-            if (sequence.profitInBase > this.core.thresholdValue) {
+            if (sequence.profitInBase > appSettings.thresholdValue) {
                 // assign to start amount corrected start amount:
                 //  this.startAmount = correctedAmounts.startAmount
                 // then calculate new profit value based on available amounts to trade
                 let correctedProfit: number = correctedAmounts.result - (correctedAmounts.startAmount)
 
                 // clarify sequence with deeper Depth of Market if corrected start amount or expected profit is too small
-                if (correctedAmounts.startAmount < this.core.minStartAmount || correctedProfit < this.core.thresholdValue) {
+                if (correctedAmounts.startAmount < appSettings.minStartAmount || correctedProfit < appSettings.thresholdValue) {
                     // define sequence's steps to clarify
                     const instructionsToClarify = correctedAmounts.correctedInstructionsNames
 
@@ -111,7 +117,7 @@ export class TradeCoreNew {
                         //calculate profit after clarify
                         const profitAfterClarify = (correctedAmountsAfterClarify.result - (correctedAmountsAfterClarify.startAmount))
                         // assign new values if  profit after clarify grater then minimum allowed profit
-                        if (profitAfterClarify > this.core.thresholdValue) {
+                        if (profitAfterClarify > appSettings.thresholdValue) {
                             correctedProfit = profitAfterClarify
                             sequence = sequenceCopy
                             this.startAmount = correctedAmountsAfterClarify.startAmount
@@ -120,12 +126,12 @@ export class TradeCoreNew {
                 }
 
                 // trade sequence if start amount or expected profit meet the parameters
-                if (this.startAmount >= this.core.minStartAmount && correctedProfit > this.core.thresholdValue) {
+                if (this.startAmount >= appSettings.minStartAmount && correctedProfit > appSettings.thresholdValue) {
 
                     // execute trade sequence in accordance to the trade mode
-                    if (this.core.tradeMode === "SPOT") {
+                    if (appSettings.tradeMode === "SPOT") {
                         await this.doTradeSequenceOnSpot(sequence)
-                    } else if (this.core.tradeMode === "MARGIN") {
+                    } else if (appSettings.tradeMode === "MARGIN") {
                         await this.doTradeSequenceOnMargin(sequence)
                     }
 
@@ -145,7 +151,7 @@ export class TradeCoreNew {
 
 
     async doTradeSequenceOnSpot(sequence: TradeSequenceType) {
-        let amount: number = this.core.startAmount
+        let amount: number = appSettings.startAmount
 
         for (let i = 0; i < this.instructionsName.length; i++) {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]
@@ -157,7 +163,7 @@ export class TradeCoreNew {
                 const result = await this.doTradeInstruction(sequence[instructionName], amount);
                 let fills = +result.executedQty
                 if (sequence[instructionName].action === orderAction.sell) fills = +result.cummulativeQuoteQty;
-                amount = +(fills - (fills / _100_PERCENT * this.core.commissionAmount)).toFixed(8)
+                amount = +(fills - (fills / _100_PERCENT * appSettings.commissionAmount)).toFixed(8)
 
                 console.log("instruction_" + (i + 1) + "_result", result) // LOGGER
                 console.log("instruction_" + (i + 1) + "_executedQty", fills) // LOGGER
@@ -169,7 +175,7 @@ export class TradeCoreNew {
     };
 
     async doTradeSequenceOnMargin(sequence: TradeSequenceType) {
-        let amount: number = this.core.startAmount
+        let amount: number = appSettings.startAmount
 
         for (let i = 0; i < this.instructionsName.length; i++) {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]
@@ -181,7 +187,7 @@ export class TradeCoreNew {
                 const result = await this.doTradeInstruction(sequence[instructionName], amount);
                 let fills = +result.executedQty
                 if (sequence[instructionName].action === orderAction.sell) fills = +result.cummulativeQuoteQty;
-                amount = +(fills - (fills / _100_PERCENT * this.core.commissionAmount)).toFixed(8)
+                amount = +(fills - (fills / _100_PERCENT * appSettings.commissionAmount)).toFixed(8)
 
                 console.log("instruction_" + (i + 1) + "_result", result) // LOGGER
                 console.log("instruction_" + (i + 1) + "_executedQty", fills) // LOGGER
@@ -215,12 +221,12 @@ export class TradeCoreNew {
 
 
     predictTradeResult(sequence: TradeSequenceType | TradeSequenceWithPredictType): TradeSequenceWithPredictType {
-        const commissionRatio = +((_100_PERCENT - this.core.commissionAmount) / _100_PERCENT).toFixed(8)
+        const commissionRatio = +((_100_PERCENT - appSettings.commissionAmount) / _100_PERCENT).toFixed(8)
         let isAllow = true;
 
         // calculate prediction for sequence trade in base
         let expectedResultInBase: number | null = _100_PERCENT;
-        let expectedResult: number | null = this.core.startAmount;
+        let expectedResult: number | null = appSettings.startAmount;
         expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence._1_Instruction.action, +sequence._1_Instruction.price!))! * commissionRatio;
         expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence._2_Instruction.action, +sequence._2_Instruction.price!))! * commissionRatio;
         expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence._3_Instruction.action, +sequence._3_Instruction.price!))! * commissionRatio;
@@ -240,7 +246,7 @@ export class TradeCoreNew {
             expectedResultInBase = expectedResultInBase - (+_100_PERCENT);
         }
         if (expectedResult) {
-            expectedResult = expectedResult - (this.core.startAmount);
+            expectedResult = expectedResult - (appSettings.startAmount);
         }
 
         return {

@@ -5,19 +5,22 @@ import {MarketHttpAdapterInterface} from "./adapters/http/interfaces/market.http
 import {AvailableSymbols} from "./services/classes/available.symbols";
 import {SequencesDataSet} from "./services/classes/sequences.data.set";
 import {SymbolsDataSet} from "./services/classes/symbols.data.set";
+import {Container} from "inversify";
+import {appSettings} from "./index";
+import {TradeCoreNew} from "./core/trade.core.new";
 
-
-const httpAdapter: HttpAdapterInterface = new FetchAdapter()
-const marketHttpAdapter: MarketHttpAdapterInterface = new BinanceHttpAdapter()
-
-const availableSymbols: AvailableSymbols = new AvailableSymbols()
-const symbolsDataSet: SymbolsDataSet = new SymbolsDataSet()
-const sequencesDataSet: SequencesDataSet = new SequencesDataSet()
-
-export const ioc = {
-    httpAdapter: httpAdapter,
-    marketHttpAdapter: marketHttpAdapter,
-    availableSymbols: availableSymbols,
-    symbolsDataSet: symbolsDataSet,
-    sequencesDataSet: sequencesDataSet
+export const container = new Container()
+export const TYPE ={
+    HttpAdapter: Symbol.for("HttpAdapter"),
+    MarketHttpAdapter: Symbol.for("MarketHttpAdapter"),
 }
+
+
+container.bind<HttpAdapterInterface>(TYPE.HttpAdapter).to(FetchAdapter).inSingletonScope()
+container.bind<MarketHttpAdapterInterface>(TYPE.MarketHttpAdapter).to(BinanceHttpAdapter).inSingletonScope()
+
+container.bind<AvailableSymbols>(AvailableSymbols).toSelf().inSingletonScope()
+container.bind<SymbolsDataSet>(SymbolsDataSet).toSelf().inSingletonScope()
+container.bind<SequencesDataSet>(SequencesDataSet).toSelf().inSingletonScope()
+container.bind<TradeCoreNew>(TradeCoreNew).toSelf().inSingletonScope()
+
