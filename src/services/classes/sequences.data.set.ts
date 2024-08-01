@@ -1,18 +1,22 @@
 import {AvailableSymbols} from "./available.symbols";
-import {ioc} from "../../composition.root";
 import {getUniqueCoins} from "../preparing-symbols";
 import {askOrBid, generateCombinations} from "../utils/utils";
 import {appSettingsOld} from "../../settings/settings";
 import {createTradeSequence} from "../create-trade-sequence";
 import {SymbolsDataSet} from "./symbols.data.set";
 import {TradeSequenceType} from "../../types/sequences";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class SequencesDataSet {
     private sequencesDataSet: any
+    protected availableSymbols: AvailableSymbols
+    protected symbolsDataSet: SymbolsDataSet
 
-    constructor(protected availableSymbols: AvailableSymbols = ioc.availableSymbols,
-                protected symbolsDataSet: SymbolsDataSet = ioc.symbolsDataSet)
-    {
+    constructor(@inject(AvailableSymbols) availableSymbols: AvailableSymbols,
+                @inject(SymbolsDataSet) symbolsDataSet: SymbolsDataSet) {
+        this.availableSymbols = availableSymbols
+        this.symbolsDataSet = symbolsDataSet
         this.sequencesDataSet = this.init()
     }
 
@@ -70,14 +74,14 @@ export class SequencesDataSet {
 
     }
 
-    get(){
+    get() {
         return this.sequencesDataSet
     }
 
     update() {
         const symbols = this.symbolsDataSet.get()
         this.sequencesDataSet.forEach((el: TradeSequenceType) => {
-            el._1_Instruction.price =symbols[el._1_Instruction.symbol][askOrBid(el._1_Instruction.action)];
+            el._1_Instruction.price = symbols[el._1_Instruction.symbol][askOrBid(el._1_Instruction.action)];
             el._2_Instruction.price = symbols[el._2_Instruction.symbol][askOrBid(el._2_Instruction.action)];
             el._3_Instruction.price = symbols[el._3_Instruction.symbol][askOrBid(el._3_Instruction.action)];
             el._1_Instruction.priceChange24Per = symbols[el._1_Instruction.symbol].priceChange24Per;

@@ -1,11 +1,14 @@
 import {AvailableSymbols} from "./available.symbols";
-import {ioc} from "../../composition.root";
 import {MarketUpdateDataType} from "../../types/web-soket-binance/output";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class SymbolsDataSet {
     private symbolsDataSet: any
+    protected availableSymbols: AvailableSymbols
 
-    constructor(protected availableSymbols: AvailableSymbols = ioc.availableSymbols) {
+    constructor(@inject(AvailableSymbols) availableSymbols: AvailableSymbols) {
+        this.availableSymbols = availableSymbols
         this.symbolsDataSet = this.init()
     }
 
@@ -24,8 +27,7 @@ export class SymbolsDataSet {
     update(marketData: MarketUpdateDataType[]) {
         marketData.forEach((el: MarketUpdateDataType) => {
             for (let i = 1; i < 10; i++) {
-                if (this.symbolsDataSet[this._addSlashToSymbol(el.symbol, i)])
-                {
+                if (this.symbolsDataSet[this._addSlashToSymbol(el.symbol, i)]) {
                     this.symbolsDataSet[this._addSlashToSymbol(el.symbol, i)].bid = el.bidPrice;
                     this.symbolsDataSet[this._addSlashToSymbol(el.symbol, i)].ask = el.askPrice
                     this.symbolsDataSet[this._addSlashToSymbol(el.symbol, i)].priceChange24Per = el.priceChange24Per
