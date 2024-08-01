@@ -1,10 +1,11 @@
 import {AvailableSymbols} from "./available.symbols";
 import {ioc} from "../../composition.root";
 import {getUniqueCoins} from "../preparing-symbols";
-import {generateCombinations} from "../utils/utils";
+import {askOrBid, generateCombinations} from "../utils/utils";
 import {appSettingsOld} from "../../settings/settings";
 import {createTradeSequence} from "../create-trade-sequence";
 import {SymbolsDataSet} from "./symbols.data.set";
+import {TradeSequenceType} from "../../types/sequences";
 
 export class SequencesDataSet {
     private sequencesDataSet: any
@@ -71,5 +72,17 @@ export class SequencesDataSet {
 
     get(){
         return this.sequencesDataSet
+    }
+
+    update() {
+        const symbols = this.symbolsDataSet.get()
+        this.sequencesDataSet.forEach((el: TradeSequenceType) => {
+            el._1_Instruction.price =symbols[el._1_Instruction.symbol][askOrBid(el._1_Instruction.action)];
+            el._2_Instruction.price = symbols[el._2_Instruction.symbol][askOrBid(el._2_Instruction.action)];
+            el._3_Instruction.price = symbols[el._3_Instruction.symbol][askOrBid(el._3_Instruction.action)];
+            el._1_Instruction.priceChange24Per = symbols[el._1_Instruction.symbol].priceChange24Per;
+            el._2_Instruction.priceChange24Per = symbols[el._2_Instruction.symbol].priceChange24Per;
+            el._3_Instruction.priceChange24Per = symbols[el._3_Instruction.symbol].priceChange24Per;
+        });
     }
 }
