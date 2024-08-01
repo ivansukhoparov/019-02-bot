@@ -1,5 +1,6 @@
 import {AvailableSymbols} from "./available.symbols";
 import {ioc} from "../../composition.root";
+import {MarketUpdateDataType} from "../../types/web-soket-binance/output";
 
 export class SymbolsDataSet {
     private symbolsDataSet: any
@@ -18,6 +19,23 @@ export class SymbolsDataSet {
 
     get() {
         return this.symbolsDataSet
+    }
+
+    update(marketData: MarketUpdateDataType[]) {
+        marketData.forEach((el: MarketUpdateDataType) => {
+            for (let i = 1; i < 10; i++) {
+                if (this.symbolsDataSet[this._addSlashToSymbol(el.symbol, i)])
+                {
+                    this.symbolsDataSet[this._addSlashToSymbol(el.symbol, i)].bid = el.bidPrice;
+                    this.symbolsDataSet[this._addSlashToSymbol(el.symbol, i)].ask = el.askPrice
+                    this.symbolsDataSet[this._addSlashToSymbol(el.symbol, i)].priceChange24Per = el.priceChange24Per
+                }
+            }
+        });
+    }
+
+    _addSlashToSymbol(symbol: string, pos: number) {
+        return symbol.slice(0, pos) + "/" + symbol.slice(pos);
     }
 
     //      receive : getAllTradableSymbols()
