@@ -12,3 +12,12 @@ if (appMode === APP_MODES.test) {
     appSettingsOld = defaultSettings;
 }
 
+export class AppSettings{
+    public commissionAmount = 0.1
+    public startAmount = 100
+    public minStartAmount = 10
+    public thresholdValue = +appSettingsOld.binance.params.thresholdValue;
+
+    public tradeMode: "SPOT"|"MARGIN" = "SPOT"
+    public excludeShortFluctuations = true
+}
