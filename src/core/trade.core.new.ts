@@ -11,7 +11,7 @@ import {askOrBid} from "../services/utils/utils";
 import {BinanceHttpAdapterOLD} from "../adapters/http/binanceHttpAdapterOLD";
 import {appSettingsOld} from "../settings/settings";
 import {LogToFile} from "../common/utils/log-to-file";
-import {Logger} from "../common/utils/logger";
+import {ioc} from "../composition.root";
 
 
 export type TradeCoreStatus = "run" | "stop"
@@ -26,38 +26,21 @@ let thresholdValue = +appSettingsOld.binance.params.thresholdValue;
 let stopThresholdValue = +appSettingsOld.binance.params.stopThresholdValue
 const resultsLog = new LogToFile("./logs/", "results.log")
 
-export class TradeCoreNew {
-    private commissionAmount: number;
-    private startAmount: number;
-    private symbolsDataSet: any;
-    private sequencesDataSet: TradeSequenceType[];
-    private tradeAllowed = true
 
+export class TradeCoreNew {
+    private tradeAllowed = true
     private _status: TradeCoreStatus = TRADE_CORE_STATUSES.run;
     private instructionsName: TradeSequenceNameType[] = ["_1_Instruction", "_2_Instruction", "_3_Instruction"]
-    // LOGGER
-    private tradeLogger
-    private eventLogger
+    private startAmount: number
 
-    constructor(commissionAmount: number,
-                startAmount: number,
-                symbolsDataSet: any,
-                sequencesDataSet: any) {
-        this.commissionAmount = commissionAmount
-        this.startAmount = startAmount
-        this.symbolsDataSet = symbolsDataSet
-        this.sequencesDataSet = sequencesDataSet
-        // LOGGER
-        this.tradeLogger = new Logger("./logs/tradeLogs.log")
-        this.tradeLogger.flushFile()
-        this.eventLogger = new Logger("./logs/eventsLogs.log")
-        this.eventLogger.flushFile()
+    constructor(protected core = ioc.appSettings,
+                protected symbolsDataSet = ioc.symbolsDataSet,
+                protected sequencesDataSet = ioc.sequencesDataSet) {
+        this.startAmount = core.startAmount
     }
 
-    catchMatches(marketData: MarketUpdateDataType[]) {
-        this.updateSymbolsDataSet(marketData);
-        this.updateSequencesDataSet();
-        const matches: TradeSequenceWithPredictType[] = this.sequencesDataSet
+    catchMatches() {
+        const matches: TradeSequenceWithPredictType[] = this.sequencesDataSet.get()
             .map((el: TradeSequenceType) => {
                 return this.predictTradeResult(el)
             })
@@ -67,123 +50,141 @@ export class TradeCoreNew {
         return matches
     }
 
+
     // Use this method to subscribe to websocket
-    async onUpdate(marketData: MarketUpdateDataType[]){
+    async onUpdate(marketData: MarketUpdateDataType[]) {
+        // update symbols and sequences data sets according new data
+        this.symbolsDataSet.update(marketData);
+        this.sequencesDataSet.update();
+        // find matches according to the conditions
+        const matches = this.catchMatches()
 
-    }
+        // if matches had been found, and no restrictions to trade we are working with found matches
+        if (matches.length > 0 && this._status === TRADE_CORE_STATUSES.run && this.tradeAllowed) {
+            this.tradeAllowed = false  // block code below executing if it had been started to execute
+            let sequence: TradeSequenceWithPredictType = matches[0] // take first sequence as the most suitable
 
-    async onDataUpdate(marketData: MarketUpdateDataType[]) {
-        const logId = +(new Date()) // LOGGER
-
-        const matches = this.catchMatches(marketData)
-
-        if (matches.length > 0 && this._status === TRADE_CORE_STATUSES.run) {
-            this.startAmount = 100
-
-
-            if (this.tradeAllowed) {
-                this.tradeAllowed = false
-                const sequence: TradeSequenceWithPredictType = {...matches[0]}
-                //  console.log(sequence)
-                let correctedSequence: TradeSequenceWithPredictType = await this.correctTradeResult(sequence)
-                let correctedStartAmount = this.correctStartAmount(correctedSequence, this.startAmount)
-                {   // LOGGER
-                    this.tradeLogger.startNewLog(logId) // LOGGER
-                    this.eventLogger.startNewLog(logId) // LOGGER
-                    this.tradeLogger.writeToLog("foundSequence", sequence) // LOGGER
-                    this.tradeLogger.writeToLog("correctedSequence", correctedSequence) // LOGGER
-                    this.tradeLogger.writeToLog("corrected Start Amount - ", correctedStartAmount.startAmount)//LOGGER
-                    this.tradeLogger.writeToLog("corrected result - ", correctedStartAmount.result)//LOGGER
-                    this.tradeLogger.writeToLog("corrected Start Amount", correctedStartAmount)//LOGGER
-                }
-                console.log("corrected Start Amount", correctedStartAmount)//LOGGER
-                if (correctedSequence.profitInBase > thresholdValue) {
-                    this.startAmount = +correctedStartAmount.startAmount
-                    const firstCorrectProfit = +correctedStartAmount.result - (+correctedStartAmount.startAmount)
-
-                    if (this.startAmount < 10
-                        || firstCorrectProfit < 0.01) {
-                        const toClarrify = correctedStartAmount.correctedInstruction
-                        if (toClarrify.length > 0) {
-                            const sequenceCopy = {...correctedSequence}
-
-                            for (let i = 0; i < toClarrify.length; i++) {
-                                const symbolToClarify = sequenceCopy[toClarrify[i]].symbol.replace("/", "");
-                                const side = askOrBid(sequenceCopy[toClarrify[i]].action) + "s"
-                                const res = await BinanceHttpAdapterOLD.getDepth(symbolToClarify)
-                                const newValues = this.clarify(res.content[side], 2)
-                                sequenceCopy[toClarrify[i]].price = newValues.averageSellPrice
-                                sequenceCopy[toClarrify[i]].actionQty = newValues.averageAmount
-                                sequenceCopy[toClarrify[i]].actionQtyInQuote = newValues.averageAmount * newValues.averageSellPrice
-                                // console.log(res.content)
-                                // console.log(newValues)
-                            }
-
-                            const correctedStartAmount2 = this.correctStartAmount(sequenceCopy, 100)
-                            this.tradeLogger.writeToLog("corrected Start Amount 2", correctedStartAmount2)//LOGGER
-                            console.log("corrected Start Amount 2", correctedStartAmount2)//LOGGER
-                            if ((+correctedStartAmount2.result - (+correctedStartAmount2.startAmount)) > 0.01) {
-                                correctedStartAmount = correctedStartAmount2
-                                correctedSequence = sequenceCopy
-                                this.startAmount = +correctedStartAmount2.startAmount
-                                this.tradeLogger.writeToLog("clarifyResult", " +++ new parameters apply +++ ")
-                            } else {
-                                this.tradeLogger.writeToLog("clarifyResult", " --- new parameters does not apply --- ")
-                            }
-                        }
-                    }
-
-                    if (this.startAmount >= 10
-                        && ((+correctedStartAmount.result - (+correctedStartAmount.startAmount)) > 0.01)) {
-                        await this.doTradeSequence(correctedSequence)
-                        const amount = await BinanceHttpAdapterOLD.getCurrencyBalance(appSettingsOld.binance.params.startCurrency);
-                        if (+amount < +stopThresholdValue) {
-                            console.log(" =============== trading stop by stopThresholdValue ===============")
-                            this._status = TRADE_CORE_STATUSES.stop
-                            throw new Error("trading stop by stopThresholdValue")
-                        }
-                        this.tradeAllowed = true
-                        {   // LOGGER
-                            this.tradeLogger.writeToLog("resultAmount", amount) // LOGGER
-                            this.eventLogger.writeToLog("resultAmount", amount)//LOGGER
-                            this.tradeLogger.writeToLog("result", "success")//LOGGER
-                            this.eventLogger.writeToLog("result", "success")//LOGGER
-                            console.log("event id - " + logId + " | has been traded success | " + "balance - " + amount);
-                        }
-                    }
-                } else {
-                    {   //LOGGER
-                        this.tradeLogger.writeToLog("result", "wrong sequence")//LOGGER
-                        this.eventLogger.writeToLog("result", "wrong sequence")//LOGGER
-                    }
-                }
-                {   //LOGGER
-                    this.eventLogger.writeDownLogToFile() //LOGGER
-                    this.tradeLogger.writeDownLogToFile() //LOGGER
-                }
-                this.tradeAllowed = true
-
+            // correct expected result with fresh data if this flag is active in settings
+            // use this for excluding short price fluctuations
+            if (this.core.excludeShortFluctuations) {
+                sequence = await this.correctTradeResult(sequence)
             }
+
+            // correct start amount according to available amounts in each sequence step
+            let correctedAmounts = this.correctStartAmount(sequence, this.startAmount)
+
+            // if profit after sequence will trade more then minimum allowed profit work this sequence as it is
+            if (sequence.profitInBase > this.core.thresholdValue) {
+                // assign to start amount corrected start amount:
+                //  this.startAmount = correctedAmounts.startAmount
+                // then calculate new profit value based on available amounts to trade
+                let correctedProfit: number = correctedAmounts.result - (correctedAmounts.startAmount)
+
+                // clarify sequence with deeper Depth of Market if corrected start amount or expected profit is too small
+                if (correctedAmounts.startAmount < this.core.minStartAmount || correctedProfit < this.core.thresholdValue) {
+                    // define sequence's steps to clarify
+                    const instructionsToClarify = correctedAmounts.correctedInstructionsNames
+
+                    // clarify if there is anything to clarify
+                    if (instructionsToClarify.length > 0) {
+                        const sequenceCopy = {...sequence}
+
+                        let symbolsToClarify = [] // create array of promises
+                        for (let instruction of instructionsToClarify) {
+                            const symbolToClarify = sequence[instruction].symbol.replace("/", "");
+                            symbolsToClarify.push(BinanceHttpAdapterOLD.getDepth(symbolToClarify))
+                        }
+                        const clarifiedSymbols = await Promise.all(symbolsToClarify)  // await api response
+
+                        // update copy of the sequence for next checks
+                        for (let i = 0; i < instructionsToClarify.length; i++) {
+                            const side = askOrBid(sequenceCopy[instructionsToClarify[i]].action) + "s"
+                            const newValues = this.clarify(clarifiedSymbols[i].content[side], 2)
+                            sequenceCopy[instructionsToClarify[i]].price = newValues.averageSellPrice
+                            sequenceCopy[instructionsToClarify[i]].actionQty = newValues.averageAmount
+                            sequenceCopy[instructionsToClarify[i]].actionQtyInQuote = newValues.averageAmount * newValues.averageSellPrice
+                        }
+
+                        // correct start amount according to the deeper Depth of Market
+                        const correctedAmountsAfterClarify = this.correctStartAmount(sequenceCopy, this.startAmount)
+
+                        //calculate profit after clarify
+                        const profitAfterClarify = (correctedAmountsAfterClarify.result - (correctedAmountsAfterClarify.startAmount))
+                        // assign new values if  profit after clarify grater then minimum allowed profit
+                        if (profitAfterClarify > this.core.thresholdValue) {
+                            correctedProfit = profitAfterClarify
+                            sequence = sequenceCopy
+                            this.startAmount = correctedAmountsAfterClarify.startAmount
+                        }
+                    }
+                }
+
+                // trade sequence if start amount or expected profit meet the parameters
+                if (this.startAmount >= this.core.minStartAmount && correctedProfit > this.core.thresholdValue) {
+
+                    // execute trade sequence in accordance to the trade mode
+                    if (this.core.tradeMode === "SPOT") {
+                        await this.doTradeSequenceOnSpot(sequence)
+                    } else if (this.core.tradeMode === "MARGIN") {
+                        await this.doTradeSequenceOnMargin(sequence)
+                    }
+
+                    // check balance and stop application if the lost is too big
+                    const amount = await BinanceHttpAdapterOLD.getCurrencyBalance(appSettingsOld.binance.params.startCurrency);
+                    if (+amount < +stopThresholdValue) {
+                        this._status = TRADE_CORE_STATUSES.stop
+                        throw new Error("trading stop by stopThresholdValue")
+                    }
+                    //  this.tradeAllowed = true
+                }
+            }
+
+            this.tradeAllowed = true  // set flag back to true after all
         }
     }
 
-    async doTradeSequence(sequence: TradeSequenceType) {
-        let amount: number = this.startAmount
+
+    async doTradeSequenceOnSpot(sequence: TradeSequenceType) {
+        let amount: number = this.core.startAmount
 
         for (let i = 0; i < this.instructionsName.length; i++) {
             const instructionName: TradeSequenceNameType = this.instructionsName[i]
 
-            this.tradeLogger.writeToLog("instruction_" + (i + 1), sequence[instructionName]) // LOGGER
-            this.tradeLogger.writeToLog("instruction_" + (i + 1) + "_amount", amount) // LOGGER
+            console.log("instruction_" + (i + 1), sequence[instructionName]) // LOGGER
+            console.log("instruction_" + (i + 1) + "_amount", amount) // LOGGER
 
             if (this._status === TRADE_CORE_STATUSES.run) {
                 const result = await this.doTradeInstruction(sequence[instructionName], amount);
                 let fills = +result.executedQty
                 if (sequence[instructionName].action === orderAction.sell) fills = +result.cummulativeQuoteQty;
-                amount = +(fills - (fills / _100_PERCENT * this.commissionAmount)).toFixed(8)
+                amount = +(fills - (fills / _100_PERCENT * this.core.commissionAmount)).toFixed(8)
 
-                this.tradeLogger.writeToLog("instruction_" + (i + 1) + "_result", result) // LOGGER
-                this.tradeLogger.writeToLog("instruction_" + (i + 1) + "_executedQty", fills) // LOGGER
+                console.log("instruction_" + (i + 1) + "_result", result) // LOGGER
+                console.log("instruction_" + (i + 1) + "_executedQty", fills) // LOGGER
+
+                // if quick calculating will entail error with quality amount use string below:
+                // const amount = await BinanceHttpAdapter.getCurrencyBalance(sequence._2_Instruction.currentCurrency);
+            }
+        }
+    };
+
+    async doTradeSequenceOnMargin(sequence: TradeSequenceType) {
+        let amount: number = this.core.startAmount
+
+        for (let i = 0; i < this.instructionsName.length; i++) {
+            const instructionName: TradeSequenceNameType = this.instructionsName[i]
+
+            console.log("instruction_" + (i + 1), sequence[instructionName]) // LOGGER
+            console.log("instruction_" + (i + 1) + "_amount", amount) // LOGGER
+
+            if (this._status === TRADE_CORE_STATUSES.run) {
+                const result = await this.doTradeInstruction(sequence[instructionName], amount);
+                let fills = +result.executedQty
+                if (sequence[instructionName].action === orderAction.sell) fills = +result.cummulativeQuoteQty;
+                amount = +(fills - (fills / _100_PERCENT * this.core.commissionAmount)).toFixed(8)
+
+                console.log("instruction_" + (i + 1) + "_result", result) // LOGGER
+                console.log("instruction_" + (i + 1) + "_executedQty", fills) // LOGGER
 
                 // if quick calculating will entail error with quality amount use string below:
                 // const amount = await BinanceHttpAdapter.getCurrencyBalance(sequence._2_Instruction.currentCurrency);
@@ -212,41 +213,14 @@ export class TradeCoreNew {
         return result.content
     };
 
-    updateSymbolsDataSet(marketData: MarketUpdateDataType[]) {
-        const NewSymbolsDataSet = {...this.symbolsDataSet};
-        marketData.forEach((el: MarketUpdateDataType) => {
-            for (let i = 1; i < 10; i++) {
-                if (NewSymbolsDataSet[this.addSlash(el.symbol, i)]) {
-                    NewSymbolsDataSet[this.addSlash(el.symbol, i)].bid = el.bidPrice;
-                    NewSymbolsDataSet[this.addSlash(el.symbol, i)].ask = el.askPrice
-                    NewSymbolsDataSet[this.addSlash(el.symbol, i)].priceChange24Per = el.priceChange24Per
-                }
-            }
-        });
-
-        this.symbolsDataSet = NewSymbolsDataSet
-    }
-
-    updateSequencesDataSet() {
-        const newSequencesDataSet: TradeSequenceType[] = [...this.sequencesDataSet]
-        newSequencesDataSet.forEach((el: TradeSequenceType) => {
-            el._1_Instruction.price = this.symbolsDataSet[el._1_Instruction.symbol][askOrBid(el._1_Instruction.action)];
-            el._2_Instruction.price = this.symbolsDataSet[el._2_Instruction.symbol][askOrBid(el._2_Instruction.action)];
-            el._3_Instruction.price = this.symbolsDataSet[el._3_Instruction.symbol][askOrBid(el._3_Instruction.action)];
-            el._1_Instruction.priceChange24Per = this.symbolsDataSet[el._1_Instruction.symbol].priceChange24Per;
-            el._2_Instruction.priceChange24Per = this.symbolsDataSet[el._2_Instruction.symbol].priceChange24Per;
-            el._3_Instruction.priceChange24Per = this.symbolsDataSet[el._3_Instruction.symbol].priceChange24Per;
-        });
-        this.sequencesDataSet = newSequencesDataSet;
-    }
 
     predictTradeResult(sequence: TradeSequenceType | TradeSequenceWithPredictType): TradeSequenceWithPredictType {
-        const commissionRatio = +((_100_PERCENT - this.commissionAmount) / _100_PERCENT).toFixed(8)
+        const commissionRatio = +((_100_PERCENT - this.core.commissionAmount) / _100_PERCENT).toFixed(8)
         let isAllow = true;
 
         // calculate prediction for sequence trade in base
         let expectedResultInBase: number | null = _100_PERCENT;
-        let expectedResult: number | null = this.startAmount;
+        let expectedResult: number | null = this.core.startAmount;
         expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence._1_Instruction.action, +sequence._1_Instruction.price!))! * commissionRatio;
         expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence._2_Instruction.action, +sequence._2_Instruction.price!))! * commissionRatio;
         expectedResultInBase = (this.calculateOrderResult(expectedResultInBase, sequence._3_Instruction.action, +sequence._3_Instruction.price!))! * commissionRatio;
@@ -266,7 +240,7 @@ export class TradeCoreNew {
             expectedResultInBase = expectedResultInBase - (+_100_PERCENT);
         }
         if (expectedResult) {
-            expectedResult = expectedResult - (this.startAmount);
+            expectedResult = expectedResult - (this.core.startAmount);
         }
 
         return {
@@ -283,10 +257,12 @@ export class TradeCoreNew {
             _2_Instruction: {...sequence._2_Instruction},
             _3_Instruction: {...sequence._3_Instruction},
         }
+
         const symbolsForRequest = []
         for (let i = 0; i < this.instructionsName.length; i++) {
             symbolsForRequest.push(correctedSequence[this.instructionsName[i]].symbol.replace("/", ""))
         }
+        // TODO
         const correctionDataArray = await BinanceHttpAdapterOLD.getSymbolsInfo(symbolsForRequest)
 
         for (let i = 0; i < this.instructionsName.length; i++) {
@@ -305,7 +281,7 @@ export class TradeCoreNew {
 
     correctStartAmount(sequence: any, start: number) {
         let startAmount = start
-        let correctedInstruction: Array<"_1_Instruction" | "_2_Instruction" | "_3_Instruction"> = []
+        let correctedInstructionsNames: Array<"_1_Instruction" | "_2_Instruction" | "_3_Instruction"> = []
 
         let _1StartAmount = startAmount
         let _1EndAmount = (this.calculateOrderResult(_1StartAmount, sequence._1_Instruction.action, sequence._1_Instruction.price))! * 0.999
@@ -344,20 +320,20 @@ export class TradeCoreNew {
         if (_3StartAmount > _3StartAmountReal) {
             _2EndAmount = _3StartAmountReal
             _2StartAmount = this.calculateOrderResultReverse(_2EndAmount, sequence._2_Instruction.action, sequence._2_Instruction.price)! / 0.999
-            correctedInstruction.push("_3_Instruction")
+            correctedInstructionsNames.push("_3_Instruction")
         }
 
         _1EndAmount = _2StartAmount
         if (_2StartAmount > _2StartAmountReal) {
             _1EndAmount = _2StartAmountReal
-            correctedInstruction.push("_2_Instruction")
+            correctedInstructionsNames.push("_2_Instruction")
         }
         _1StartAmount = this.calculateOrderResultReverse(_1EndAmount, sequence._1_Instruction.action, sequence._1_Instruction.price)! / 0.999
 
         startAmount = Math.floor(_1StartAmount)
         if (_1StartAmount > _1StartAmountReal) {
             startAmount = Math.floor(_1StartAmountReal)
-            correctedInstruction.push("_1_Instruction")
+            correctedInstructionsNames.push("_1_Instruction")
         }
 
         _1StartAmount = startAmount
@@ -367,7 +343,7 @@ export class TradeCoreNew {
         _3StartAmount = _2EndAmount
         _3EndAmount = (this.calculateOrderResult(_3StartAmount, sequence._3_Instruction.action, sequence._3_Instruction.price))! * 0.999
 
-        return {startAmount: startAmount, result: _3EndAmount, correctedInstruction: correctedInstruction}
+        return {startAmount: +startAmount, result: +_3EndAmount, correctedInstructionsNames: correctedInstructionsNames}
     }
 
 
@@ -408,9 +384,6 @@ export class TradeCoreNew {
         this._status = status
     }
 
-    addSlash(symbol: string, pos: number) {
-        return symbol.slice(0, pos) + "/" + symbol.slice(pos);
-    }
 
     clarify(arr: any[], depth: number) {
         let totalCost = 0
