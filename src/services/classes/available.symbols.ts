@@ -8,8 +8,9 @@ import {inject, injectable} from "inversify";
 export class AvailableSymbols {
     private availableSymbols: Array<any> = []
     protected marketAdapter: MarketHttpAdapterInterface
+
     constructor(@inject(TYPE.MarketHttpAdapter) marketAdapter: MarketHttpAdapterInterface) {
-        this.marketAdapter =marketAdapter
+        this.marketAdapter = marketAdapter
         this.init();
     }
 
