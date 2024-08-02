@@ -8,5 +8,7 @@ export interface IMarketService {
 
     getSymbolInfo(symbol: string): Promise<any>
 
+    getDepth(symbol: string): Promise<any>
+
     _getSymbol(currentCurrency: string, targetCurrency: string, symbolsDataSet: any): any
 }

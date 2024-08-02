@@ -59,7 +59,6 @@ export class MarketService implements IMarketService {
         return result
     }
 
-
     async getSymbolsInfo(symbols: string[]):Promise<any>{
         return await this.marketAdapter.getSymbolsInfo(symbols)
     }
@@ -67,6 +66,9 @@ export class MarketService implements IMarketService {
         return await this.marketAdapter.getSymbolInfo(symbol)
     }
 
+    async getDepth(symbol: string): Promise<any>{
+        return this.marketAdapter.getDepth(symbol)
+    }
 
     public _getSymbol(currentCurrency: string, targetCurrency: string, symbolsDataSet: any) {
 

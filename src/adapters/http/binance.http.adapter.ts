@@ -166,6 +166,11 @@ export class BinanceHttpAdapter implements MarketHttpAdapterInterface {
         return null
     }
 
+     async getDepth(symbol: string){
+		const url = `${BASE_URL}/api/v3/depth?symbol=${symbol}&limit=3`;
+		return await this.httpAdapter.request(url);
+	}
+
     _createQueryFilter(...filters: any) {
         let filter = "";
         for (let i = 0; i < arguments.length; i++) {
