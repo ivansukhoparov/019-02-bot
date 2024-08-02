@@ -8,16 +8,20 @@ import {SymbolsDataSet} from "./services/classes/symbols.data.set";
 import {Container} from "inversify";
 import {appSettings} from "./index";
 import {TradeCoreNew} from "./core/trade.core.new";
+import {BinanceService} from "./application/binance-service";
+import {IMarketService} from "./application/market.service.interface";
 
 export const container = new Container()
 export const TYPE ={
     HttpAdapter: Symbol.for("HttpAdapter"),
     MarketHttpAdapter: Symbol.for("MarketHttpAdapter"),
+    MarketService: Symbol.for("MarketService"),
 }
 
 
 container.bind<HttpAdapterInterface>(TYPE.HttpAdapter).to(FetchAdapter).inSingletonScope()
 container.bind<MarketHttpAdapterInterface>(TYPE.MarketHttpAdapter).to(BinanceHttpAdapter).inSingletonScope()
+container.bind<IMarketService>(TYPE.MarketService).to(BinanceService).inSingletonScope()
 
 container.bind<AvailableSymbols>(AvailableSymbols).toSelf().inSingletonScope()
 container.bind<SymbolsDataSet>(SymbolsDataSet).toSelf().inSingletonScope()
