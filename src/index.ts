@@ -1,8 +1,6 @@
-import {logCurrencyAmount} from "./common/utils/logs";
 
 import {appMode, AppSettings, appSettingsOld} from "./settings/settings";
 import {APP_MODES} from "./common/common";
-import {iotaToUsdt} from "./core/utils/test.mode.utils";
 import {app} from "./app";
 
 require("dotenv").config();
