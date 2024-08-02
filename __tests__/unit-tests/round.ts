@@ -1,8 +1,4 @@
-import {BinanceService} from "../../src/application/binance-service";
-import {symbolsDataSet_test} from "../tests-data-sets/symbols-data-set";
-import {orderAction, orderQuantity} from "../../src/common/common";
-import {BinanceHttpAdapterOLD} from "../../src/adapters/http/binanceHttpAdapterOLD";
-import {roundDownNumber} from "../../src/services/trade-sequence";
+import {roundDownNumber} from "../../src/services/utils/round-down-number";
 
 
 describe("binance-services methods tests", () => {
