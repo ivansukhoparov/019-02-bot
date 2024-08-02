@@ -1,6 +1,6 @@
 import {askOrBid, getReverseAction} from "./utils";
-import {TradeInstructionType} from "../../types/sequences";
-import {OrderSide} from "../../types/fetch-binance/input";
+import {TradeInstructionType} from "../../../types/sequences";
+import {OrderSide} from "../../../types/fetch-binance/input";
 
 export const getSymbol = (base: string,
 	quot: string,

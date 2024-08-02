@@ -1,4 +1,4 @@
-import {ApiResponseType, OrderSide, OrderTypeType} from "../../../types/fetch-binance/input";
+import {ApiResponseType, OrderSide, OrderTypeType} from "../../types/fetch-binance/input";
 
 export interface MarketHttpAdapterInterface {
 

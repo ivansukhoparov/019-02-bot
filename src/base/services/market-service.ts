@@ -1,12 +1,11 @@
 
-import {ApiResponseType, OrderSide} from "../types/fetch-binance/input";
-import {orderAction, orderQuantity} from "../common/common";
-import {ActionTimer} from "../common/utils/timer";
+import {ApiResponseType, OrderSide} from "../../types/fetch-binance/input";
+import {orderAction, orderQuantity} from "./utils/common";
 import {inject, injectable} from "inversify";
-import {MarketHttpAdapterInterface} from "../adapters/http/interfaces/market.http.adapter.interface";
-import {TYPE} from "../composition.root";
-import {IMarketService} from "./market.service.interface";
-import {roundDownNumber} from "../services/utils/round-down-number";
+import {MarketHttpAdapterInterface} from "../interfaces/market.http.adapter.interface";
+import {TYPE} from "../../composition.root";
+import {IMarketService} from "../interfaces/market.service.interface";
+import {roundDownNumber} from "./utils/round-down-number";
 
 @injectable()
 export class MarketService implements IMarketService {

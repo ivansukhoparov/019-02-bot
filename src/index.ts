@@ -1,6 +1,6 @@
 
 import {appMode, AppSettings, appSettingsOld} from "./settings/settings";
-import {APP_MODES} from "./common/common";
+import {APP_MODES} from "./base/services/utils/common";
 import {app} from "./app";
 
 require("dotenv").config();

@@ -1,6 +1,6 @@
 import {testSettings} from "./test-settings";
 import {defaultSettings} from "./default-settings";
-import {APP_MODES} from "../common/common";
+import {APP_MODES} from "../base/services/utils/common";
 import {injectable} from "inversify";
 
 require("dotenv").config();
