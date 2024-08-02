@@ -1,11 +1,11 @@
 import {AvailableSymbols} from "./available.symbols";
-import {getUniqueCoins} from "../../services/preparing-symbols";
-import {askOrBid, generateCombinations} from "../../services/utils/utils";
-import {appSettingsOld} from "../../settings/settings";
-import {createTradeSequence} from "../../services/create-trade-sequence";
+import {askOrBid, generateCombinations} from "../utils/utils";
+import {appSettingsOld} from "../../../settings/settings";
+import {createTradeSequence} from "../utils/create-trade-sequence";
 import {SymbolsDataSet} from "./symbols.data.set";
-import {TradeSequenceType} from "../../types/sequences";
+import {TradeSequenceType} from "../../../types/sequences";
 import {inject, injectable} from "inversify";
+import {getUniqueCoins} from "../utils/get-unique-coins";
 
 @injectable()
 export class SequencesDataSet {

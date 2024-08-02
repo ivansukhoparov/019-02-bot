@@ -1,7 +1,7 @@
-import {MarketHttpAdapterInterface} from "../../base/interfaces/market.http.adapter.interface";
-import {TYPE} from "../../composition.root";
-import {TickerOutputDataType} from "../../types/web-soket-binance/input";
-import {symbolMapper} from "../../types/fetch-binance/mapper";
+import {MarketHttpAdapterInterface} from "../../interfaces/market.http.adapter.interface";
+import {TYPE} from "../../../composition.root";
+import {TickerOutputDataType} from "../../../types/web-soket-binance/input";
+import {symbolMapper} from "../../../types/fetch-binance/mapper";
 import {inject, injectable} from "inversify";
 
 @injectable()

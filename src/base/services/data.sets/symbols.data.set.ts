@@ -1,5 +1,5 @@
 import {AvailableSymbols} from "./available.symbols";
-import {MarketUpdateDataType} from "../../types/web-soket-binance/output";
+import {MarketUpdateDataType} from "../../../types/web-soket-binance/output";
 import {inject, injectable} from "inversify";
 
 @injectable()

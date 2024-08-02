@@ -4,15 +4,14 @@ import {
     TradeSequenceType,
     TradeSequenceWithPredictType
 } from "../types/sequences";
-import {orderAction} from "../common/common";
+import {orderAction} from "../base/services/utils/common";
 import {MarketUpdateDataType} from "../types/web-soket-binance/output";
-import {askOrBid} from "../services/utils/utils";
+import {askOrBid} from "../base/services/utils/utils";
 import {appSettingsOld} from "../settings/settings";
-import {LogToFile} from "../common/utils/log-to-file";
 import {inject, injectable} from "inversify";
 import {appSettings} from "../index";
-import {SymbolsDataSet} from "../application/data.sets/symbols.data.set";
-import {SequencesDataSet} from "../application/data.sets/sequences.data.set";
+import {SymbolsDataSet} from "../base/services/data.sets/symbols.data.set";
+import {SequencesDataSet} from "../base/services/data.sets/sequences.data.set";
 import {TYPE} from "../composition.root";
 import {MarketHttpAdapterInterface} from "../base/interfaces/market.http.adapter.interface";
 import {IMarketService} from "../base/interfaces/market.service.interface";
@@ -28,7 +27,6 @@ const _100_PERCENT: 100 = 100
 
 let thresholdValue = +appSettingsOld.binance.params.thresholdValue;
 let stopThresholdValue = +appSettingsOld.binance.params.stopThresholdValue
-const resultsLog = new LogToFile("./logs/", "results.log")
 
 @injectable()
 export class TradeCore {

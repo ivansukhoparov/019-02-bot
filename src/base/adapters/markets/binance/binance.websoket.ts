@@ -1,10 +1,10 @@
 import WebSocket from "ws";
 
-import {appMode} from "../../../settings/settings";
-import {APP_MODES} from "../../../common/common";
-import {MarketUpdateDataType} from "../../../types/web-soket-binance/output";
-import {marketDataMapper} from "../../../types/web-soket-binance/mapper";
-import {TradeCore} from "../../../core/trade.core";
+import {appMode} from "../../../../settings/settings";
+import {APP_MODES} from "../../../services/utils/common";
+import {MarketUpdateDataType} from "../../../../types/web-soket-binance/output";
+import {marketDataMapper} from "../../../../types/web-soket-binance/mapper";
+import {TradeCore} from "../../../../core/trade.core";
 
 
 let combinedStreamsUrl: string

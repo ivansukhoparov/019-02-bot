@@ -1,4 +1,4 @@
-import {generateCombinations} from "../../src/services/utils/utils";
+import {generateCombinations} from "../../src/base/services/utils/utils";
 import * as $C from 'js-combinatorics';
 
 

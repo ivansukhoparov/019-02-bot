@@ -1,9 +1,9 @@
-import {appSettingsOld} from "../../../settings/settings";
-import {AccountBalanceInfoInputType, ApiResponseType, OrderSide, OrderTypeType} from "../../../types/fetch-binance/input";
+import {appSettingsOld} from "../../../../settings/settings";
+import {AccountBalanceInfoInputType, ApiResponseType, OrderSide, OrderTypeType} from "../../../../types/fetch-binance/input";
 import crypto from "crypto";
-import {MarketHttpAdapterInterface} from "../../../base/interfaces/market.http.adapter.interface";
-import {TYPE} from "../../../composition.root";
-import {HttpAdapterInterface} from "../../../base/interfaces/http.adapter.interface";
+import {MarketHttpAdapterInterface} from "../../../interfaces/market.http.adapter.interface";
+import {TYPE} from "../../../../composition.root";
+import {HttpAdapterInterface} from "../../../interfaces/http.adapter.interface";
 import {inject, injectable} from "inversify";
 
 const API_KEY = appSettingsOld.binance.keys.api;

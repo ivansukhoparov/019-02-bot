@@ -1,4 +1,4 @@
-import {roundDownNumber} from "../../src/services/utils/round-down-number";
+import {roundDownNumber} from "../../src/base/services/utils/round-down-number";
 
 
 describe("binance-services methods tests", () => {
