@@ -9,7 +9,7 @@ import {IMarketService} from "./market.service.interface";
 import {roundDownNumber} from "../services/utils/round-down-number";
 
 @injectable()
-export class BinanceService implements IMarketService {
+export class MarketService implements IMarketService {
     // Dependencies
     protected marketAdapter: MarketHttpAdapterInterface
 

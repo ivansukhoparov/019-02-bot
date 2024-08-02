@@ -1,4 +1,4 @@
-import {BinanceService} from "../../src/application/binance-service";
+import {MarketService} from "../../src/application/market-service";
 import {symbolsDataSet_test} from "../tests-data-sets/symbols-data-set";
 import {orderAction, orderQuantity} from "../../src/common/common";
 import {BinanceHttpAdapterOLD} from "../../src/adapters/http/binanceHttpAdapterOLD";
@@ -7,7 +7,7 @@ import {BinanceHttpAdapterOLD} from "../../src/adapters/http/binanceHttpAdapterO
 describe("binance-services methods tests", () => {
 
     it("_getSymbol method must return correct data", () => {
-        const binanceService   = new BinanceService(symbolsDataSet_test);
+        const binanceService   = new MarketService(symbolsDataSet_test);
         const {symbol,action, quantityType}:any =  binanceService._getSymbol('XAI','USDT');
         expect(symbol).toBe("XAI/USDT");
         expect(action).toBe(orderAction.sell);
@@ -15,7 +15,7 @@ describe("binance-services methods tests", () => {
     })
 
     it("_getSymbol method must return correct data", () => {
-        const binanceService   = new BinanceService(symbolsDataSet_test);
+        const binanceService   = new MarketService(symbolsDataSet_test);
         const {symbol,action, quantityType}:any =  binanceService._getSymbol('USDT','XAI');
         expect(symbol).toBe("XAI/USDT");
         expect(action).toBe(orderAction.buy);
@@ -23,7 +23,7 @@ describe("binance-services methods tests", () => {
     })
 
     it("_getSymbol method must return null if symbol not exist", () => {
-        const binanceService   = new BinanceService(symbolsDataSet_test);
+        const binanceService   = new MarketService(symbolsDataSet_test);
         expect(()=>{
             binanceService._getSymbol('USDT','MNAI');
         }).toThrow()

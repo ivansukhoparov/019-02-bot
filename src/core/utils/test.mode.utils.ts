@@ -2,7 +2,7 @@ import {logCurrencyAmount} from "../../common/utils/logs";
 import {BinanceHttpAdapterOLD} from "../../adapters/http/binanceHttpAdapterOLD";
 import {getAllTradableSymbols} from "../../services/get-all-tradable-symbols";
 import {createSymbolsDataSet, getUniqueCoins} from "../../services/preparing-symbols";
-import {BinanceService} from "../../application/binance-service";
+import {MarketService} from "../../application/market-service";
 
 export const iotaToUsdt = async (usdt:number) => {
     console.log("============================================================")
@@ -22,7 +22,7 @@ export const sellAllToUsdt = async () => {
         const currentCoin = tradableCoins[i];
         const currentCoinAmountBefore = await BinanceHttpAdapterOLD.getCurrencyBalance(currentCoin);
         try {
-            await BinanceService.createOrder(currentCoin, "USDT", currentCoinAmountBefore, symbolsDataSet)
+            await MarketService.createOrder(currentCoin, "USDT", currentCoinAmountBefore, symbolsDataSet)
             const currentCoinAmountAfter = await BinanceHttpAdapterOLD.getCurrencyBalance(currentCoin);
             const usdtAmountAfter = await BinanceHttpAdapterOLD.getCurrencyBalance("USDT");
             const message = `${currentCoin}  ${currentCoinAmountBefore} || ${currentCoinAmountAfter} - ${currentCoin} and ${usdtAmountAfter} - USDT`
