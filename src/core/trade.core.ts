@@ -5,7 +5,7 @@ import {
     TradeSequenceWithPredictType
 } from "../types/sequences";
 import {orderAction} from "../common/common";
-import {BinanceService} from "../application/binance-service";
+import {MarketService} from "../application/market-service";
 import {MarketUpdateDataType} from "../types/web-soket-binance/output";
 import {askOrBid} from "../services/utils/utils";
 import {BinanceHttpAdapterOLD} from "../adapters/http/binanceHttpAdapterOLD";
@@ -195,7 +195,7 @@ export class TradeCore {
         if (separatedSymbol[0] === currentCurrency) targetCurrency = separatedSymbol[1]
         else targetCurrency = separatedSymbol[0]
 
-        const result = await BinanceService.createOrder(currentCurrency, targetCurrency, amount, updSymbolsDataSet)
+        const result = await MarketService.createOrder(currentCurrency, targetCurrency, amount, updSymbolsDataSet)
 
         if (result.type === "error") {
             console.log("=============== trading stop doTradeInstruction error ===============")
