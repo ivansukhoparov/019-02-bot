@@ -155,8 +155,8 @@ export class BinanceHttpAdapter implements MarketHttpAdapterInterface {
         return null
     }
 
-    async getSymbolsInfo(symbol: string[]) {
-        const url = `${BASE_URL}/api/v3/ticker/24hr?symbols=${JSON.stringify(symbol)}`;
+    async getSymbolsInfo(symbols: string[]) {
+        const url = `${BASE_URL}/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`;
 
         const response: any = await this.httpAdapter.request(url);
         const mappedResponse: ApiResponseType = this._responseMapper(response)
@@ -178,11 +178,11 @@ export class BinanceHttpAdapter implements MarketHttpAdapterInterface {
         return filter;
     }
 
-    private _createSignature(queryString: string, secret: string, algorithm: string = "sha256") {
+    _createSignature(queryString: string, secret: string, algorithm: string = "sha256") {
         return crypto.createHmac(algorithm, secret).update(queryString).digest("hex");
     }
 
-    private _responseMapper(response: any): ApiResponseType {
+    _responseMapper(response: any): ApiResponseType {
         const responseKeys = Object.keys(response);
         if (responseKeys.length === 2 && responseKeys[0] === "code" && responseKeys[1] === "msg") {
             return {
