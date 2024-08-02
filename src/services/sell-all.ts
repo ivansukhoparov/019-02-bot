@@ -1,8 +1,8 @@
 import {OrderSide} from "../types/fetch-binance/input";
 import {BinanceHttpAdapterOLD} from "../adapters/http/binanceHttpAdapterOLD";
-import {roundDownNumber} from "./trade-sequence";
 import {orderAction, orderQuantity} from "../common/common";
 import {symbolMapper} from "../types/fetch-binance/mapper";
+import {roundDownNumber} from "./utils/round-down-number";
 
 export const sellAllThis = async (curr: string) => {
 	try {
