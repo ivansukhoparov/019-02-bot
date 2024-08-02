@@ -2,9 +2,9 @@ import {BinanceHttpAdapter} from "./adapters/markets/binance/binance.http.adapte
 import {HttpAdapterInterface} from "./base/interfaces/http.adapter.interface";
 import {FetchAdapter} from "./adapters/common/fetch.adapter";
 import {MarketHttpAdapterInterface} from "./base/interfaces/market.http.adapter.interface";
-import {AvailableSymbols} from "./services/classes/available.symbols";
-import {SequencesDataSet} from "./services/classes/sequences.data.set";
-import {SymbolsDataSet} from "./services/classes/symbols.data.set";
+import {AvailableSymbols} from "./application/data.sets/available.symbols";
+import {SequencesDataSet} from "./application/data.sets/sequences.data.set";
+import {SymbolsDataSet} from "./application/data.sets/symbols.data.set";
 import {Container} from "inversify";
 import {appSettings} from "./index";
 import {TradeCore} from "./core/trade.core";
