@@ -31,7 +31,7 @@ let stopThresholdValue = +appSettingsOld.binance.params.stopThresholdValue
 const resultsLog = new LogToFile("./logs/", "results.log")
 
 @injectable()
-export class TradeCoreNew {
+export class TradeCore {
     // Dependencies
     protected symbolsDataSet: SymbolsDataSet
     protected sequencesDataSet: SequencesDataSet
