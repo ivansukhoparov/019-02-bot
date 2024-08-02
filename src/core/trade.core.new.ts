@@ -7,7 +7,6 @@ import {
 import {orderAction} from "../common/common";
 import {MarketUpdateDataType} from "../types/web-soket-binance/output";
 import {askOrBid} from "../services/utils/utils";
-import {BinanceHttpAdapterOLD} from "../adapters/http/binanceHttpAdapterOLD";
 import {appSettingsOld} from "../settings/settings";
 import {LogToFile} from "../common/utils/log-to-file";
 import {inject, injectable} from "inversify";
@@ -108,7 +107,7 @@ export class TradeCoreNew {
                         let symbolsToClarify = [] // create array of promises
                         for (let instruction of instructionsToClarify) {
                             const symbolToClarify = sequence[instruction].symbol.replace("/", "");
-                            symbolsToClarify.push(BinanceHttpAdapterOLD.getDepth(symbolToClarify))
+                            symbolsToClarify.push(this.marketService.getDepth(symbolToClarify))
                         }
                         const clarifiedSymbols = await Promise.all(symbolsToClarify)  // await api response
 
@@ -146,7 +145,7 @@ export class TradeCoreNew {
                     }
 
                     // check balance and stop application if the lost after trading is too big
-                    const amount = await BinanceHttpAdapterOLD.getCurrencyBalance(appSettingsOld.binance.params.startCurrency);
+                    const amount = await this.marketAdapter.getCurrencyBalance(appSettingsOld.binance.params.startCurrency);
                     if (+amount < +stopThresholdValue) {
                         this._status = TRADE_CORE_STATUSES.stop
                         throw new Error("trading stop by stopThresholdValue")

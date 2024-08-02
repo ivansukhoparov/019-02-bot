@@ -27,6 +27,8 @@ export interface MarketHttpAdapterInterface {
 
     getSymbolsInfo(symbols: string[]): Promise<any>
 
+     getDepth(symbol: string): Promise<any>
+
     _createQueryFilter(...filters: any): string
 
     _createSignature(queryString: string, secret: string, algorithm: string): string
