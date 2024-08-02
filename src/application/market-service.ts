@@ -3,9 +3,9 @@ import {ApiResponseType, OrderSide} from "../types/fetch-binance/input";
 import {orderAction, orderQuantity} from "../common/common";
 import {ActionTimer} from "../common/utils/timer";
 import {inject, injectable} from "inversify";
-import {MarketHttpAdapterInterface} from "../adapters/http/interfaces/market.http.adapter.interface";
+import {MarketHttpAdapterInterface} from "../base/interfaces/market.http.adapter.interface";
 import {TYPE} from "../composition.root";
-import {IMarketService} from "./market.service.interface";
+import {IMarketService} from "../base/interfaces/market.service.interface";
 import {roundDownNumber} from "../services/utils/round-down-number";
 
 @injectable()

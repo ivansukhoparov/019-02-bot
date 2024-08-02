@@ -1,6 +1,6 @@
 // import {logCurrencyAmount, logPositiveBalances} from "./logs";
 // import {BinanceHttpAdapterOLD} from "../../adapters/http/binanceHttpAdapterOLD";
-// import {sellAllToUsdt} from "../../core/utils/test.mode.utils";
+// import {sellAllToUsdt} from "../../core/common/test.mode.common";
 //
 // const normaliseWallets = async () => {
 //     await logPositiveBalances()

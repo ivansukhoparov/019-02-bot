@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
-import {ApiResponseType} from "../../../types/fetch-binance/input";
-import {ActionTimer} from "../../../common/utils/timer";
-import {HttpAdapterInterface} from "../interfaces/http.adapter.interface";
+import {ApiResponseType} from "../../types/fetch-binance/input";
+import {ActionTimer} from "../../common/utils/timer";
+import {HttpAdapterInterface} from "../../base/interfaces/http.adapter.interface";
 import {injectable} from "inversify";
 
 @injectable()

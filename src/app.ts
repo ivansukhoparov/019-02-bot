@@ -1,4 +1,4 @@
-import {wsUpdate} from "./adapters/websoket/binance.websoket";
+import {wsUpdate} from "./adapters/markets/binance/binance.websoket";
 
 
 export const app = async () => {

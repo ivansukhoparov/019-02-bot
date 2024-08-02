@@ -2,7 +2,7 @@
 //
 // import {orderAction, orderQuantity} from "../common/common";
 // import {symbolMapper} from "../types/fetch-binance/mapper";
-// import {roundDownNumber} from "./utils/round-down-number";
+// import {roundDownNumber} from "./common/round-down-number";
 //
 // export const sellAllThis = async (curr: string) => {
 // 	try {

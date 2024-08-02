@@ -1,4 +1,4 @@
-// import {logCurrencyAmount} from "../../common/utils/logs";
+// import {logCurrencyAmount} from "../../common/common/logs";
 // import {BinanceHttpAdapterOLD} from "../../adapters/http/binanceHttpAdapterOLD";
 // import {getAllTradableSymbols} from "../../services/get-all-tradable-symbols";
 // import {createSymbolsDataSet, getUniqueCoins} from "../../services/preparing-symbols";

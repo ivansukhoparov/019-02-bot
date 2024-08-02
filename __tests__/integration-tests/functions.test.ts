@@ -1,6 +1,6 @@
 // import {testSymbols} from "./data";
 // import {createTradeSequence} from "../../src/services/create-trade-sequence";
-// import {ActionTimer} from "../../src/common/utils/timer";
+// import {ActionTimer} from "../../src/common/common/timer";
 // import {PredictTradeResult} from "../../src/adapters/websoket/websoket-adapter";
 // const a = {
 //     _1_Instruction: { symbol: 'BTCUSDT', action: 'buy', price: '10000' },

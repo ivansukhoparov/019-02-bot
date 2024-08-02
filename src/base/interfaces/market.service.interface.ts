@@ -1,4 +1,4 @@
-import {ApiResponseType} from "../types/fetch-binance/input";
+import {ApiResponseType} from "../../types/fetch-binance/input";
 
 
 export interface IMarketService {

@@ -1,4 +1,4 @@
-import {MarketHttpAdapterInterface} from "../../adapters/http/interfaces/market.http.adapter.interface";
+import {MarketHttpAdapterInterface} from "../../base/interfaces/market.http.adapter.interface";
 import {TYPE} from "../../composition.root";
 import {TickerOutputDataType} from "../../types/web-soket-binance/input";
 import {symbolMapper} from "../../types/fetch-binance/mapper";
