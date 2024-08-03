@@ -9,11 +9,10 @@ export class SymbolsDataSet {
 
     constructor(@inject(AvailableSymbols) availableSymbols: AvailableSymbols) {
         this.availableSymbols = availableSymbols
-        this.symbolsDataSet = this.init()
     }
 
     init() {
-        return this.availableSymbols.get().reduce((acc: any, el: any) => {
+        this.symbolsDataSet = this.availableSymbols.get().reduce((acc: any, el: any) => {
             acc[el.symbol] = el;
             delete acc[el.symbol].symbol;
             return acc;

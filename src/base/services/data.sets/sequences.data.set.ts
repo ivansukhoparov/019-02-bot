@@ -1,6 +1,5 @@
 import {AvailableSymbols} from "./available.symbols";
 import {askOrBid, generateCombinations} from "../utils/utils";
-import {appSettingsOld} from "../../../settings/settings";
 import {createTradeSequence} from "../utils/create-trade-sequence";
 import {SymbolsDataSet} from "./symbols.data.set";
 import {TradeSequenceType} from "../../../types/sequences";
@@ -17,7 +16,6 @@ export class SequencesDataSet {
                 @inject(SymbolsDataSet) symbolsDataSet: SymbolsDataSet) {
         this.availableSymbols = availableSymbols
         this.symbolsDataSet = symbolsDataSet
-        this.sequencesDataSet = this.init()
     }
 
     init() {
@@ -32,6 +30,8 @@ export class SequencesDataSet {
         //      Get array of coins that trading now
         //      collect unique coins names from tradableTickers
         //      ['ETH',   'LTC',  'BNB',   'NEO', ...]
+
+
         const tradableCoins = getUniqueCoins(this.availableSymbols.get())
             .filter((el: any) => el !== "GAL"
                 || el !== "GALA"
@@ -49,8 +49,8 @@ export class SequencesDataSet {
         //          [ 'ETH', 'USDT', 'LTO' ],
         //          [ 'ETH', 'USDT', 'MBL' ],
         //      ...]
-        const allCombinations = generateCombinations(tradableCoins, appSettingsOld.binance.params.startCurrency)
-
+        const allCombinations = generateCombinations(tradableCoins, "USDT")
+        console.log("Created " + allCombinations.length + " combinations")
         //       combinations with "USDT" in central position was filtered because it is start currency
 
 
@@ -67,10 +67,10 @@ export class SequencesDataSet {
         //      ...]
 
         const sequencesDataSet = allCombinations
-            .map((el: any) => createTradeSequence(el, this.symbolsDataSet))
+            .map((el: any) => createTradeSequence(el, this.symbolsDataSet.get()))
             .filter((el: any) => el !== null);
 
-        return sequencesDataSet;
+        this.sequencesDataSet = sequencesDataSet;
 
     }
 
