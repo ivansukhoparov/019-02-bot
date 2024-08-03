@@ -4,7 +4,7 @@ import {APP_MODES} from "../base/services/utils/common";
 import {injectable} from "inversify";
 
 require("dotenv").config();
-export const appMode: string = process.env.APP_MODE!
+export const appMode: string = "TEST"
 export let appSettingsOld: typeof defaultSettings;
 
 if (appMode === APP_MODES.test) {

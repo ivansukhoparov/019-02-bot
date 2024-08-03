@@ -2,11 +2,17 @@
 import {appMode, AppSettings, appSettingsOld} from "./settings/settings";
 import {APP_MODES} from "./base/services/utils/common";
 import {app} from "./app";
+import {container, TYPE} from "./composition.root";
+import {SymbolsDataSet} from "./base/services/data.sets/symbols.data.set";
 
 require("dotenv").config();
 export const appSettings = new AppSettings()
 
+
+const ds = container.resolve<SymbolsDataSet>(SymbolsDataSet)
 const startApp = async ()=>{
+     console.log(ds.get())
+    // console.log(ds.get())
 	// try {
 	// 	console.log("v0.02.4.3")
 	// 	console.log("APP MODE " + appMode)
