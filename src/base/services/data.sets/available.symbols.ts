@@ -9,7 +9,7 @@ export class AvailableSymbols {
     private availableSymbols: Array<any> = []
     protected marketAdapter: MarketHttpAdapterInterface
 
-    constructor(@inject(TYPE.MarketHttpAdapter) marketAdapter: MarketHttpAdapterInterface) {
+    constructor(@inject("MarketHttpAdapter") marketAdapter: MarketHttpAdapterInterface) {
         this.marketAdapter = marketAdapter
         this.init();
     }

@@ -44,8 +44,8 @@ export class TradeCore {
 
     constructor(@inject(SymbolsDataSet) symbolsDataSet: SymbolsDataSet,
                 @inject(SequencesDataSet) sequencesDataSet: SequencesDataSet,
-                @inject(TYPE.MarketHttpAdapter) marketAdapter: MarketHttpAdapterInterface,
-                @inject(TYPE.MarketService) marketService: IMarketService,) {
+                @inject("MarketHttpAdapter") marketAdapter: MarketHttpAdapterInterface,
+                @inject("MarketService") marketService: IMarketService,) {
         this.symbolsDataSet = symbolsDataSet
         this.sequencesDataSet = sequencesDataSet
         this.marketAdapter = marketAdapter

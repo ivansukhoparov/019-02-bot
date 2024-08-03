@@ -12,7 +12,7 @@ export class MarketService implements IMarketService {
     // Dependencies
     protected marketAdapter: MarketHttpAdapterInterface
 
-    constructor(@inject(TYPE.MarketHttpAdapter) marketAdapter: MarketHttpAdapterInterface) {
+    constructor(@inject("MarketHttpAdapter") marketAdapter: MarketHttpAdapterInterface) {
         this.marketAdapter = marketAdapter
     }
 

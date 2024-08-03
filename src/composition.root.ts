@@ -11,23 +11,23 @@ import {SymbolsDataSet} from "./base/services/data.sets/symbols.data.set";
 import {SequencesDataSet} from "./base/services/data.sets/sequences.data.set";
 import {TradeCore} from "./core/trade.core";
 
-
-
-export const container = new Container()
 export const TYPE ={
-    HttpAdapter: Symbol.for("HttpAdapter"),
-    MarketHttpAdapter: Symbol.for("MarketHttpAdapter"),
-    MarketService: Symbol.for("MarketService"),
+    HttpAdapter: "HttpAdapter",
+    MarketHttpAdapter: "MarketHttpAdapter",
+    MarketService:"MarketService",
 }
 
+export const container = new Container()
 
-container.bind<HttpAdapterInterface>(TYPE.HttpAdapter).to(FetchAdapter).inSingletonScope()
-container.bind<MarketHttpAdapterInterface>(TYPE.MarketHttpAdapter).to(BinanceHttpAdapter).inSingletonScope()
-container.bind<IMarketService>(TYPE.MarketService).to(MarketService).inSingletonScope()
 
-container.bind<AvailableSymbols>(AvailableSymbols).toSelf().inSingletonScope()
-container.bind<SymbolsDataSet>(SymbolsDataSet).toSelf().inSingletonScope()
-container.bind<SequencesDataSet>(SequencesDataSet).toSelf().inSingletonScope()
 
-container.bind<TradeCore>(TradeCore).toSelf().inSingletonScope()
+ container.bind<HttpAdapterInterface>("HttpAdapter").to(FetchAdapter).inSingletonScope()
+ container.bind<MarketHttpAdapterInterface>("MarketHttpAdapter").to(BinanceHttpAdapter).inSingletonScope()
+container.bind<IMarketService>('MarketService').to(MarketService).inSingletonScope()
+
+ container.bind<AvailableSymbols>(AvailableSymbols).toSelf().inSingletonScope()
+ container.bind<SymbolsDataSet>(SymbolsDataSet).toSelf().inSingletonScope()
+ container.bind<SequencesDataSet>(SequencesDataSet).toSelf().inSingletonScope()
+
+// container.bind<TradeCore>(TradeCore).toSelf().inSingletonScope()
 

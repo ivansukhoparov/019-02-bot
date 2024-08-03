@@ -14,7 +14,7 @@ const BASE_URL = appSettingsOld.binance.urls.baseUrl;
 export class BinanceHttpAdapter implements MarketHttpAdapterInterface {
     protected httpAdapter: HttpAdapterInterface
 
-    constructor(@inject(TYPE.HttpAdapter) httpAdapter: HttpAdapterInterface) {
+    constructor(@inject("HttpAdapter") httpAdapter: HttpAdapterInterface) {
         this.httpAdapter = httpAdapter
     }
 
