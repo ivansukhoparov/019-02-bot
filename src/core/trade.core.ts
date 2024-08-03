@@ -12,7 +12,6 @@ import {inject, injectable} from "inversify";
 import {appSettings} from "../index";
 import {SymbolsDataSet} from "../base/services/data.sets/symbols.data.set";
 import {SequencesDataSet} from "../base/services/data.sets/sequences.data.set";
-import {TYPE} from "../composition.root";
 import {MarketHttpAdapterInterface} from "../base/interfaces/market.http.adapter.interface";
 import {IMarketService} from "../base/interfaces/market.service.interface";
 
@@ -26,7 +25,7 @@ export const TRADE_CORE_STATUSES: { [T: string]: TradeCoreStatus } = {
 const _100_PERCENT: 100 = 100
 
 let thresholdValue = +appSettingsOld.binance.params.thresholdValue;
-let stopThresholdValue = +appSettingsOld.binance.params.stopThresholdValue
+let stopThresholdValue = 0
 
 @injectable()
 export class TradeCore {
@@ -40,7 +39,7 @@ export class TradeCore {
     private tradeAllowed = true
     private _status: TradeCoreStatus = TRADE_CORE_STATUSES.run;
     private instructionsName: TradeSequenceNameType[] = ["_1_Instruction", "_2_Instruction", "_3_Instruction"]
-    private startAmount: number = appSettings.startAmount
+    private startAmount: number
 
     constructor(@inject(SymbolsDataSet) symbolsDataSet: SymbolsDataSet,
                 @inject(SequencesDataSet) sequencesDataSet: SequencesDataSet,
@@ -50,6 +49,7 @@ export class TradeCore {
         this.sequencesDataSet = sequencesDataSet
         this.marketAdapter = marketAdapter
         this.marketService = marketService
+        this.startAmount = 100
     }
 
     catchMatches() {
@@ -74,6 +74,7 @@ export class TradeCore {
 
         // if matches had been found, and no restrictions to trade we are working with found matches
         if (matches.length > 0 && this._status === TRADE_CORE_STATUSES.run && this.tradeAllowed) {
+
             this.tradeAllowed = false  // block code below executing if it had been started to execute
             let sequence: TradeSequenceWithPredictType = matches[0] // take first sequence as the most suitable
 
@@ -103,6 +104,7 @@ export class TradeCore {
                         const sequenceCopy = {...sequence}
 
                         let symbolsToClarify = [] // create array of promises
+
                         for (let instruction of instructionsToClarify) {
                             const symbolToClarify = sequence[instruction].symbol.replace("/", "");
                             symbolsToClarify.push(this.marketService.getDepth(symbolToClarify))
@@ -112,7 +114,20 @@ export class TradeCore {
                         // update copy of the sequence for next checks
                         for (let i = 0; i < instructionsToClarify.length; i++) {
                             const side = askOrBid(sequenceCopy[instructionsToClarify[i]].action) + "s"
-                            const newValues = this.clarify(clarifiedSymbols[i].content[side], 2)
+
+                            let newValues = this.clarify(clarifiedSymbols[i][side], 2)
+                            // try{
+                            //      newValues = this.clarify(clarifiedSymbols[i].content[side], 2)
+                            // }catch (err){
+                            //     console.log(clarifiedSymbols)
+                            //     for (let a of clarifiedSymbols){
+                            //         console.log(clarifiedSymbols)
+                            //         console.log(a)
+                            //     }
+                            //
+                            //     console.log(err)
+                            // }
+
                             sequenceCopy[instructionsToClarify[i]].price = newValues.averageSellPrice
                             sequenceCopy[instructionsToClarify[i]].actionQty = newValues.averageAmount
                             sequenceCopy[instructionsToClarify[i]].actionQtyInQuote = newValues.averageAmount * newValues.averageSellPrice
@@ -143,7 +158,9 @@ export class TradeCore {
                     }
 
                     // check balance and stop application if the lost after trading is too big
-                    const amount = await this.marketAdapter.getCurrencyBalance(appSettingsOld.binance.params.startCurrency);
+                    const amount = await this.marketAdapter.getCurrencyBalance("USDT");
+                    console.log("AMOUNT: " + amount)
+
                     if (+amount < +stopThresholdValue) {
                         this._status = TRADE_CORE_STATUSES.stop
                         throw new Error("trading stop by stopThresholdValue")
@@ -160,8 +177,8 @@ export class TradeCore {
 
         for (let instructionName of this.instructionsName) {
 
-            console.log(instructionName, sequence[instructionName]) // LOGGER
-            console.log(instructionName + "_amount", amount) // LOGGER
+            // console.log(instructionName, sequence[instructionName]) // LOGGER
+            // console.log(instructionName + "_amount", amount) // LOGGER
 
             if (this._status === TRADE_CORE_STATUSES.run) {
                 const result = await this.tradeInstruction(sequence[instructionName], amount);
@@ -169,8 +186,8 @@ export class TradeCore {
                 if (sequence[instructionName].action === orderAction.sell) fills = +result.cummulativeQuoteQty;
                 amount = +(fills - (fills / _100_PERCENT * appSettings.commissionAmount)).toFixed(8)
 
-                console.log(instructionName + "_result", result) // LOGGER
-                console.log(instructionName + "_executedQty", fills) // LOGGER
+                // console.log(instructionName + "_result", result) // LOGGER
+                // console.log(instructionName + "_executedQty", fills) // LOGGER
 
                 // if quick calculating will entail error with quality amount use string below:
                 // const amount = await BinanceHttpAdapter.getCurrencyBalance(sequence._2_Instruction.currentCurrency);
@@ -205,7 +222,7 @@ export class TradeCore {
     async tradeInstruction(instruction: TradeInstructionType, amount: number) {
 
         const currentCurrency = instruction.currentCurrency
-        const updSymbolsDataSet = this.symbolsDataSet
+        const updSymbolsDataSet = this.symbolsDataSet.get()
         const separatedSymbol = instruction.symbol.split("/")
 
         let targetCurrency
@@ -220,12 +237,11 @@ export class TradeCore {
 
         if (result.type === "error") {
             this.status = TRADE_CORE_STATUSES.stop
-            throw new Error("trading stop by stopThresholdValue")
+            console.log(result.content)
+            throw new Error("trading stop because of error during trading instruction")
         }
         return result.content
     };
-
-
 
 
     async correctTradeResult(sequence: TradeSequenceWithPredictType): Promise<TradeSequenceWithPredictType> {
@@ -292,6 +308,7 @@ export class TradeCore {
             isAllow: isAllow,
         };
     }
+
     correctStartAmount(sequence: any, start: number) {
         let startAmount = start
         let correctedInstructionsNames: Array<"_1_Instruction" | "_2_Instruction" | "_3_Instruction"> = []

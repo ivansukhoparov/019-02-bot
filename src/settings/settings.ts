@@ -19,8 +19,21 @@ export class AppSettings{
     public commissionAmount = 0.1
     public startAmount = 100
     public minStartAmount = 10
-    public thresholdValue = +appSettingsOld.binance.params.thresholdValue;
+    public thresholdValue = 0.1;
 
     public tradeMode: "SPOT"|"MARGIN" = "SPOT"
     public excludeShortFluctuations = true
+
+    public urls: {
+        baseUrl: "https://testnet.binance.vision",
+        websocket: "wss://testnet.binance.vision/ws/"
+    }
+    public keys: {
+        api: "vj32ugTRz4opP9C086t2iHiW6Hinn5nkx3BwMk7vdqGTVvhXphKcjBnJwyUvwJMM",
+        secret: "H9f2TLAyvYFwaFPF08YqJFmXuRkjPbn61QXnENJc1qVm6ozDgregLC0irCTtBMad"
+    }
+
+    constructor(mode:string) {
+
+    }
 }
