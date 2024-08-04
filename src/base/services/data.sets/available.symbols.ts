@@ -1,4 +1,4 @@
-import {MarketHttpAdapterInterface} from "../../interfaces/market.http.adapter.interface";
+import {IMarketHttpAdapter} from "../../interfaces/market.http.adapter.interface";
 import {TickerOutputDataType} from "../../../types/web-soket-binance/input";
 import {symbolMapper} from "../../../types/fetch-binance/mapper";
 import {inject, injectable} from "inversify";
@@ -6,9 +6,9 @@ import {inject, injectable} from "inversify";
 @injectable()
 export class AvailableSymbols {
     private availableSymbols: Array<any> = []
-    protected marketAdapter: MarketHttpAdapterInterface
+    protected marketAdapter: IMarketHttpAdapter
 
-    constructor(@inject("MarketHttpAdapter") marketAdapter: MarketHttpAdapterInterface) {
+    constructor(@inject("MarketHttpAdapter") marketAdapter: IMarketHttpAdapter) {
         this.marketAdapter = marketAdapter
     }
 

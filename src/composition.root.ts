@@ -1,8 +1,8 @@
 import "reflect-metadata"
 import {Container} from "inversify";
-import {HttpAdapterInterface} from "./base/interfaces/http.adapter.interface";
+import {IHttpAdapter} from "./base/interfaces/http.adapter.interface";
 import {FetchAdapter} from "./base/adapters/common/fetch.adapter";
-import {MarketHttpAdapterInterface} from "./base/interfaces/market.http.adapter.interface";
+import {IMarketHttpAdapter} from "./base/interfaces/market.http.adapter.interface";
 import {BinanceHttpAdapter} from "./base/adapters/markets/binance/binance.http.adapter";
 import {IMarketService} from "./base/interfaces/market.service.interface";
 import {MarketService} from "./base/services/market-service";
@@ -21,8 +21,8 @@ export const container = new Container()
 
 
 
- container.bind<HttpAdapterInterface>("HttpAdapter").to(FetchAdapter).inSingletonScope()
- container.bind<MarketHttpAdapterInterface>("MarketHttpAdapter").to(BinanceHttpAdapter).inSingletonScope()
+ container.bind<IHttpAdapter>("HttpAdapter").to(FetchAdapter).inSingletonScope()
+ container.bind<IMarketHttpAdapter>("MarketHttpAdapter").to(BinanceHttpAdapter).inSingletonScope()
 container.bind<IMarketService>('MarketService').to(MarketService).inSingletonScope()
 
  container.bind<AvailableSymbols>(AvailableSymbols).toSelf().inSingletonScope()

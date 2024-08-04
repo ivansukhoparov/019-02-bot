@@ -2,7 +2,7 @@
 import {ApiResponseType, OrderSide} from "../../types/fetch-binance/input";
 import {orderAction, orderQuantity} from "./utils/common";
 import {inject, injectable} from "inversify";
-import {MarketHttpAdapterInterface} from "../interfaces/market.http.adapter.interface";
+import {IMarketHttpAdapter} from "../interfaces/market.http.adapter.interface";
 import {TYPE} from "../../composition.root";
 import {IMarketService} from "../interfaces/market.service.interface";
 import {roundDownNumber} from "./utils/round-down-number";
@@ -10,9 +10,9 @@ import {roundDownNumber} from "./utils/round-down-number";
 @injectable()
 export class MarketService implements IMarketService {
     // Dependencies
-    protected marketAdapter: MarketHttpAdapterInterface
+    protected marketAdapter: IMarketHttpAdapter
 
-    constructor(@inject("MarketHttpAdapter") marketAdapter: MarketHttpAdapterInterface) {
+    constructor(@inject("MarketHttpAdapter") marketAdapter: IMarketHttpAdapter) {
         this.marketAdapter = marketAdapter
     }
 

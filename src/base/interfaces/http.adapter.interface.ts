@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
 
-export interface HttpAdapterInterface {
+export interface IHttpAdapter {
      request(url: string, init?: any):Promise<any>
 }

@@ -1,6 +1,6 @@
 import {ApiResponseType, OrderSide, OrderTypeType} from "../../types/fetch-binance/input";
 
-export interface MarketHttpAdapterInterface {
+export interface IMarketHttpAdapter {
 
 
     getAccountInfo(): Promise<ApiResponseType>

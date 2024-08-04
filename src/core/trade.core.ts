@@ -12,7 +12,7 @@ import {inject, injectable} from "inversify";
 import {appSettings} from "../index";
 import {SymbolsDataSet} from "../base/services/data.sets/symbols.data.set";
 import {SequencesDataSet} from "../base/services/data.sets/sequences.data.set";
-import {MarketHttpAdapterInterface} from "../base/interfaces/market.http.adapter.interface";
+import {IMarketHttpAdapter} from "../base/interfaces/market.http.adapter.interface";
 import {IMarketService} from "../base/interfaces/market.service.interface";
 
 
@@ -33,7 +33,7 @@ export class TradeCore {
     protected symbolsDataSet: SymbolsDataSet
     protected sequencesDataSet: SequencesDataSet
     protected marketService: IMarketService
-    protected marketAdapter: MarketHttpAdapterInterface
+    protected marketAdapter: IMarketHttpAdapter
 
     // States
     private tradeAllowed = true
@@ -43,7 +43,7 @@ export class TradeCore {
 
     constructor(@inject(SymbolsDataSet) symbolsDataSet: SymbolsDataSet,
                 @inject(SequencesDataSet) sequencesDataSet: SequencesDataSet,
-                @inject("MarketHttpAdapter") marketAdapter: MarketHttpAdapterInterface,
+                @inject("MarketHttpAdapter") marketAdapter: IMarketHttpAdapter,
                 @inject("MarketService") marketService: IMarketService,) {
         this.symbolsDataSet = symbolsDataSet
         this.sequencesDataSet = sequencesDataSet

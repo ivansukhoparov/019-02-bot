@@ -1,9 +1,9 @@
 import {appSettingsOld} from "../../../../settings/settings";
 import {AccountBalanceInfoInputType, ApiResponseType, OrderSide, OrderTypeType} from "../../../../types/fetch-binance/input";
 import crypto from "crypto";
-import {MarketHttpAdapterInterface} from "../../../interfaces/market.http.adapter.interface";
+import {IMarketHttpAdapter} from "../../../interfaces/market.http.adapter.interface";
 import {TYPE} from "../../../../composition.root";
-import {HttpAdapterInterface} from "../../../interfaces/http.adapter.interface";
+import {IHttpAdapter} from "../../../interfaces/http.adapter.interface";
 import {inject, injectable} from "inversify";
 
 const API_KEY = appSettingsOld.binance.keys.api;
@@ -11,10 +11,10 @@ const API_SECRET = appSettingsOld.binance.keys.secret;
 const BASE_URL = appSettingsOld.binance.urls.baseUrl;
 
 @injectable()
-export class BinanceHttpAdapter implements MarketHttpAdapterInterface {
-    protected httpAdapter: HttpAdapterInterface
+export class BinanceHttpAdapter implements IMarketHttpAdapter {
+    protected httpAdapter: IHttpAdapter
 
-    constructor(@inject("HttpAdapter") httpAdapter: HttpAdapterInterface) {
+    constructor(@inject("HttpAdapter") httpAdapter: IHttpAdapter) {
         this.httpAdapter = httpAdapter
     }
 

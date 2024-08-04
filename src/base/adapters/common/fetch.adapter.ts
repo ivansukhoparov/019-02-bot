@@ -1,9 +1,9 @@
 import fetch from "node-fetch";
-import {HttpAdapterInterface} from "../../interfaces/http.adapter.interface";
+import {IHttpAdapter} from "../../interfaces/http.adapter.interface";
 import {injectable} from "inversify";
 
 @injectable()
-export class FetchAdapter implements HttpAdapterInterface{
+export class FetchAdapter implements IHttpAdapter{
 
 	 async request(url: string, init?: any):Promise<any> {
 		try {
