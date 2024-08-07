@@ -14,6 +14,8 @@ import {SymbolsDataSet} from "../base/services/data.sets/symbols.data.set";
 import {SequencesDataSet} from "../base/services/data.sets/sequences.data.set";
 import {IMarketHttpAdapter} from "../base/interfaces/market.http.adapter.interface";
 import {IMarketService} from "../base/interfaces/market.service.interface";
+import any = jasmine.any;
+import {ActionTimer} from "../infrastucture/action.timer";
 
 
 export type TradeCoreStatus = "run" | "stop"
@@ -66,6 +68,13 @@ export class TradeCore {
 
     // Use this method to subscribe to websocket
     async onUpdate(marketData: MarketUpdateDataType[]) {
+        // TIMER
+        const processId = new Date().getTime()
+        const fullTimer = new ActionTimer(`process ${processId}`)// TIMER
+        const partTimer = new ActionTimer("part process")// TIMER
+        fullTimer.start()// TIMER
+
+
         // update symbols and sequences data sets according new data
         this.symbolsDataSet.update(marketData);
         this.sequencesDataSet.update();
@@ -78,10 +87,41 @@ export class TradeCore {
             this.tradeAllowed = false  // block code below executing if it had been started to execute
             let sequence: TradeSequenceWithPredictType = matches[0] // take first sequence as the most suitable
 
+            {
+                partTimer.start("getting balance before")// TIMER
+
+                const conis = [
+                    sequence._1_Instruction.symbol.split("/")[0],
+                    sequence._1_Instruction.symbol.split("/")[1],
+                    sequence._2_Instruction.symbol.split("/")[0],
+                    sequence._2_Instruction.symbol.split("/")[1],
+                    sequence._3_Instruction.symbol.split("/")[0],
+                    sequence._3_Instruction.symbol.split("/")[1],]
+                let ddd:Array<any>=[]
+                conis.forEach((el: any) => {
+                    const isInArray = ddd.find((d: any) => el === d)
+                    if (!isInArray) {
+                        ddd.push(el)
+                    }
+
+                })
+
+                Promise.all(ddd.map((el: any) => this.marketAdapter.getCurrencyBalance(el))).then((am)=>{
+                    console.log("++++++++++ before trade -"+ processId +"++++++++++")
+                    for (let i = 0; i < ddd.length; i++) {
+                        console.log(ddd[i] + ": " + am[i])
+                    }
+                    console.log("++++++++++  ++++++++++")
+                })
+                partTimer.stop()// TIMER
+            }
+
             // correct expected result with fresh data if this flag is active in settings
             // use this for excluding short price fluctuations
             if (appSettings.excludeShortFluctuations) {
+                partTimer.start("correcting prices")// TIMER
                 sequence = await this.correctTradeResult(sequence)
+                partTimer.stop()// TIMER
             }
 
             // correct start amount according to available amounts in each sequence step
@@ -109,25 +149,13 @@ export class TradeCore {
                             const symbolToClarify = sequence[instruction].symbol.replace("/", "");
                             symbolsToClarify.push(this.marketService.getDepth(symbolToClarify))
                         }
+                        partTimer.start("clarifying request")// TIMER
                         const clarifiedSymbols = await Promise.all(symbolsToClarify)  // await api response
-
+                        partTimer.stop()
                         // update copy of the sequence for next checks
                         for (let i = 0; i < instructionsToClarify.length; i++) {
                             const side = askOrBid(sequenceCopy[instructionsToClarify[i]].action) + "s"
-
                             let newValues = this.clarify(clarifiedSymbols[i][side], 2)
-                            // try{
-                            //      newValues = this.clarify(clarifiedSymbols[i].content[side], 2)
-                            // }catch (err){
-                            //     console.log(clarifiedSymbols)
-                            //     for (let a of clarifiedSymbols){
-                            //         console.log(clarifiedSymbols)
-                            //         console.log(a)
-                            //     }
-                            //
-                            //     console.log(err)
-                            // }
-
                             sequenceCopy[instructionsToClarify[i]].price = newValues.averageSellPrice
                             sequenceCopy[instructionsToClarify[i]].actionQty = newValues.averageAmount
                             sequenceCopy[instructionsToClarify[i]].actionQtyInQuote = newValues.averageAmount * newValues.averageSellPrice
@@ -152,14 +180,48 @@ export class TradeCore {
 
                     // execute trade sequence in accordance to the trade mode
                     if (appSettings.tradeMode === "SPOT") {
+                        partTimer.start("trading sequence")// TIMER
                         await this.tradeSequenceOnSpot(sequence)
+                        partTimer.stop()// TIMER
                     } else if (appSettings.tradeMode === "MARGIN") {
                         await this.tradeSequenceOnMargin(sequence)
                     }
 
                     // check balance and stop application if the lost after trading is too big
+
+
+                    {
+
+
+                        const conis = [
+                            sequence._1_Instruction.symbol.split("/")[0],
+                            sequence._1_Instruction.symbol.split("/")[1],
+                            sequence._2_Instruction.symbol.split("/")[0],
+                            sequence._2_Instruction.symbol.split("/")[1],
+                            sequence._3_Instruction.symbol.split("/")[0],
+                            sequence._3_Instruction.symbol.split("/")[1],]
+                        let ddd:Array<any>=[]
+                        conis.forEach((el: any) => {
+                            const isInArray = ddd.find((d: any) => el === d)
+                            if (!isInArray) {
+                                ddd.push(el)
+                            }
+                        })
+
+                        Promise.all(ddd.map((el: any) => this.marketAdapter.getCurrencyBalance(el))).then((am)=>{
+                            console.log("++++++++++ after trade -"+ processId +"++++++++++")
+                            for (let i = 0; i < ddd.length; i++) {
+                                console.log(ddd[i] + ": " + am[i])
+                            }
+                            console.log("++++++++++  ++++++++++")
+                        })
+
+                    }
+
+                    console.log("++++++++++ TRADED ++++++++++")
                     const amount = await this.marketAdapter.getCurrencyBalance("USDT");
-                    console.log("AMOUNT: " + amount)
+                    console.log("USDT AMOUNT: " + amount)
+                    console.log("")
 
                     if (+amount < +stopThresholdValue) {
                         this._status = TRADE_CORE_STATUSES.stop
@@ -168,6 +230,7 @@ export class TradeCore {
                 }
             }
             this.tradeAllowed = true  // set flag back to true after all
+            fullTimer.stop()// TIMER
         }
     }
 
