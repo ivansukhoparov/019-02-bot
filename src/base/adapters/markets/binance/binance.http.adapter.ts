@@ -1,4 +1,4 @@
-import {appSettingsOld} from "../../../../settings/settings";
+import {appSettings, AppSettings} from "../../../../settings/settings";
 import {AccountBalanceInfoInputType, ApiResponseType, OrderSide, OrderTypeType} from "../../../../types/fetch-binance/input";
 import crypto from "crypto";
 import {IMarketHttpAdapter} from "../../../interfaces/market.http.adapter.interface";
@@ -6,28 +6,25 @@ import {TYPE} from "../../../../composition.root";
 import {IHttpAdapter} from "../../../interfaces/http.adapter.interface";
 import {inject, injectable} from "inversify";
 
-const API_KEY = appSettingsOld.binance.keys.api;
-const API_SECRET = appSettingsOld.binance.keys.secret;
-const BASE_URL = appSettingsOld.binance.urls.baseUrl;
 
 @injectable()
 export class BinanceHttpAdapter implements IMarketHttpAdapter {
     protected httpAdapter: IHttpAdapter
 
-    constructor(@inject("HttpAdapter") httpAdapter: IHttpAdapter) {
+    constructor(@inject("HttpAdapter") httpAdapter: IHttpAdapter,) {
         this.httpAdapter = httpAdapter
     }
 
     async getAccountInfo(): Promise<ApiResponseType> {
         const data: any = {timestamp: Date.now()};
         const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
-        const signature = this._createSignature(queryString, API_SECRET);
+        const signature = this._createSignature(queryString,appSettings.marketData.secretKey);
 
-        const url = `${BASE_URL}/api/v3/account?${queryString}&signature=${signature}`;
+        const url = `${appSettings.marketData.baseUrl}/api/v3/account?${queryString}&signature=${signature}`;
         const payload = {
             method: "GET",
             headers: {
-                "X-MBX-APIKEY": API_KEY
+                "X-MBX-APIKEY": appSettings.marketData.apiKey
             }
         };
         const response = await this.httpAdapter.request(url, payload);
@@ -37,12 +34,12 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
     async getTickerPrices(): Promise<ApiResponseType> {
         const data: any = {timestamp: Date.now()};
         const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
-        const signature = this._createSignature(queryString, API_SECRET);
-        const url = `${BASE_URL}/api/v3/ticker/price`;
+        const signature = this._createSignature(queryString, appSettings.marketData.secretKey);
+        const url = `${appSettings.marketData.baseUrl}/api/v3/ticker/price`;
         const payload = {
             method: "GET",
             headers: {
-                "X-MBX-APIKEY": API_KEY
+                "X-MBX-APIKEY": appSettings.marketData.apiKey
             }
         };
         const response = await this.httpAdapter.request(url, payload);
@@ -63,13 +60,13 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
             timestamp: Date.now()
         };
         const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
-        const signature = this._createSignature(queryString, API_SECRET);
-        const url = `${BASE_URL}/api/v3/order`;
+        const signature = this._createSignature(queryString, appSettings.marketData.secretKey);
+        const url = `${appSettings.marketData.baseUrl}/api/v3/order`;
 
         const payload = {
             method: "POST",
             headers: {
-                "X-MBX-APIKEY": API_KEY,
+                "X-MBX-APIKEY": appSettings.marketData.apiKey,
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             body: `${queryString}&signature=${signature}`
@@ -81,7 +78,7 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
 
 
     async getAllSymbols(): Promise<ApiResponseType> {
-        const url = `${BASE_URL}/api/v3/exchangeInfo`;
+        const url = `${appSettings.marketData.baseUrl}/api/v3/exchangeInfo`;
         const response = await this.httpAdapter.request(url);
         return this._responseMapper(response)
     }
@@ -109,12 +106,12 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
             timestamp: Date.now()
         };
         const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
-        const signature = this._createSignature(queryString, API_SECRET);
-        const url = `${BASE_URL}/sapi/v1/convert/trade?${queryString}&signature=${signature}`;
+        const signature = this._createSignature(queryString, appSettings.marketData.secretKey);
+        const url = `${appSettings.marketData.baseUrl}/sapi/v1/convert/trade?${queryString}&signature=${signature}`;
         const payload = {
             method: "POST",
             headers: {
-                "X-MBX-APIKEY": API_KEY
+                "X-MBX-APIKEY": appSettings.marketData.apiKey
             }
         };
 
@@ -125,12 +122,12 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
     async getCurrencyBalance(currency: string) {
         const data: any = {timestamp: Date.now()};
         const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
-        const signature = this._createSignature(queryString, API_SECRET);
-        const url = `${BASE_URL}/api/v3/account?${queryString}&signature=${signature}`;
+        const signature = this._createSignature(queryString, appSettings.marketData.secretKey);
+        const url = `${appSettings.marketData.baseUrl}/api/v3/account?${queryString}&signature=${signature}`;
         const payload = {
             method: "GET",
             headers: {
-                "X-MBX-APIKEY": API_KEY
+                "X-MBX-APIKEY": appSettings.marketData.apiKey
             }
         };
 
@@ -145,7 +142,7 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
     }
 
     async getSymbolInfo(symbol: string) {
-        const url = `${BASE_URL}/api/v3/ticker/24hr?symbol=${JSON.stringify(symbol)}`;
+        const url = `${appSettings.marketData.baseUrl}/api/v3/ticker/24hr?symbol=${JSON.stringify(symbol)}`;
 
         const response = await this.httpAdapter.request(url);
         const mappedResponse = this._responseMapper(response)
@@ -156,7 +153,7 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
     }
 
     async getSymbolsInfo(symbols: string[]) {
-        const url = `${BASE_URL}/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`;
+        const url = `${appSettings.marketData.baseUrl}/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`;
 
         const response: any = await this.httpAdapter.request(url);
         const mappedResponse: ApiResponseType = this._responseMapper(response)
@@ -167,7 +164,7 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
     }
 
      async getDepth(symbol: string){
-		const url = `${BASE_URL}/api/v3/depth?symbol=${symbol}&limit=3`;
+		const url = `${appSettings.marketData.baseUrl}/api/v3/depth?symbol=${symbol}&limit=3`;
 		return await this.httpAdapter.request(url);
 	}
 

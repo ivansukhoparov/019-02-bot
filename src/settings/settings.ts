@@ -1,39 +1,52 @@
-import {testSettings} from "./test-settings";
-import {defaultSettings} from "./default-settings";
 import {APP_MODES} from "../base/services/utils/common";
-import {injectable} from "inversify";
 
 require("dotenv").config();
-export const appMode: string = "TEST"
-export let appSettingsOld: typeof defaultSettings;
 
-if (appMode === APP_MODES.test) {
-    appSettingsOld = testSettings;
-} else {
-    appSettingsOld = defaultSettings;
-}
-
-export class AppSettings{
+export class AppSettings {
+    public appMode:string = "TEST"
     public marketName = "Binance"
 
     public commissionAmount = 0.1
-    public startAmount = 100
+    public startAmount = 90
+    public startCurrency: string = "USDT"
     public minStartAmount = 10
-    public thresholdValue = 0.1;
+    public thresholdValue: number =0
+    public stopThreshold: number =0
 
-    public tradeMode: "SPOT"|"MARGIN" = "SPOT"
+    public tradeMode: "SPOT" | "MARGIN" = "SPOT"
     public excludeShortFluctuations = true
 
-    public urls: {
+    public marketData = {
         baseUrl: "https://testnet.binance.vision",
-        websocket: "wss://testnet.binance.vision/ws/"
-    }
-    public keys: {
-        api: "vj32ugTRz4opP9C086t2iHiW6Hinn5nkx3BwMk7vdqGTVvhXphKcjBnJwyUvwJMM",
-        secret: "H9f2TLAyvYFwaFPF08YqJFmXuRkjPbn61QXnENJc1qVm6ozDgregLC0irCTtBMad"
+        websocket: "wss://testnet.binance.vision/ws/",
+        apiKey: "vj32ugTRz4opP9C086t2iHiW6Hinn5nkx3BwMk7vdqGTVvhXphKcjBnJwyUvwJMM",
+        secretKey: "H9f2TLAyvYFwaFPF08YqJFmXuRkjPbn61QXnENJc1qVm6ozDgregLC0irCTtBMad"
     }
 
-    constructor(mode:string) {
+    constructor() {
+        const appMode = process.env.APP_MODE
+        if (appMode === APP_MODES.test || appMode === APP_MODES.prod){
+            this.appMode=appMode
+        }else{
+            throw new Error("undefined app mode")
+        }
+        this.marketName = process.env.MARKET!
+        this.startCurrency = process.env.START_CURRENCY!
+        this.thresholdValue = +process.env[this.appMode + "_THRESHOLD_VALUE"]!
+        this.stopThreshold = +process.env[this.appMode + "_STOP_THRESHOLD"]!
 
+        this.marketData.baseUrl = process.env[this.appMode + "_BASE_URL"]!
+        this.marketData.websocket = process.env[this.appMode + "_WEBSOCKET"]!
+        this.marketData.apiKey = process.env[this.appMode + "_API_KEY"]!
+        this.marketData.secretKey = process.env[this.appMode + "_SECRET_KEY"]!
+
+        this.marketData.secretKey = process.env[this.appMode + "_SECRET_KEY"]!
+        this.marketData.secretKey = process.env[this.appMode + "_SECRET_KEY"]!
+        this.marketData.secretKey = process.env[this.appMode + "_SECRET_KEY"]!
+        this.marketData.secretKey = process.env[this.appMode + "_SECRET_KEY"]!
+
+        console.log(this.appMode)
     }
 }
+
+export const appSettings = new AppSettings()

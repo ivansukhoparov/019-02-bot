@@ -7,15 +7,14 @@ import {
 import {orderAction} from "../base/services/utils/common";
 import {MarketUpdateDataType} from "../types/web-soket-binance/output";
 import {askOrBid} from "../base/services/utils/utils";
-import {appSettingsOld} from "../settings/settings";
 import {inject, injectable} from "inversify";
-import {appSettings} from "../index";
 import {SymbolsDataSet} from "../base/services/data.sets/symbols.data.set";
 import {SequencesDataSet} from "../base/services/data.sets/sequences.data.set";
 import {IMarketHttpAdapter} from "../base/interfaces/market.http.adapter.interface";
 import {IMarketService} from "../base/interfaces/market.service.interface";
 import any = jasmine.any;
 import {ActionTimer} from "../infrastucture/action.timer";
+import {appSettings} from "../settings/settings";
 
 
 export type TradeCoreStatus = "run" | "stop"
@@ -26,7 +25,7 @@ export const TRADE_CORE_STATUSES: { [T: string]: TradeCoreStatus } = {
 
 const _100_PERCENT: 100 = 100
 
-let thresholdValue = +appSettingsOld.binance.params.thresholdValue;
+let thresholdValue = appSettings.thresholdValue;
 let stopThresholdValue = 0
 
 @injectable()

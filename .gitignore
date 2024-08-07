@@ -16,4 +16,5 @@ logs
 npm-debug.*
 Thumbs.db
 .env
+.test-env
 start.bat

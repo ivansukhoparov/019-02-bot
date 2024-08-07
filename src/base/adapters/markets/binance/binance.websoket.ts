@@ -1,16 +1,16 @@
 import WebSocket from "ws";
-
-import {appMode} from "../../../../settings/settings";
 import {APP_MODES} from "../../../services/utils/common";
 import {MarketUpdateDataType} from "../../../../types/web-soket-binance/output";
 import {marketDataMapper} from "../../../../types/web-soket-binance/mapper";
 import {TradeCore} from "../../../../core/trade.core";
 
+import {appSettings} from "../../../../settings/settings";
+
 
 let combinedStreamsUrl: string
 
 
-if (appMode === APP_MODES.test) {
+if (appSettings.appMode === APP_MODES.test) {
     combinedStreamsUrl = "wss://testnet.binance.vision/ws/!ticker@arr"
 } else {
     const streamNames = ["!ticker@arr"];
@@ -29,7 +29,7 @@ export const wsUpdate = (tradeCore:TradeCore) => {
         try {
 
             let marketData = JSON.parse(e.data.toString());
-            if (appMode !== APP_MODES.test) marketData = marketData.data
+            if (appSettings.appMode !== APP_MODES.test) marketData = marketData.data
             const mappedMarketData: MarketUpdateDataType[] = marketData.map(marketDataMapper)
             await tradeCore.onUpdate(mappedMarketData)
         } catch (error) {
