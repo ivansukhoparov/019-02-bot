@@ -1,10 +1,18 @@
 import {appSettings, AppSettings} from "../../../../settings/settings";
-import {AccountBalanceInfoInputType, ApiResponseType, OrderSide, OrderTypeType} from "../../../../types/fetch-binance/input";
+import {
+    AccountBalanceInfoInputType,
+    ApiResponseType,
+    OrderSide,
+    OrderTypeType,
+    ResponseType
+} from "../../../../types/fetch-binance/input";
 import crypto from "crypto";
 import {IMarketHttpAdapter} from "../../../interfaces/market.http.adapter.interface";
 import {TYPE} from "../../../../composition.root";
 import {IHttpAdapter} from "../../../interfaces/http.adapter.interface";
 import {inject, injectable} from "inversify";
+import {GetAllSymbolsOutputType} from "../../../../types/http-adapter/binance/get.all.symbols.types/output";
+import {getAllSymbolsBinanceMapper} from "../../../../types/http-adapter/binance/get.all.symbols.types/binance.mapper";
 
 
 @injectable()
@@ -77,10 +85,14 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
     }
 
 
-    async getAllSymbols(): Promise<ApiResponseType> {
+    async getAllSymbols(): Promise<ResponseType<Array<GetAllSymbolsOutputType>>> {
         const url = `${appSettings.marketData.baseUrl}/api/v3/exchangeInfo`;
-        const response = await this.httpAdapter.request(url);
-        return this._responseMapper(response)
+        const rawResponse = await this.httpAdapter.request(url);
+        const response:ApiResponseType =  this._responseMapper(rawResponse)
+        if (response.type==="success"){
+            response.content = response.content.symbols.map(getAllSymbolsBinanceMapper)
+        }
+        return response
     }
 
     async getAllAvailableTickers() {
@@ -198,6 +210,5 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
             };
         }
     }
-
 }
 

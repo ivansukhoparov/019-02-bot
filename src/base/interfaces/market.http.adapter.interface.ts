@@ -1,4 +1,5 @@
-import {ApiResponseType, OrderSide, OrderTypeType} from "../../types/fetch-binance/input";
+import {ApiResponseType, OrderSide, OrderTypeType, ResponseType} from "../../types/fetch-binance/input";
+import {GetAllSymbolsOutputType} from "../../types/http-adapter/binance/get.all.symbols.types/output";
 
 export interface IMarketHttpAdapter {
 
@@ -13,7 +14,7 @@ export interface IMarketHttpAdapter {
                side: OrderSide,
                type?: OrderTypeType): Promise<ApiResponseType>
 
-    getAllSymbols(): Promise<ApiResponseType>
+    getAllSymbols():  Promise<ResponseType<Array<GetAllSymbolsOutputType>>>
 
     getAllAvailableTickers(): Promise<any>
 

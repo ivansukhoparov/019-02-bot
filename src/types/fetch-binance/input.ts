@@ -148,6 +148,10 @@ export type ApiResponseType = {
     content: ResponseErrorType | any
 }
 
+export type ResponseType<T> = {
+    type: "error" | "success"
+    content: ResponseErrorType | T
+}
 
 export type QuantityType = "quantity" | "quoteOrderQty"
 

@@ -2,6 +2,8 @@ import {IMarketHttpAdapter} from "../../interfaces/market.http.adapter.interface
 import {TickerOutputDataType} from "../../../types/web-soket-binance/input";
 import {symbolMapper} from "../../../types/fetch-binance/mapper";
 import {inject, injectable} from "inversify";
+import {ResponseType} from "../../../types/fetch-binance/input";
+import {GetAllSymbolsOutputType} from "../../../types/http-adapter/binance/get.all.symbols.types/output";
 
 @injectable()
 export class AvailableSymbols {
@@ -14,15 +16,22 @@ export class AvailableSymbols {
 
     async init() {
         // Get all symbols and all prices
-        const allSymbolsPromise = this.marketAdapter.getAllSymbols();
+        const allSymbolsPromise: Promise<ResponseType<Array<GetAllSymbolsOutputType>>>  = this.marketAdapter.getAllSymbols();
         const allPricesPromise = this.marketAdapter.getTickerPrices();
         // const [allSymbols, allPrices] = await
 
         const [allSymbols, allPrices] = await Promise.all([allSymbolsPromise, allPricesPromise])
 
-        const symbols: TickerOutputDataType[] = allSymbols.content.symbols
-            .filter((el: any) => el.status === "TRADING")
-            .map(symbolMapper);
+        let  symbols: TickerOutputDataType[]
+
+        if (Array.isArray(allSymbols.content)){
+             symbols = allSymbols.content
+                .filter((el: any) => el.status === "TRADING")
+                .map(symbolMapper);
+        }else {
+            throw new Error("")
+        }
+
 
 
         //
