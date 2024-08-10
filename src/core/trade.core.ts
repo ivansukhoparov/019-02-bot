@@ -12,8 +12,6 @@ import {SymbolsDataSet} from "../base/services/data.sets/symbols.data.set";
 import {SequencesDataSet} from "../base/services/data.sets/sequences.data.set";
 import {IMarketHttpAdapter} from "../base/interfaces/market.http.adapter.interface";
 import {IMarketService} from "../base/interfaces/market.service.interface";
-import any = jasmine.any;
-import {ActionTimer} from "../infrastucture/action.timer";
 import {appSettings} from "../settings/settings";
 
 
@@ -101,7 +99,7 @@ export class TradeCore {
                 if (correctedAmounts.startAmount < appSettings.minStartAmount || correctedProfit < appSettings.thresholdValue) {
                     // define sequence's steps to clarify
                     const instructionsToClarify = correctedAmounts.correctedInstructionsNames
-
+                    console.log("instructionsToClarify", instructionsToClarify)
                     // clarify if there is anything to clarify
                     if (instructionsToClarify.length > 0) {
                         const sequenceCopy = {...sequence}
@@ -112,10 +110,14 @@ export class TradeCore {
                             const symbolToClarify = sequence[instruction].symbol.replace("/", "");
                             symbolsToClarify.push(this.marketService.getDepth(symbolToClarify))
                         }
+                        console.log("symbolsToClarify", symbolsToClarify)
                         const clarifiedSymbols = await Promise.all(symbolsToClarify)  // await api response
+                        console.log("clarifiedSymbols", clarifiedSymbols)
                         // update copy of the sequence for next checks
                         for (let i = 0; i < instructionsToClarify.length; i++) {
                             const side = askOrBid(sequenceCopy[instructionsToClarify[i]].action) + "s"
+
+                            console.log("clarifiedSymbols[i][side]", clarifiedSymbols[i][side])
                             let newValues = this.clarify(clarifiedSymbols[i][side], 2)
                             sequenceCopy[instructionsToClarify[i]].price = newValues.averageSellPrice
                             sequenceCopy[instructionsToClarify[i]].actionQty = newValues.averageAmount
@@ -139,7 +141,8 @@ export class TradeCore {
                 console.log("++++++++++ SEQUENCE ++++++++++")
                 console.log(sequence)
                 console.log("++++++++++   ++++++++++")
-
+                console.log(this.startAmount, appSettings.minStartAmount, correctedProfit, appSettings.thresholdValue)
+                console.log(this.startAmount >= appSettings.minStartAmount && correctedProfit > appSettings.thresholdValue)
                 // trade sequence if start amount or expected profit meet the parameters
                 if (this.startAmount >= appSettings.minStartAmount && correctedProfit > appSettings.thresholdValue) {
 
@@ -159,7 +162,7 @@ export class TradeCore {
                             sequence._2_Instruction.symbol.split("/")[1],
                             sequence._3_Instruction.symbol.split("/")[0],
                             sequence._3_Instruction.symbol.split("/")[1],]
-                        let ddd:Array<any>=[]
+                        let ddd: Array<any> = []
                         conis.forEach((el: any) => {
                             const isInArray = ddd.find((d: any) => el === d)
                             if (!isInArray) {
@@ -167,8 +170,8 @@ export class TradeCore {
                             }
                         })
 
-                        Promise.all(ddd.map((el: any) => this.marketAdapter.getCurrencyBalance(el))).then((am)=>{
-                            console.log("++++++++++ after trade -"+ "processId" +"++++++++++")
+                        Promise.all(ddd.map((el: any) => this.marketAdapter.getCurrencyBalance(el))).then((am) => {
+                            console.log("++++++++++ after trade -" + "processId" + "++++++++++")
                             for (let i = 0; i < ddd.length; i++) {
                                 console.log(ddd[i] + ": " + am[i])
                             }
@@ -440,7 +443,7 @@ export class TradeCore {
     clarify(arr: any[], depth: number) {
         let totalCost = 0
         let totalAmount = 0
-
+        console.log("arr", arr)
         for (let i = 0; i < depth; i++) {
             totalAmount += +arr[i][1]
             totalCost += +arr[i][0] * +arr[i][1]

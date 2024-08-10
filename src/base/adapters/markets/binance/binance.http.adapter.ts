@@ -177,7 +177,10 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
 
      async getDepth(symbol: string){
 		const url = `${appSettings.marketData.baseUrl}/api/v3/depth?symbol=${symbol}&limit=3`;
-		return await this.httpAdapter.request(url);
+        const result = await this.httpAdapter.request(url);
+         console.log("getDepth for", symbol)
+        console.log(result)
+		return result
 	}
 
     _createQueryFilter(...filters: any) {

@@ -54,7 +54,14 @@ export class MarketService implements IMarketService {
         // 	}
         // }
         const totalAmount: number = +amount.toFixed(8)
+        console.log("============= order info");
+        console.log(symbolName, quantityType, totalAmount, side);
+        console.log(symbol.filters);
+
         const result = await this.marketAdapter.placeOrder(symbolName, quantityType, totalAmount, side);
+        console.log("============= ");
+        console.log(result.type);
+        console.log("============= order info - end");
         return result
     }
 
