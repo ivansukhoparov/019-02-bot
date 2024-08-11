@@ -4,12 +4,12 @@ require("dotenv").config();
 
 export class AppSettings {
     public appMode:string = "TEST"
-    public marketName = "Binance"
+    public marketName:string = "BINANCE"
 
-    public commissionAmount = 0.1
-    public startAmount = 90
+    public commissionAmount:number = 0.1
+    public startAmount:number = 90
     public startCurrency: string = "USDT"
-    public minStartAmount = 10
+    public minStartAmount:number = 10
     public thresholdValue: number =0
     public stopThreshold: number =0
 
@@ -17,11 +17,12 @@ export class AppSettings {
     public excludeShortFluctuations = true
 
     public marketData = {
-        baseUrl: "https://testnet.binance.vision",
+        baseUrl: "https://api.huobi.pro",
         websocket: "wss://testnet.binance.vision/ws/",
         apiKey: "vj32ugTRz4opP9C086t2iHiW6Hinn5nkx3BwMk7vdqGTVvhXphKcjBnJwyUvwJMM",
         secretKey: "H9f2TLAyvYFwaFPF08YqJFmXuRkjPbn61QXnENJc1qVm6ozDgregLC0irCTtBMad"
     }
+
 
     constructor() {
         const appMode = process.env.APP_MODE
@@ -31,19 +32,17 @@ export class AppSettings {
             throw new Error("undefined app mode")
         }
         this.marketName = process.env.MARKET!
+
+        const prefix = this.marketName+"_"+this.appMode
+
         this.startCurrency = process.env.START_CURRENCY!
         this.thresholdValue = +process.env[this.appMode + "_THRESHOLD_VALUE"]!
         this.stopThreshold = +process.env[this.appMode + "_STOP_THRESHOLD"]!
 
-        this.marketData.baseUrl = process.env[this.appMode + "_BASE_URL"]!
-        this.marketData.websocket = process.env[this.appMode + "_WEBSOCKET"]!
-        this.marketData.apiKey = process.env[this.appMode + "_API_KEY"]!
-        this.marketData.secretKey = process.env[this.appMode + "_SECRET_KEY"]!
-
-        this.marketData.secretKey = process.env[this.appMode + "_SECRET_KEY"]!
-        this.marketData.secretKey = process.env[this.appMode + "_SECRET_KEY"]!
-        this.marketData.secretKey = process.env[this.appMode + "_SECRET_KEY"]!
-        this.marketData.secretKey = process.env[this.appMode + "_SECRET_KEY"]!
+        this.marketData.baseUrl = process.env[prefix + "_BASE_URL"]!
+        this.marketData.websocket = process.env[prefix + "_WEBSOCKET"]!
+        this.marketData.apiKey = process.env[prefix + "_API_KEY"]!
+        this.marketData.secretKey = process.env[prefix + "_SECRET_KEY"]!
 
         console.log(this.appMode)
     }
