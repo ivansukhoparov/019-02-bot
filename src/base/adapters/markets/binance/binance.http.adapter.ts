@@ -43,7 +43,7 @@ export class BinanceHttpAdapter implements IMarketHttpAdapter {
         const data: any = {timestamp: Date.now()};
         const queryString = Object.keys(data).map(key => `${key}=${data[key]}`).join("&");
         const signature = this._createSignature(queryString, appSettings.marketData.secretKey);
-        const url = `${appSettings.marketData.baseUrl}/api/v3/ticker/price`;
+        const url = `${appSettings.marketData.baseUrl}/api/v3/ticker/price`; //https://testnet.binance.vision/api/v3/ticker/price
         const payload = {
             method: "GET",
             headers: {
